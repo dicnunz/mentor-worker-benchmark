@@ -58,7 +58,10 @@ class OllamaClient:
 
         return OllamaServerStatus(
             False,
-            "Ollama server is not running. Start the Ollama desktop app or run `ollama serve`.",
+            (
+                "Ollama server is not running. Start the Ollama desktop app, "
+                "or run `ollama serve` in a separate terminal, then retry."
+            ),
         )
 
     @staticmethod
@@ -89,7 +92,8 @@ class OllamaClient:
             response.raise_for_status()
         except requests.RequestException as exc:
             raise RuntimeError(
-                "Failed to query local models. Ensure Ollama is running at http://localhost:11434."
+                "Failed to query local models at http://localhost:11434. "
+                "Start Ollama Desktop or run `ollama serve`, then retry."
             ) from exc
 
         payload = response.json()
@@ -181,7 +185,8 @@ class OllamaClient:
             response.raise_for_status()
         except requests.RequestException as exc:
             raise RuntimeError(
-                f"Ollama chat request failed for model `{model}`. Ensure the model is available and server is healthy."
+                f"Ollama chat request failed for model `{model}`. "
+                "Confirm Ollama is running (`ollama serve`) and the model is pulled (`ollama list`)."
             ) from exc
 
         body = response.json()

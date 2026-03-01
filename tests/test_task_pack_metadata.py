@@ -1,4 +1,5 @@
 from mentor_worker_benchmark.tasks.task_pack_v1.pack import read_pack_metadata
+from mentor_worker_benchmark.tasks.task_pack_v1.validate import validate_task_pack
 
 
 def test_task_pack_v1_counts() -> None:
@@ -24,3 +25,8 @@ def test_task_pack_v1_categories() -> None:
     }
 
     assert set(metadata["categories"]) == expected
+
+
+def test_task_pack_v1_schema_validation() -> None:
+    ok, errors = validate_task_pack()
+    assert ok, f"task pack validation failed: {errors}"

@@ -1,7 +1,10 @@
-.PHONY: setup lock generate-pack sanity run-quick run-dev run-test run-all leaderboard compare lint test
+.PHONY: setup quick lock generate-pack sanity run-quick run-dev run-test run-all leaderboard compare lint test
 
 setup:
 	python -m mentor_worker_benchmark setup
+
+quick:
+	python -m mentor_worker_benchmark run --suite quick --repro
 
 lock:
 	. .venv/bin/activate && pip-compile --generate-hashes --output-file requirements.lock requirements.in

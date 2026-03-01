@@ -1,0 +1,140 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "mentor-worker-benchmark task pack v1 metadata",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "pack_name",
+    "pack_version",
+    "generator_seed",
+    "categories",
+    "counts",
+    "category_counts",
+    "tasks"
+  ],
+  "properties": {
+    "pack_name": {
+      "type": "string",
+      "const": "task_pack_v1"
+    },
+    "pack_version": {
+      "type": "string"
+    },
+    "generator_seed": {
+      "type": "integer"
+    },
+    "categories": {
+      "type": "array",
+      "minItems": 6,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "enum": [
+          "string_regex_parsing",
+          "ds_algo",
+          "file_io_serialization",
+          "concurrency_basics",
+          "numerical_edge_cases",
+          "multi_file_mini_module"
+        ]
+      }
+    },
+    "counts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "total",
+        "train",
+        "dev",
+        "test",
+        "quick"
+      ],
+      "properties": {
+        "total": {
+          "type": "integer",
+          "const": 300
+        },
+        "train": {
+          "type": "integer",
+          "const": 200
+        },
+        "dev": {
+          "type": "integer",
+          "const": 50
+        },
+        "test": {
+          "type": "integer",
+          "const": 50
+        },
+        "quick": {
+          "type": "integer",
+          "const": 18
+        }
+      }
+    },
+    "category_counts": {
+      "type": "object"
+    },
+    "tasks": {
+      "type": "array",
+      "minItems": 300,
+      "maxItems": 300,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "task_id",
+          "title",
+          "category",
+          "difficulty",
+          "split",
+          "quick",
+          "path"
+        ],
+        "properties": {
+          "task_id": {
+            "type": "string",
+            "pattern": "^v1_[a-z_]+_[0-9]{3}$"
+          },
+          "title": {
+            "type": "string"
+          },
+          "category": {
+            "type": "string",
+            "enum": [
+              "string_regex_parsing",
+              "ds_algo",
+              "file_io_serialization",
+              "concurrency_basics",
+              "numerical_edge_cases",
+              "multi_file_mini_module"
+            ]
+          },
+          "difficulty": {
+            "type": "string",
+            "enum": [
+              "easy",
+              "medium",
+              "hard"
+            ]
+          },
+          "split": {
+            "type": "string",
+            "enum": [
+              "train",
+              "dev",
+              "test"
+            ]
+          },
+          "quick": {
+            "type": "boolean"
+          },
+          "path": {
+            "type": "string",
+            "pattern": "^tasks/v1_[a-z_]+_[0-9]{3}$"
+          }
+        }
+      }
+    }
+  }
+}

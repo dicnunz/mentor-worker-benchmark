@@ -1,79 +1,35 @@
 # mentor-worker-benchmark
 
-A fully local benchmark for evaluating whether a **mentor LLM** improves a **worker LLM** on objective coding tasks.
+`mentor-worker-benchmark` is a fully local benchmark for measuring whether a **mentor LLM** improves a **worker LLM** on objective coding tasks.
 
-- Inference: [Ollama](https://ollama.com/) (local/free runtime)
-- Scoring: objective `pytest` pass/fail only
-- Task corpus: versioned/generated `task_pack_v1` (300 tasks)
-- Artifacts:
-  - `results/results.json`
-  - `results/leaderboard.md`
-  - `results/schema.md`
+- Inference is local via [Ollama](https://ollama.com/) (no paid APIs required).
+- Scoring is objective: generated patches are applied, then `pytest` decides pass/fail.
+- Outputs are reproducible artifacts (`results.json`, markdown leaderboard, optional static docs page).
 
-## Why this benchmark is harder to game
+## Motivation
 
-### Deterministic execution (repro mode)
+Many “AI collaboration” evaluations are hard to verify and easy to game. This project tests a narrower, auditable question:
 
-`--repro` enforces fixed generation parameters and deterministic ordering:
+> When a mentor can only send natural-language guidance, does the worker solve more tasks than the worker alone?
 
-- `temperature=0`
-- `top_p=1`
-- fixed seeded calls
-- fixed max tokens (worker + mentor)
-- fixed max turns (`2`)
+The benchmark includes controls and ablations (baseline worker-only and dummy-mentor control), plus guardrails against mentor cheating and unsafe patches.
 
-The run artifact logs environment/provenance for reproducibility:
+## What It Measures (And What It Doesn’t)
 
-- Python version/executable
-- platform info
-- Ollama CLI version
-- selected model tags from Ollama
-- git commit + dirty state
+What it measures:
+- Task success rate on objective Python microtasks with unit tests.
+- Mentorship lift: mentored pass rate minus worker-only baseline.
+- Control performance with non-informative mentor advice.
+- Mentor constraint violation rate.
 
-### Stronger controls and ablations
+What it does not measure:
+- Open-ended coding quality beyond test coverage.
+- Subjective style or readability judgments.
+- Real-world long-horizon software engineering workflows.
 
-Run modes:
+## Task Pack and Splits
 
-- `worker_only` (baseline)
-- `mentor_worker` (standard mentored loop)
-- `mentor_only_suggestion_noise` (dummy mentor control)
-- `stronger_worker` (adds larger local worker if available)
-- `mentor_swap` (explicit mentor cross-worker matrix mode)
-
-### Mentor anti-cheating guardrails
-
-Mentor outputs are validated and filtered before the worker sees them.
-Violations include:
-
-- fenced code blocks (especially long blocks)
-- unified diff markers
-- file headers
-- imports
-- function/class definitions
-
-On violation, the original output is blocked and replaced with short natural-language guidance.
-Original violating output is logged under `violations` in `results.json` for auditability.
-
-### Patch and runtime safety
-
-- worker patch must be valid unified diff
-- patch paths are checked for traversal/unsafe targets
-- tests run in isolated temp dirs
-- per-task pytest timeout enforced
-- test subprocesses run with network disabled
-
-## Task pack
-
-`task_pack_v1` is deterministic and versioned.
-
-- Total: `300` tasks
-- Splits:
-  - `train`: `200`
-  - `dev`: `50`
-  - `test`: `50`
-- `quick`: `18` balanced eval tasks
-
-Categories:
+`task_pack_v1` contains 300 deterministic tasks across 6 categories:
 
 1. `string_regex_parsing`
 2. `ds_algo`
@@ -82,74 +38,135 @@ Categories:
 5. `numerical_edge_cases`
 6. `multi_file_mini_module`
 
-Regenerate pack:
+Splits:
+- `train`: 200
+- `dev`: 50
+- `test`: 50
+- `quick`: 18 balanced eval tasks
 
-```bash
-python -m mentor_worker_benchmark.tasks.task_pack_v1.generate_task_pack --seed 1337
-```
+Default benchmark behavior runs `dev+test` unless overridden.
 
-## Setup
+## Install
 
-Python 3.11+ required.
+Python 3.11+ is required.
 
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -e .
 pip install -r requirements.lock
+```
+
+## Local Setup (Ollama)
+
+```bash
 python -m mentor_worker_benchmark setup
 ```
 
-Default model set:
-
+Default models (pulled if missing):
 - `llama3.1:8b`
 - `qwen2.5-coder:7b`
 - `mistral:7b`
 - `phi3:mini`
 - `gemma2:9b`
 
-## Reproduce exactly (recommended)
+If Ollama is installed but not running, start it with the desktop app or:
 
-Quick reproducible run:
+```bash
+ollama serve
+```
+
+## Reproducible Run (Recommended)
+
+Run quick suite in reproducibility mode:
 
 ```bash
 python -m mentor_worker_benchmark run \
-  --models phi3:mini \
   --task-pack task_pack_v1 \
   --suite quick \
+  --models phi3:mini \
+  --run-modes worker_only,mentor_worker,mentor_only_suggestion_noise \
   --repro \
   --seed 1337 \
-  --run-modes worker_only,mentor_worker,mentor_only_suggestion_noise \
   --results-path results/results.json
 ```
 
-Sanity-check all task starters (no model calls):
+`--repro` fixes key generation/runtime settings (temperature, top_p, seeds, max tokens, max turns).
+
+## Sanity Check (No Model Calls)
+
+Validate task harness and starters without Ollama:
 
 ```bash
-python -m mentor_worker_benchmark sanity --task-pack task_pack_v1 --suite all --seed 1337
+python -m mentor_worker_benchmark sanity --task-pack task_pack_v1 --suite quick --seed 1337
+python -m mentor_worker_benchmark.tasks.task_pack_v1.validate
 ```
 
 ## CLI
 
 ```bash
 python -m mentor_worker_benchmark setup [--models default|m1,m2] [--skip-pull]
-python -m mentor_worker_benchmark run [--suite quick|dev|test|all] [--repro] [--run-modes ...]
-python -m mentor_worker_benchmark sanity [--suite quick|dev|test|all]
+python -m mentor_worker_benchmark run [--task-pack task_pack_v1] [--suite quick|dev|test|all] [--repro]
+python -m mentor_worker_benchmark sanity [--task-pack task_pack_v1] [--suite quick|dev|test|all]
 python -m mentor_worker_benchmark leaderboard --results results/results.json --output results/leaderboard.md
-python -m mentor_worker_benchmark compare --before old.json --after new.json
+python -m mentor_worker_benchmark compare --before before.json --after after.json
 ```
 
-## Reporting
+Convenience:
 
-`results/leaderboard.md` includes:
+```bash
+make setup
+make quick
+```
 
-- Top mentors by average lift
-- Top workers baseline vs mentored vs control
-- Per-category breakdown
-- Mentor/worker pair matrix with mentor violation rate
+## Example Leaderboard Snippet
 
-`results/schema.md` documents `results.json` fields.
+```md
+## Best Mentors
+| Mentor | Avg Lift | Mentored Pass Rate | Violation Rate |
+| --- | --- | --- | --- |
+| phi3:mini | 0.00% | 0.00% | 0.00% |
+
+## Best Workers
+| Worker | Baseline | Mentored | Control | Lift |
+| --- | --- | --- | --- | --- |
+| phi3:mini | 0.00% | 0.00% | 0.00% | 0.00% |
+```
+
+Generated files:
+- `results/results.json`
+- `results/leaderboard.md`
+- `docs/index.html` (optional GitHub Pages view)
+
+## Lightweight Leaderboard Publishing
+
+Generate markdown + static HTML:
+
+```bash
+python scripts/publish_leaderboard.py \
+  --results results/results.json \
+  --markdown-out results/leaderboard.md \
+  --html-out docs/index.html
+```
+
+Enable GitHub Pages (repo settings):
+1. Open **Settings → Pages**.
+2. Set **Source** to “Deploy from a branch”.
+3. Select `main` branch and `/docs` folder.
+4. Save. GitHub publishes `docs/index.html`.
+
+## Methodology Guardrails
+
+- Mentor can only send natural-language guidance; code-like mentor output is blocked/sanitized and logged.
+- Worker must return a unified diff patch; patch format and paths are validated.
+- Patch application forbids traversal outside the task workspace.
+- Tests run in isolated temp directories with per-task timeout and network disabled.
+- Run metadata logs environment and provenance (Python, platform, Ollama version/model tags, git commit hash).
+
+## Adding or Updating Tasks
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for task authoring standards, split rules, and validation commands.
 
 ## License
 
-MIT
+MIT ([LICENSE](LICENSE))

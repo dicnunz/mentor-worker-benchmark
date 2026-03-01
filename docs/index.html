@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Mentor Worker Benchmark Leaderboard</title>
+  <style>
+    :root {
+      --bg: #f7f8fa;
+      --card: #ffffff;
+      --text: #1f2430;
+      --muted: #5c667a;
+      --line: #dde3ee;
+      --accent: #0f5cc0;
+    }
+    body {
+      margin: 0;
+      font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: radial-gradient(circle at 0% 0%, #e9eef8 0, var(--bg) 45%);
+      color: var(--text);
+    }
+    main {
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 2rem 1rem 3rem;
+    }
+    h1 { margin: 0 0 0.5rem; font-size: 1.9rem; }
+    .meta { color: var(--muted); margin-bottom: 1.5rem; }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 1rem;
+      margin: 0 0 1rem;
+      overflow-x: auto;
+      box-shadow: 0 3px 12px rgba(15, 34, 68, 0.06);
+    }
+    table { border-collapse: collapse; width: 100%; min-width: 600px; }
+    th, td { border-bottom: 1px solid var(--line); text-align: left; padding: 0.55rem; font-size: 0.92rem; }
+    th { color: var(--muted); font-weight: 600; }
+    td { color: var(--text); }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Mentor Worker Benchmark</h1>
+    <div class="meta">Generated: 2026-03-01T05:36:36.328447+00:00 | Runs: 54 | Wall time: 572.0695s</div>
+
+    <section class="card">
+      <h2>Best Mentors</h2>
+      <table><thead><tr><th>Mentor</th><th>Avg Lift</th><th>Mentored Pass Rate</th><th>Violation Rate</th></tr></thead><tbody><tr><td>phi3:mini</td><td>0.00%</td><td>0.00%</td><td>0.00%</td></tr></tbody></table>
+    </section>
+
+    <section class="card">
+      <h2>Best Workers</h2>
+      <table><thead><tr><th>Worker</th><th>Baseline</th><th>Mentored</th><th>Control</th><th>Lift</th></tr></thead><tbody><tr><td>phi3:mini</td><td>0.00%</td><td>0.00%</td><td>0.00%</td><td>0.00%</td></tr></tbody></table>
+    </section>
+
+    <section class="card">
+      <h2>Per-Category Breakdown</h2>
+      <table><thead><tr><th>Category</th><th>Baseline</th><th>Mentored</th><th>Control</th><th>Lift</th></tr></thead><tbody><tr><td>concurrency_basics</td><td>0.00%</td><td>0.00%</td><td>0.00%</td><td>0.00%</td></tr>
+<tr><td>ds_algo</td><td>0.00%</td><td>0.00%</td><td>0.00%</td><td>0.00%</td></tr>
+<tr><td>file_io_serialization</td><td>0.00%</td><td>0.00%</td><td>0.00%</td><td>0.00%</td></tr>
+<tr><td>multi_file_mini_module</td><td>0.00%</td><td>0.00%</td><td>0.00%</td><td>0.00%</td></tr>
+<tr><td>numerical_edge_cases</td><td>0.00%</td><td>0.00%</td><td>0.00%</td><td>0.00%</td></tr>
+<tr><td>string_regex_parsing</td><td>0.00%</td><td>0.00%</td><td>0.00%</td><td>0.00%</td></tr></tbody></table>
+    </section>
+
+    <p class="meta">Generated from <code>results/results.json</code>. Markdown version: <a href="../results/leaderboard.md">results/leaderboard.md</a></p>
+  </main>
+</body>
+</html>
