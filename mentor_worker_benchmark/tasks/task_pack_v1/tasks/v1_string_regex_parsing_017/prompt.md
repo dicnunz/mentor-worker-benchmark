@@ -1,4 +1,4 @@
-# Task: Marker Extraction (hard)
+# Task: Marker Extraction (easy)
 
 Fix `extract_markers` in `src/solution.py`.
 
@@ -14,3 +14,15 @@ Requirements:
 Example:
 - Input: `... $Alpha_1 ... $alpha_1 ...`
 - Output: `["alpha_1"]`
+
+## Quality Gate Expectations
+Implement all behavior required by tests, including edge-case handling and deterministic output.
+
+## Input/Output Examples
+- Example 1 input/output contract: `assert extract_markers(text) == ['velvet_7', 'eagle3']`
+- Example 2 input/output contract: `assert extract_markers(text) == ['vivid6']`
+
+## Required Edge Cases
+- Handle empty input gracefully.
+- Preserve deterministic ordering when deduplicating.
+- Reject invalid inputs where required by the tests.

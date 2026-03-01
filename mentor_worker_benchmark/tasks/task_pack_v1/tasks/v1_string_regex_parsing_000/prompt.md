@@ -14,3 +14,15 @@ Requirements:
 Example:
 - Input: `... @Alpha_1 ... @alpha_1 ...`
 - Output: `["alpha_1"]`
+
+## Quality Gate Expectations
+Implement all behavior required by tests, including edge-case handling and deterministic output.
+
+## Input/Output Examples
+- Example 1 input/output contract: `assert extract_markers(text) == ['knight_0', 'nectarine0']`
+- Example 2 input/output contract: `assert extract_markers(text) == ['zephyr3']`
+
+## Required Edge Cases
+- Handle empty input gracefully.
+- Preserve deterministic ordering when deduplicating.
+- Reject invalid inputs where required by the tests.

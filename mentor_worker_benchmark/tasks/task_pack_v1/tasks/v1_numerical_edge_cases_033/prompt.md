@@ -9,3 +9,15 @@ Requirements:
 - Trim `int(n * trim_ratio)` values from each end.
 - Raise `ValueError` if no values remain.
 - Return the arithmetic mean of the retained values.
+
+## Quality Gate Expectations
+Implement all behavior required by tests, including edge-case handling and deterministic output.
+
+## Input/Output Examples
+- Example 1 input/output contract: `assert result == pytest.approx(10.515555555555556, rel=1e-9, abs=1e-9)`
+- Example 2 input/output contract: `assert result == pytest.approx(_oracle(values, 0.1), rel=1e-9, abs=1e-9)`
+
+## Required Edge Cases
+- Handle NaN/invalid ratios explicitly.
+- Protect boundary trimming behavior.
+- Reject invalid inputs where required by the tests.

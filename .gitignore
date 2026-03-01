@@ -22,6 +22,8 @@ results/*
 !results/.gitkeep
 !results/leaderboard.example.md
 !results/schema.md
+!results/curation_report.md
+!results/curation_report.json
 
 # OS files
 .DS_Store

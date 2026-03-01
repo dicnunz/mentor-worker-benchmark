@@ -17,6 +17,7 @@ from mentor_worker_benchmark.runner import (
     run_sanity_check,
     write_leaderboard,
 )
+from mentor_worker_benchmark.tasks.task_pack_v1.curate import CurationConfig, run_curation
 
 
 def _parse_models(raw: str) -> list[str]:
@@ -186,6 +187,35 @@ def cmd_compare(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_curate(args: argparse.Namespace) -> int:
+    config = CurationConfig(
+        task_pack=args.task_pack,
+        seed=args.seed,
+        similarity_threshold=args.similarity_threshold,
+        triviality_sample_size=args.triviality_sample_size,
+        full_triviality_model_check=args.full_triviality_model_check,
+        max_replacement_attempts=args.max_replacement_attempts,
+        results_dir=Path(args.results_dir),
+        worker_num_predict=args.worker_num_predict,
+        ollama_timeout_seconds=args.ollama_timeout_seconds,
+    )
+
+    try:
+        payload = run_curation(config)
+    except (ValueError, RuntimeError) as exc:
+        print(str(exc))
+        return 1
+
+    print(
+        f"Curation finished: replaced {payload['replacements']['count']} tasks. "
+        f"Duplicate clusters {payload['duplicates']['cluster_count_before']} -> "
+        f"{payload['duplicates']['cluster_count_after']}."
+    )
+    print(f"Report JSON: {config.results_dir / 'curation_report.json'}")
+    print(f"Report Markdown: {config.results_dir / 'curation_report.md'}")
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="mentor-worker-benchmark",
@@ -255,6 +285,21 @@ def build_parser() -> argparse.ArgumentParser:
     compare.add_argument("--before", required=True)
     compare.add_argument("--after", required=True)
     compare.set_defaults(func=cmd_compare)
+
+    curate = subparsers.add_parser(
+        "curate",
+        help="Run task-pack quality gates, regenerate flagged tasks, and emit curation reports.",
+    )
+    curate.add_argument("--task-pack", default="task_pack_v1")
+    curate.add_argument("--seed", type=int, default=1337)
+    curate.add_argument("--similarity-threshold", type=float, default=0.92)
+    curate.add_argument("--triviality-sample-size", type=int, default=72)
+    curate.add_argument("--full-triviality-model-check", action="store_true")
+    curate.add_argument("--max-replacement-attempts", type=int, default=10)
+    curate.add_argument("--worker-num-predict", type=int, default=220)
+    curate.add_argument("--ollama-timeout-seconds", type=int, default=60)
+    curate.add_argument("--results-dir", default="results")
+    curate.set_defaults(func=cmd_curate)
 
     return parser
 

@@ -87,6 +87,8 @@ class BenchmarkConfig:
     run_modes: tuple[str, ...] = DEFAULT_RUN_MODES
     repro_mode: bool = False
     stronger_worker_model: str | None = None
+    worker_num_predict_override: int | None = None
+    mentor_num_predict_override: int | None = None
 
 
 @dataclass(slots=True)
@@ -1045,8 +1047,8 @@ def run_benchmark(config: BenchmarkConfig, client: OllamaClient | None = None) -
     generation = GenerationSettings(
         temperature=REPRO_TEMPERATURE if config.repro_mode else REPRO_TEMPERATURE,
         top_p=REPRO_TOP_P if config.repro_mode else REPRO_TOP_P,
-        worker_num_predict=REPRO_WORKER_MAX_TOKENS,
-        mentor_num_predict=REPRO_MENTOR_MAX_TOKENS,
+        worker_num_predict=config.worker_num_predict_override or REPRO_WORKER_MAX_TOKENS,
+        mentor_num_predict=config.mentor_num_predict_override or REPRO_MENTOR_MAX_TOKENS,
         max_turns=REPRO_MAX_TURNS if config.repro_mode else config.max_turns,
         seed=config.seed,
     )

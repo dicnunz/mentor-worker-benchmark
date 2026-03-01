@@ -1,4 +1,4 @@
-# Task: Mini Module Pipeline (easy)
+# Task: Mini Module Pipeline (hard)
 
 This task spans multiple files under `src/`.
 
@@ -14,3 +14,16 @@ Rules:
   - `unique_keys`
   - `top_key` (highest value, tie -> lexicographically smallest key)
   - `top_value`
+
+## Quality Gate Expectations
+Implement all behavior required by tests, including edge-case handling and deterministic output.
+
+## Input/Output Examples
+- Example 1 input/output contract: `assert summarize(raw) == {'total': 16, 'unique_keys': 3, 'top_key': 'cinder', 'top_value': 8}`
+- Example 2 input/output contract: `assert summarize("") == {`
+
+## Required Edge Cases
+- Handle empty and malformed input rows.
+- Keep aggregation semantics deterministic.
+- Reject invalid inputs where required by the tests.
+- Avoid brittle shortcuts that only satisfy one fixture.

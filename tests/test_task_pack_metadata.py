@@ -27,6 +27,15 @@ def test_task_pack_v1_categories() -> None:
     assert set(metadata["categories"]) == expected
 
 
+def test_task_pack_v1_difficulty_distribution() -> None:
+    metadata = read_pack_metadata()
+    tasks = metadata["tasks"]
+    difficulty_counts = {"easy": 0, "medium": 0, "hard": 0}
+    for row in tasks:
+        difficulty_counts[row["difficulty"]] += 1
+    assert difficulty_counts == {"easy": 105, "medium": 135, "hard": 60}
+
+
 def test_task_pack_v1_schema_validation() -> None:
     ok, errors = validate_task_pack()
     assert ok, f"task pack validation failed: {errors}"

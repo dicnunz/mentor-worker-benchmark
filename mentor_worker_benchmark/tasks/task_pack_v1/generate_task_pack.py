@@ -142,6 +142,233 @@ class GeneratedTask:
     files: dict[str, str]
 
 
+def _task_seed(seed: int, category_index: int, task_index: int, variant: int = 0) -> int:
+    # Deterministic variant-aware seed for reproducible regeneration.
+    global_index = category_index * TASKS_PER_CATEGORY + task_index
+    return seed * 1009 + global_index * 9173 + variant * 104729 + 17
+
+
+def _extract_assert_examples(tests_text: str, *, limit: int = 2) -> list[str]:
+    examples: list[str] = []
+    for line in tests_text.splitlines():
+        stripped = line.strip()
+        if stripped.startswith("assert "):
+            examples.append(stripped)
+        if len(examples) >= limit:
+            break
+    return examples
+
+
+def _append_prompt_quality_section(
+    *,
+    prompt: str,
+    category: str,
+    strict_level: int,
+    tests_text: str,
+) -> str:
+    if strict_level <= 0:
+        return prompt
+
+    category_edge_hints = {
+        "string_regex_parsing": [
+            "Handle empty input gracefully.",
+            "Preserve deterministic ordering when deduplicating.",
+        ],
+        "ds_algo": [
+            "Handle empty datasets and non-positive limits.",
+            "Keep tie-breaking deterministic.",
+        ],
+        "file_io_serialization": [
+            "Handle empty files and malformed rows safely.",
+            "Keep output ordering deterministic.",
+        ],
+        "concurrency_basics": [
+            "Handle empty job lists and invalid worker counts.",
+            "Preserve deterministic output ordering despite concurrency.",
+        ],
+        "numerical_edge_cases": [
+            "Handle NaN/invalid ratios explicitly.",
+            "Protect boundary trimming behavior.",
+        ],
+        "multi_file_mini_module": [
+            "Handle empty and malformed input rows.",
+            "Keep aggregation semantics deterministic.",
+        ],
+    }
+
+    examples = _extract_assert_examples(tests_text, limit=2)
+    lines: list[str] = [
+        "## Quality Gate Expectations",
+        "Implement all behavior required by tests, including edge-case handling and deterministic output.",
+        "",
+        "## Input/Output Examples",
+    ]
+    if examples:
+        for idx, entry in enumerate(examples, start=1):
+            lines.append(f"- Example {idx} input/output contract: `{entry}`")
+    else:
+        lines.append("- Input: see test fixtures for canonical inputs.")
+        lines.append("- Output: satisfy exact assertion values in tests.")
+
+    edge_hints = category_edge_hints.get(category, [])
+    if edge_hints:
+        lines.append("")
+        lines.append("## Required Edge Cases")
+        for hint in edge_hints:
+            lines.append(f"- {hint}")
+
+    if strict_level >= 2:
+        lines.append("- Reject invalid inputs where required by the tests.")
+    if strict_level >= 3:
+        lines.append("- Avoid brittle shortcuts that only satisfy one fixture.")
+
+    return prompt.rstrip() + "\n\n" + "\n".join(lines).rstrip() + "\n"
+
+
+def _strict_test_snippet(category: str, strict_level: int) -> str:
+    if strict_level <= 0:
+        return ""
+
+    snippets: dict[str, list[str]] = {
+        "string_regex_parsing": [
+            dedent(
+                """
+                def test_empty_input_returns_empty_list() -> None:
+                    assert extract_markers("") == []
+                """
+            ).strip(),
+            dedent(
+                """
+                def test_no_marker_returns_empty_list() -> None:
+                    assert extract_markers("plain text without marker") == []
+                """
+            ).strip(),
+        ],
+        "ds_algo": [
+            dedent(
+                """
+                def test_empty_records_returns_empty() -> None:
+                    assert rank_products([], 3) == []
+                """
+            ).strip(),
+            dedent(
+                """
+                def test_k_larger_than_population_is_safe() -> None:
+                    records = [("alpha", 2), ("beta", 1), ("alpha", 1)]
+                    assert rank_products(records, 10) == ["alpha", "beta"]
+                """
+            ).strip(),
+        ],
+        "file_io_serialization": [
+            dedent(
+                """
+                def test_only_invalid_rows_produces_empty_object(tmp_path) -> None:
+                    input_path = tmp_path / "invalid.csv"
+                    output_path = tmp_path / "invalid.json"
+                    input_path.write_text("user,amount,category\\n name , bad , cat \\n", encoding="utf-8")
+                    summarize_transactions(str(input_path), str(output_path))
+                    assert json.loads(output_path.read_text(encoding="utf-8")) == {}
+                """
+            ).strip(),
+            dedent(
+                """
+                def test_whitespace_only_user_rows_are_ignored(tmp_path) -> None:
+                    input_path = tmp_path / "spaces.csv"
+                    output_path = tmp_path / "spaces.json"
+                    input_path.write_text("user,amount,category\\n   ,3,x\\n", encoding="utf-8")
+                    summarize_transactions(str(input_path), str(output_path))
+                    assert json.loads(output_path.read_text(encoding="utf-8")) == {}
+                """
+            ).strip(),
+        ],
+        "concurrency_basics": [
+            dedent(
+                """
+                def test_empty_jobs_returns_empty_result() -> None:
+                    assert run_jobs([], max_workers=2) == []
+                """
+            ).strip(),
+            dedent(
+                """
+                def test_single_job() -> None:
+                    assert run_jobs([lambda: 42], max_workers=1) == [42]
+                """
+            ).strip(),
+        ],
+        "numerical_edge_cases": [
+            dedent(
+                """
+                def test_single_value_no_trim() -> None:
+                    assert trimmed_mean([5.0], 0.0) == pytest.approx(5.0)
+                """
+            ).strip(),
+            dedent(
+                """
+                def test_negative_trim_ratio_raises() -> None:
+                    with pytest.raises(ValueError):
+                        trimmed_mean([1.0, 2.0, 3.0], -0.1)
+                """
+            ).strip(),
+        ],
+        "multi_file_mini_module": [
+            dedent(
+                """
+                def test_malformed_only_input_returns_empty_report() -> None:
+                    assert summarize("invalid line only") == {
+                        "total": 0,
+                        "unique_keys": 0,
+                        "top_key": None,
+                        "top_value": None,
+                    }
+                """
+            ).strip(),
+            dedent(
+                """
+                def test_trailing_blank_lines_are_safe() -> None:
+                    payload = summarize("\\n\\n")
+                    assert payload["total"] == 0
+                    assert payload["unique_keys"] == 0
+                """
+            ).strip(),
+        ],
+    }
+
+    category_snippets = snippets.get(category, [])
+    if not category_snippets:
+        return ""
+
+    picked = category_snippets[: min(strict_level, len(category_snippets))]
+    return "\n\n" + "\n\n".join(picked).rstrip() + "\n"
+
+
+def _apply_quality_profile(task: GeneratedTask, strict_level: int) -> GeneratedTask:
+    if strict_level <= 0:
+        return task
+
+    files = dict(task.files)
+    tests_path = "tests/test_solution.py"
+    prompt_path = "prompt.md"
+
+    tests_text = files.get(tests_path, "")
+    prompt_text = files.get(prompt_path, "")
+
+    files[prompt_path] = _append_prompt_quality_section(
+        prompt=prompt_text,
+        category=task.category,
+        strict_level=strict_level,
+        tests_text=tests_text,
+    )
+    files[tests_path] = tests_text.rstrip() + _strict_test_snippet(task.category, strict_level)
+
+    return GeneratedTask(
+        task_id=task.task_id,
+        title=task.title,
+        category=task.category,
+        difficulty=task.difficulty,
+        files=files,
+    )
+
+
 def _pick_words(rng: random.Random, count: int) -> list[str]:
     return rng.sample(WORD_BANK, k=count)
 
@@ -821,7 +1048,10 @@ def _generate_multi_file_task(task_id: str, idx: int, rng: random.Random, diffic
     )
 
 
-CATEGORY_GENERATORS: dict[str, Callable[[str, int, random.Random, str], GeneratedTask]] = {
+GeneratorFn = Callable[[str, int, random.Random, str], GeneratedTask]
+
+
+CATEGORY_GENERATORS: dict[str, GeneratorFn] = {
     "string_regex_parsing": _generate_string_regex_task,
     "ds_algo": _generate_ds_algo_task,
     "file_io_serialization": _generate_file_io_task,
@@ -831,16 +1061,51 @@ CATEGORY_GENERATORS: dict[str, Callable[[str, int, random.Random, str], Generate
 }
 
 
+def _task_index_from_id(task_id: str) -> int:
+    try:
+        suffix = task_id.rsplit("_", 1)[1]
+        return int(suffix)
+    except (IndexError, ValueError) as exc:
+        raise ValueError(f"Invalid task id format: {task_id}") from exc
+
+
+def generate_task_variant(
+    *,
+    task_id: str,
+    category: str,
+    difficulty: str,
+    seed: int = DEFAULT_SEED,
+    variant: int = 0,
+    strict_level: int = 0,
+) -> GeneratedTask:
+    if category not in CATEGORY_GENERATORS:
+        known = ", ".join(sorted(CATEGORY_GENERATORS))
+        raise ValueError(f"Unknown category `{category}`. Known categories: {known}")
+
+    task_index = _task_index_from_id(task_id)
+    category_index = CATEGORY_ORDER.index(category)
+    rng = random.Random(_task_seed(seed, category_index, task_index, variant=variant))
+    generator = CATEGORY_GENERATORS[category]
+    generated = generator(task_id, task_index, rng, difficulty)
+    return _apply_quality_profile(generated, strict_level=strict_level)
+
+
 def _build_task_list(seed: int) -> list[GeneratedTask]:
     generated: list[GeneratedTask] = []
     for category_index, category in enumerate(CATEGORY_ORDER):
-        generator = CATEGORY_GENERATORS[category]
         for task_index in range(TASKS_PER_CATEGORY):
-            global_index = category_index * TASKS_PER_CATEGORY + task_index
             task_id = f"v1_{category}_{task_index:03d}"
             difficulty = DIFFICULTIES[(task_index + category_index) % len(DIFFICULTIES)]
-            rng = random.Random(seed * 1009 + global_index * 9173 + 17)
-            generated.append(generator(task_id, task_index, rng, difficulty))
+            generated.append(
+                generate_task_variant(
+                    task_id=task_id,
+                    category=category,
+                    difficulty=difficulty,
+                    seed=seed,
+                    variant=0,
+                    strict_level=0,
+                )
+            )
     return generated
 
 
@@ -882,6 +1147,13 @@ def _write_task_files(base: Path, task: GeneratedTask) -> None:
         path = task_dir / rel_path
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(content, encoding="utf-8")
+
+
+def write_task_variant(base: Path, task: GeneratedTask, *, clean: bool = True) -> None:
+    task_dir = base / "tasks" / task.task_id
+    if clean and task_dir.exists():
+        shutil.rmtree(task_dir)
+    _write_task_files(base, task)
 
 
 def _validate_task_shape(task: GeneratedTask) -> None:

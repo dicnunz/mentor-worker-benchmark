@@ -19,6 +19,7 @@ Run all of these before opening a PR:
 python -m pytest tests -q
 python -m mentor_worker_benchmark.tasks.task_pack_v1.validate
 python -m mentor_worker_benchmark sanity --task-pack task_pack_v1 --suite quick --seed 1337
+python -m mentor_worker_benchmark curate --task-pack task_pack_v1 --seed 1337
 ```
 
 ## Task Pack Contribution Rules

@@ -2,15 +2,22 @@ from src.solution import rank_products
 
 
 def test_aggregates_and_sorts() -> None:
-    records = [('zephyr', 6), ('knight', 2), ('zephyr', 1), ('solace', 9), ('knight', -1), ('raven', 0), ('cobalt', -4)]
-    assert rank_products(records, 3) == ['solace', 'zephyr', 'knight']
+    records = [('juliet', 6), ('island', 2), ('juliet', 1), ('quiver', 9), ('island', -1), ('echo', 0), ('canyon', -4)]
+    assert rank_products(records, 3) == ['quiver', 'juliet', 'island']
 
 
 def test_tie_breaks_alphabetically() -> None:
-    records = [('zephyr', 4), ('raven', 4), ('cobalt', 4), ('zephyr', -1), ('raven', -1), ('knight', 1)]
-    assert rank_products(records, 2) == ['cobalt', 'raven']
+    records = [('juliet', 4), ('echo', 4), ('canyon', 4), ('juliet', -1), ('echo', -1), ('island', 1)]
+    assert rank_products(records, 2) == ['canyon', 'echo']
 
 
 def test_non_positive_k_returns_empty() -> None:
-    records = [('zephyr', 6), ('knight', 2), ('zephyr', 1), ('solace', 9), ('knight', -1), ('raven', 0), ('cobalt', -4)]
+    records = [('juliet', 6), ('island', 2), ('juliet', 1), ('quiver', 9), ('island', -1), ('echo', 0), ('canyon', -4)]
     assert rank_products(records, 0) == []
+
+def test_empty_records_returns_empty() -> None:
+    assert rank_products([], 3) == []
+
+def test_k_larger_than_population_is_safe() -> None:
+    records = [("alpha", 2), ("beta", 1), ("alpha", 1)]
+    assert rank_products(records, 10) == ["alpha", "beta"]

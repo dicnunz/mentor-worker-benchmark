@@ -22,9 +22,9 @@ def _oracle(values: list[float], trim_ratio: float) -> float:
 
 
 def test_matches_oracle_for_mixed_values() -> None:
-    values = [-5.26, 6.71, -7.03, -1.85, 12.99, 12.75, -3.62, 16.51, 82.5, nan]
+    values = [4.64, -2.07, 4.06, 7.58, -5.97, 11.67, 5.95, 2.31, 82.5, nan]
     result = trimmed_mean(values, 0.25)
-    assert result == pytest.approx(5.396, rel=1e-9, abs=1e-9)
+    assert result == pytest.approx(4.9079999999999995, rel=1e-9, abs=1e-9)
     assert result == pytest.approx(_oracle(values, 0.25), rel=1e-9, abs=1e-9)
 
 
@@ -36,3 +36,10 @@ def test_invalid_trim_ratio_raises() -> None:
 def test_all_nan_raises() -> None:
     with pytest.raises(ValueError):
         trimmed_mean([math.nan, math.nan], 0.1)
+
+def test_single_value_no_trim() -> None:
+    assert trimmed_mean([5.0], 0.0) == pytest.approx(5.0)
+
+def test_negative_trim_ratio_raises() -> None:
+    with pytest.raises(ValueError):
+        trimmed_mean([1.0, 2.0, 3.0], -0.1)

@@ -37,3 +37,9 @@ def test_exceptions_are_propagated() -> None:
 
     with pytest.raises(RuntimeError):
         run_jobs([ok, boom], max_workers=2)
+
+def test_empty_jobs_returns_empty_result() -> None:
+    assert run_jobs([], max_workers=2) == []
+
+def test_single_job() -> None:
+    assert run_jobs([lambda: 42], max_workers=1) == [42]

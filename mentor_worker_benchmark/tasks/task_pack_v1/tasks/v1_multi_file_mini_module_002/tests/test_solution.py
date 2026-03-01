@@ -2,12 +2,20 @@ from src.pipeline import summarize
 
 
 def test_pipeline_summary_handles_invalid_lines() -> None:
-    raw = 'meadow | 6\\nwillow|2\\nmeadow|3\\nbad_line_without_separator\\nfrost|6\\nwillow|not_an_int\\n'
-    assert summarize(raw) == {'total': 17, 'unique_keys': 3, 'top_key': 'meadow', 'top_value': 9}
+    raw = 'blossom | 6\\nmeadow|2\\nblossom|3\\nbad_line_without_separator\\nunity|6\\nmeadow|not_an_int\\n'
+    assert summarize(raw) == {'total': 17, 'unique_keys': 3, 'top_key': 'blossom', 'top_value': 9}
 
 
 def test_empty_input() -> None:
     assert summarize("") == {
+        "total": 0,
+        "unique_keys": 0,
+        "top_key": None,
+        "top_value": None,
+    }
+
+def test_malformed_only_input_returns_empty_report() -> None:
+    assert summarize("invalid line only") == {
         "total": 0,
         "unique_keys": 0,
         "top_key": None,

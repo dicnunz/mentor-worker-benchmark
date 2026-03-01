@@ -1,4 +1,4 @@
-# Task: CSV -> JSON Summary (medium)
+# Task: CSV -> JSON Summary (easy)
 
 Fix `summarize_transactions(input_csv, output_json)` in `src/solution.py`.
 
@@ -13,3 +13,15 @@ Requirements:
   - `count`: number of valid rows
   - `categories`: sorted unique category names
 - Write JSON object keyed by user (sorted lexicographically).
+
+## Quality Gate Expectations
+Implement all behavior required by tests, including edge-case handling and deterministic output.
+
+## Input/Output Examples
+- Example 1 input/output contract: `assert payload == {'drift': {'total': 9, 'count': 1, 'categories': ['juliet']}, 'jasper': {'total': 10, 'count': 2, 'categories': ['juliet', 'maple']}, 'tango': {'total': 10, 'count': 2, 'categories': ['quiver']}}`
+- Example 2 input/output contract: `assert list(payload) == sorted(payload)`
+
+## Required Edge Cases
+- Handle empty files and malformed rows safely.
+- Keep output ordering deterministic.
+- Reject invalid inputs where required by the tests.

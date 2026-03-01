@@ -2,15 +2,21 @@ from src.solution import extract_markers
 
 
 def test_normalizes_and_dedupes() -> None:
-    text = 'Kickoff #eagle_6 then #breeze6! repeat #EAGLE_6 and punctuation #breeze6,'
-    assert extract_markers(text) == ['eagle_6', 'breeze6']
+    text = 'Kickoff #rocket_6 then #kilo6! repeat #ROCKET_6 and punctuation #kilo6,'
+    assert extract_markers(text) == ['rocket_6', 'kilo6']
 
 
 def test_ignores_embedded_and_too_short_tokens() -> None:
-    text = 'embedded#dynamo2 should be ignored; keep (#dynamo2) and skip #x.'
-    assert extract_markers(text) == ['dynamo2']
+    text = 'embedded#bravo2 should be ignored; keep (#bravo2) and skip #x.'
+    assert extract_markers(text) == ['bravo2']
 
 
 def test_preserves_order() -> None:
-    text = 'Noise (#kepler_1) plus #eagle_6. trailing #kepler_1,'
-    assert extract_markers(text) == ['kepler_1', 'eagle_6']
+    text = 'Noise (#utopia_1) plus #rocket_6. trailing #utopia_1,'
+    assert extract_markers(text) == ['utopia_1', 'rocket_6']
+
+def test_empty_input_returns_empty_list() -> None:
+    assert extract_markers("") == []
+
+def test_no_marker_returns_empty_list() -> None:
+    assert extract_markers("plain text without marker") == []

@@ -110,6 +110,7 @@ python -m mentor_worker_benchmark run [--task-pack task_pack_v1] [--suite quick|
 python -m mentor_worker_benchmark sanity [--task-pack task_pack_v1] [--suite quick|dev|test|all]
 python -m mentor_worker_benchmark leaderboard --results results/results.json --output results/leaderboard.md
 python -m mentor_worker_benchmark compare --before before.json --after after.json
+python -m mentor_worker_benchmark curate --task-pack task_pack_v1 --seed 1337
 ```
 
 Convenience:
@@ -162,6 +163,28 @@ Enable GitHub Pages (repo settings):
 - Patch application forbids traversal outside the task workspace.
 - Tests run in isolated temp directories with per-task timeout and network disabled.
 - Run metadata logs environment and provenance (Python, platform, Ollama version/model tags, git commit hash).
+
+## Quality Gates
+
+`task_pack_v1` includes an automated curation pipeline to keep the 300-task corpus credible and harder to game.
+
+Run:
+
+```bash
+python -m mentor_worker_benchmark curate --task-pack task_pack_v1 --seed 1337
+```
+
+What `curate` does:
+- Detects near-duplicates using hashed token/character n-gram cosine similarity.
+- Flags trivial tasks (low test depth, short starter code, and phi3 one-turn pass checks).
+- Flags ambiguity (missing explicit prompt I/O examples, weak edge-case/invalid-input test coverage).
+- Rebalances difficulty to target distribution (`easy 35%`, `medium 45%`, `hard 20%`) with DEV calibration.
+- Runs DEV one-turn worker-only calibration on `phi3:mini` and `qwen2.5-coder:7b` before/after.
+- Regenerates flagged tasks deterministically while preserving category/split and exact split counts.
+
+Curation artifacts:
+- `results/curation_report.json`
+- `results/curation_report.md`
 
 ## Adding or Updating Tasks
 

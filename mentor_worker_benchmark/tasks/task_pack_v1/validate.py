@@ -144,6 +144,7 @@ def validate_task_pack() -> tuple[bool, list[str]]:
 
     seen_ids: set[str] = set()
     split_counts = {"train": 0, "dev": 0, "test": 0}
+    difficulty_counts = {"easy": 0, "medium": 0, "hard": 0}
 
     for idx, task in enumerate(tasks):
         if not isinstance(task, dict):
@@ -165,6 +166,12 @@ def validate_task_pack() -> tuple[bool, list[str]]:
             errors.append(f"Invalid split for {task_id}: {split}")
         else:
             split_counts[split] += 1
+
+        difficulty = str(task["difficulty"])
+        if difficulty not in difficulty_counts:
+            errors.append(f"Invalid difficulty for {task_id}: {difficulty}")
+        else:
+            difficulty_counts[difficulty] += 1
 
         rel_path = str(task["path"])
         task_dir = (root / rel_path).resolve()
@@ -198,6 +205,9 @@ def validate_task_pack() -> tuple[bool, list[str]]:
     quick_count = sum(1 for task in tasks if isinstance(task, dict) and bool(task.get("quick")))
     if quick_count != 18:
         errors.append(f"Expected quick count 18, found {quick_count}")
+
+    if difficulty_counts != {"easy": 105, "medium": 135, "hard": 60}:
+        errors.append(f"Unexpected difficulty counts: {difficulty_counts}")
 
     ok = not errors
     return ok, errors

@@ -2,15 +2,22 @@ from src.solution import rank_products
 
 
 def test_aggregates_and_sorts() -> None:
-    records = [('horizon', 5), ('golf', 2), ('horizon', 1), ('willow', 10), ('golf', -1), ('cinder', 0), ('pearl', -4)]
-    assert rank_products(records, 3) == ['willow', 'horizon', 'golf']
+    records = [('yankee', 5), ('foxtrot', 2), ('yankee', 1), ('bravo', 10), ('foxtrot', -1), ('nebula', 0), ('golf', -4)]
+    assert rank_products(records, 3) == ['bravo', 'yankee', 'foxtrot']
 
 
 def test_tie_breaks_alphabetically() -> None:
-    records = [('horizon', 4), ('cinder', 4), ('pearl', 4), ('horizon', -1), ('cinder', -1), ('golf', 1)]
-    assert rank_products(records, 2) == ['pearl', 'cinder']
+    records = [('yankee', 4), ('nebula', 4), ('golf', 4), ('yankee', -1), ('nebula', -1), ('foxtrot', 1)]
+    assert rank_products(records, 2) == ['golf', 'nebula']
 
 
 def test_non_positive_k_returns_empty() -> None:
-    records = [('horizon', 5), ('golf', 2), ('horizon', 1), ('willow', 10), ('golf', -1), ('cinder', 0), ('pearl', -4)]
+    records = [('yankee', 5), ('foxtrot', 2), ('yankee', 1), ('bravo', 10), ('foxtrot', -1), ('nebula', 0), ('golf', -4)]
     assert rank_products(records, 0) == []
+
+def test_empty_records_returns_empty() -> None:
+    assert rank_products([], 3) == []
+
+def test_k_larger_than_population_is_safe() -> None:
+    records = [("alpha", 2), ("beta", 1), ("alpha", 1)]
+    assert rank_products(records, 10) == ["alpha", "beta"]

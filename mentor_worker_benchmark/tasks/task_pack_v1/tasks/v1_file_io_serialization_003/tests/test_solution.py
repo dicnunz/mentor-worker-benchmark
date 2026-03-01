@@ -6,12 +6,12 @@ from src.solution import summarize_transactions
 def test_aggregates_valid_rows(tmp_path) -> None:
     input_path = tmp_path / "in.csv"
     output_path = tmp_path / "out.json"
-    input_path.write_text('user,amount,category\\n jungle , 8 , ripple \\n vivid , 3 , xenon \\n jungle , 2 , sunset \\n vivid , oops , ripple \\n nectarine , 9 , ripple \\n  , 4 , xenon \\n vivid , 7 , xenon \\n', encoding="utf-8")
+    input_path.write_text('user,amount,category\\n willow , 8 , prairie \\n thunder , 3 , acorn \\n willow , 2 , quiver \\n thunder , oops , prairie \\n kernel , 9 , prairie \\n  , 4 , acorn \\n thunder , 7 , acorn \\n', encoding="utf-8")
 
     summarize_transactions(str(input_path), str(output_path))
     payload = json.loads(output_path.read_text(encoding="utf-8"))
 
-    assert payload == {'jungle': {'total': 10, 'count': 2, 'categories': ['ripple', 'sunset']}, 'nectarine': {'total': 9, 'count': 1, 'categories': ['ripple']}, 'vivid': {'total': 10, 'count': 2, 'categories': ['xenon']}}
+    assert payload == {'kernel': {'total': 9, 'count': 1, 'categories': ['prairie']}, 'thunder': {'total': 10, 'count': 2, 'categories': ['acorn']}, 'willow': {'total': 10, 'count': 2, 'categories': ['prairie', 'quiver']}}
     assert list(payload) == sorted(payload)
 
 
@@ -23,3 +23,17 @@ def test_empty_input_produces_empty_object(tmp_path) -> None:
     summarize_transactions(str(input_path), str(output_path))
     payload = json.loads(output_path.read_text(encoding="utf-8"))
     assert payload == {}
+
+def test_only_invalid_rows_produces_empty_object(tmp_path) -> None:
+    input_path = tmp_path / "invalid.csv"
+    output_path = tmp_path / "invalid.json"
+    input_path.write_text("user,amount,category\n name , bad , cat \n", encoding="utf-8")
+    summarize_transactions(str(input_path), str(output_path))
+    assert json.loads(output_path.read_text(encoding="utf-8")) == {}
+
+def test_whitespace_only_user_rows_are_ignored(tmp_path) -> None:
+    input_path = tmp_path / "spaces.csv"
+    output_path = tmp_path / "spaces.json"
+    input_path.write_text("user,amount,category\n   ,3,x\n", encoding="utf-8")
+    summarize_transactions(str(input_path), str(output_path))
+    assert json.loads(output_path.read_text(encoding="utf-8")) == {}

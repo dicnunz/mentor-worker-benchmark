@@ -2,15 +2,22 @@ from src.solution import rank_products
 
 
 def test_aggregates_and_sorts() -> None:
-    records = [('galaxy', 6), ('charlie', 2), ('galaxy', 1), ('eagle', 10), ('charlie', -1), ('juliet', 0), ('dynamo', -4)]
-    assert rank_products(records, 3) == ['eagle', 'galaxy', 'charlie']
+    records = [('vertex', 6), ('blossom', 2), ('vertex', 1), ('orion', 10), ('blossom', -1), ('echo', 0), ('ivory', -4)]
+    assert rank_products(records, 3) == ['orion', 'vertex', 'blossom']
 
 
 def test_tie_breaks_alphabetically() -> None:
-    records = [('galaxy', 4), ('juliet', 4), ('dynamo', 4), ('galaxy', -1), ('juliet', -1), ('charlie', 1)]
-    assert rank_products(records, 2) == ['dynamo', 'galaxy']
+    records = [('vertex', 4), ('echo', 4), ('ivory', 4), ('vertex', -1), ('echo', -1), ('blossom', 1)]
+    assert rank_products(records, 2) == ['ivory', 'echo']
 
 
 def test_non_positive_k_returns_empty() -> None:
-    records = [('galaxy', 6), ('charlie', 2), ('galaxy', 1), ('eagle', 10), ('charlie', -1), ('juliet', 0), ('dynamo', -4)]
+    records = [('vertex', 6), ('blossom', 2), ('vertex', 1), ('orion', 10), ('blossom', -1), ('echo', 0), ('ivory', -4)]
     assert rank_products(records, 0) == []
+
+def test_empty_records_returns_empty() -> None:
+    assert rank_products([], 3) == []
+
+def test_k_larger_than_population_is_safe() -> None:
+    records = [("alpha", 2), ("beta", 1), ("alpha", 1)]
+    assert rank_products(records, 10) == ["alpha", "beta"]

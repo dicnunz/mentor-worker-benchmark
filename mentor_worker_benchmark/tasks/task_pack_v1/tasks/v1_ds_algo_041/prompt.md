@@ -1,4 +1,4 @@
-# Task: Rank Products (easy)
+# Task: Rank Products (medium)
 
 Fix `rank_products(records, k)` in `src/solution.py`.
 
@@ -11,3 +11,15 @@ Requirements:
 - Return only product names.
 - Return at most `k` entries.
 - If `k <= 0`, return `[]`.
+
+## Quality Gate Expectations
+Implement all behavior required by tests, including edge-case handling and deterministic output.
+
+## Input/Output Examples
+- Example 1 input/output contract: `assert rank_products(records, 3) == ['hazel', 'knight', 'opal']`
+- Example 2 input/output contract: `assert rank_products(records, 2) == ['voyage', 'charlie']`
+
+## Required Edge Cases
+- Handle empty datasets and non-positive limits.
+- Keep tie-breaking deterministic.
+- Reject invalid inputs where required by the tests.

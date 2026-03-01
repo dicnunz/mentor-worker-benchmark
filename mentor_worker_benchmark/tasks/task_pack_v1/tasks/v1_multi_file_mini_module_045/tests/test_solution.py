@@ -2,8 +2,8 @@ from src.pipeline import summarize
 
 
 def test_pipeline_summary_handles_invalid_lines() -> None:
-    raw = 'onyx = 4\\nwarden=2\\nonyx=3\\nbad_line_without_separator\\nxenon=6\\nwarden=not_an_int\\n'
-    assert summarize(raw) == {'total': 15, 'unique_keys': 3, 'top_key': 'onyx', 'top_value': 7}
+    raw = 'eagle = 4\\njasper=2\\neagle=3\\nbad_line_without_separator\\nxenon=6\\njasper=not_an_int\\n'
+    assert summarize(raw) == {'total': 15, 'unique_keys': 3, 'top_key': 'eagle', 'top_value': 7}
 
 
 def test_empty_input() -> None:
@@ -13,3 +13,16 @@ def test_empty_input() -> None:
         "top_key": None,
         "top_value": None,
     }
+
+def test_malformed_only_input_returns_empty_report() -> None:
+    assert summarize("invalid line only") == {
+        "total": 0,
+        "unique_keys": 0,
+        "top_key": None,
+        "top_value": None,
+    }
+
+def test_trailing_blank_lines_are_safe() -> None:
+    payload = summarize("\n\n")
+    assert payload["total"] == 0
+    assert payload["unique_keys"] == 0

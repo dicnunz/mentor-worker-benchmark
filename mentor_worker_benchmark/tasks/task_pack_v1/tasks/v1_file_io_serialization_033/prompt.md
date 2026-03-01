@@ -13,3 +13,16 @@ Requirements:
   - `count`: number of valid rows
   - `categories`: sorted unique category names
 - Write JSON object keyed by user (sorted lexicographically).
+
+## Quality Gate Expectations
+Implement all behavior required by tests, including edge-case handling and deterministic output.
+
+## Input/Output Examples
+- Example 1 input/output contract: `assert payload == {'grove': {'total': 10, 'count': 2, 'categories': ['knight']}, 'kernel': {'total': 9, 'count': 1, 'categories': ['india']}, 'lotus': {'total': 8, 'count': 2, 'categories': ['india', 'opal']}}`
+- Example 2 input/output contract: `assert list(payload) == sorted(payload)`
+
+## Required Edge Cases
+- Handle empty files and malformed rows safely.
+- Keep output ordering deterministic.
+- Reject invalid inputs where required by the tests.
+- Avoid brittle shortcuts that only satisfy one fixture.

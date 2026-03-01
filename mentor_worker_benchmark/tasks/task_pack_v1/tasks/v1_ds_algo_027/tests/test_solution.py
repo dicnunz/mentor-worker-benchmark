@@ -2,15 +2,22 @@ from src.solution import rank_products
 
 
 def test_aggregates_and_sorts() -> None:
-    records = [('ivory', 5), ('yearling', 2), ('ivory', 1), ('hotel', 10), ('yearling', -1), ('apricot', 0), ('acorn', -4)]
-    assert rank_products(records, 3) == ['hotel', 'ivory', 'yearling']
+    records = [('quartz', 5), ('nectar', 2), ('quartz', 1), ('kernel', 10), ('nectar', -1), ('blossom', 0), ('sierra', -4)]
+    assert rank_products(records, 3) == ['kernel', 'quartz', 'nectar']
 
 
 def test_tie_breaks_alphabetically() -> None:
-    records = [('ivory', 4), ('apricot', 4), ('acorn', 4), ('ivory', -1), ('apricot', -1), ('yearling', 1)]
-    assert rank_products(records, 2) == ['acorn', 'apricot']
+    records = [('quartz', 4), ('blossom', 4), ('sierra', 4), ('quartz', -1), ('blossom', -1), ('nectar', 1)]
+    assert rank_products(records, 2) == ['sierra', 'blossom']
 
 
 def test_non_positive_k_returns_empty() -> None:
-    records = [('ivory', 5), ('yearling', 2), ('ivory', 1), ('hotel', 10), ('yearling', -1), ('apricot', 0), ('acorn', -4)]
+    records = [('quartz', 5), ('nectar', 2), ('quartz', 1), ('kernel', 10), ('nectar', -1), ('blossom', 0), ('sierra', -4)]
     assert rank_products(records, 0) == []
+
+def test_empty_records_returns_empty() -> None:
+    assert rank_products([], 3) == []
+
+def test_k_larger_than_population_is_safe() -> None:
+    records = [("alpha", 2), ("beta", 1), ("alpha", 1)]
+    assert rank_products(records, 10) == ["alpha", "beta"]

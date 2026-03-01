@@ -2,15 +2,22 @@ from src.solution import rank_products
 
 
 def test_aggregates_and_sorts() -> None:
-    records = [('xylem', 6), ('quest', 2), ('xylem', 1), ('lantern', 10), ('quest', -1), ('mango', 0), ('unity', -4)]
-    assert rank_products(records, 3) == ['lantern', 'xylem', 'quest']
+    records = [('ember', 6), ('grove', 2), ('ember', 1), ('opal', 10), ('grove', -1), ('charlie', 0), ('mango', -4)]
+    assert rank_products(records, 3) == ['opal', 'ember', 'grove']
 
 
 def test_tie_breaks_alphabetically() -> None:
-    records = [('xylem', 4), ('mango', 4), ('unity', 4), ('xylem', -1), ('mango', -1), ('quest', 1)]
-    assert rank_products(records, 2) == ['unity', 'mango']
+    records = [('ember', 4), ('charlie', 4), ('mango', 4), ('ember', -1), ('charlie', -1), ('grove', 1)]
+    assert rank_products(records, 2) == ['mango', 'charlie']
 
 
 def test_non_positive_k_returns_empty() -> None:
-    records = [('xylem', 6), ('quest', 2), ('xylem', 1), ('lantern', 10), ('quest', -1), ('mango', 0), ('unity', -4)]
+    records = [('ember', 6), ('grove', 2), ('ember', 1), ('opal', 10), ('grove', -1), ('charlie', 0), ('mango', -4)]
     assert rank_products(records, 0) == []
+
+def test_empty_records_returns_empty() -> None:
+    assert rank_products([], 3) == []
+
+def test_k_larger_than_population_is_safe() -> None:
+    records = [("alpha", 2), ("beta", 1), ("alpha", 1)]
+    assert rank_products(records, 10) == ["alpha", "beta"]

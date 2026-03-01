@@ -14,3 +14,14 @@ Rules:
   - `unique_keys`
   - `top_key` (highest value, tie -> lexicographically smallest key)
   - `top_value`
+
+## Quality Gate Expectations
+Implement all behavior required by tests, including edge-case handling and deterministic output.
+
+## Input/Output Examples
+- Example 1 input/output contract: `assert summarize(raw) == {'total': 17, 'unique_keys': 3, 'top_key': 'blossom', 'top_value': 9}`
+- Example 2 input/output contract: `assert summarize("") == {`
+
+## Required Edge Cases
+- Handle empty and malformed input rows.
+- Keep aggregation semantics deterministic.

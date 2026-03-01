@@ -11,3 +11,16 @@ Requirements:
 - Return only product names.
 - Return at most `k` entries.
 - If `k <= 0`, return `[]`.
+
+## Quality Gate Expectations
+Implement all behavior required by tests, including edge-case handling and deterministic output.
+
+## Input/Output Examples
+- Example 1 input/output contract: `assert rank_products(records, 3) == ['glider', 'ultra', 'utopia']`
+- Example 2 input/output contract: `assert rank_products(records, 2) == ['grove', 'jungle']`
+
+## Required Edge Cases
+- Handle empty datasets and non-positive limits.
+- Keep tie-breaking deterministic.
+- Reject invalid inputs where required by the tests.
+- Avoid brittle shortcuts that only satisfy one fixture.

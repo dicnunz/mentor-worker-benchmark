@@ -2,15 +2,22 @@ from src.solution import rank_products
 
 
 def test_aggregates_and_sorts() -> None:
-    records = [('iris', 7), ('xenon', 2), ('iris', 1), ('lima', 10), ('xenon', -1), ('prairie', 0), ('quartz', -4)]
-    assert rank_products(records, 3) == ['lima', 'iris', 'xenon']
+    records = [('willow', 7), ('velvet', 2), ('willow', 1), ('yearling', 10), ('velvet', -1), ('feather', 0), ('timber', -4)]
+    assert rank_products(records, 3) == ['yearling', 'willow', 'velvet']
 
 
 def test_tie_breaks_alphabetically() -> None:
-    records = [('iris', 4), ('prairie', 4), ('quartz', 4), ('iris', -1), ('prairie', -1), ('xenon', 1)]
-    assert rank_products(records, 2) == ['quartz', 'iris']
+    records = [('willow', 4), ('feather', 4), ('timber', 4), ('willow', -1), ('feather', -1), ('velvet', 1)]
+    assert rank_products(records, 2) == ['timber', 'feather']
 
 
 def test_non_positive_k_returns_empty() -> None:
-    records = [('iris', 7), ('xenon', 2), ('iris', 1), ('lima', 10), ('xenon', -1), ('prairie', 0), ('quartz', -4)]
+    records = [('willow', 7), ('velvet', 2), ('willow', 1), ('yearling', 10), ('velvet', -1), ('feather', 0), ('timber', -4)]
     assert rank_products(records, 0) == []
+
+def test_empty_records_returns_empty() -> None:
+    assert rank_products([], 3) == []
+
+def test_k_larger_than_population_is_safe() -> None:
+    records = [("alpha", 2), ("beta", 1), ("alpha", 1)]
+    assert rank_products(records, 10) == ["alpha", "beta"]
