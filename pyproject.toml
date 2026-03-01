@@ -1,0 +1,42 @@
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mentor-worker-benchmark"
+version = "0.1.0"
+description = "Local benchmark for mentor/worker LLM collaboration with objective coding tasks"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [{ name = "nicdunz" }]
+dependencies = [
+  "requests>=2.32.0",
+  "pytest>=8.0.0",
+]
+
+[project.scripts]
+mentor-worker-benchmark = "mentor_worker_benchmark.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["mentor_worker_benchmark*"]
+
+[tool.setuptools.package-data]
+mentor_worker_benchmark = [
+  "tasks/task_codegen_py/templates/*.txt",
+  "tasks/task_codegen_py/task_cases/*/prompt.md",
+  "tasks/task_codegen_py/task_cases/*/src/*.py",
+  "tasks/task_codegen_py/task_cases/*/tests/*.py",
+]
+
+[tool.pytest.ini_options]
+addopts = "-q"
+testpaths = ["tests"]
+
+[tool.ruff]
+target-version = "py311"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
