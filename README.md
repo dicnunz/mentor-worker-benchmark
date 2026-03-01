@@ -140,7 +140,7 @@ python -m mentor_worker_benchmark run [--task-pack task_pack_v2|task_pack_v1] [-
 python -m mentor_worker_benchmark sanity [--task-pack task_pack_v2|task_pack_v1] [--suite quick|dev|test|all]
 python -m mentor_worker_benchmark leaderboard --results results/results.json --output results/leaderboard.md
 python -m mentor_worker_benchmark compare --before before.json --after after.json
-python -m mentor_worker_benchmark export --results results/results.json --out submissions/<name>.zip
+python -m mentor_worker_benchmark export --results results/results.json --out submissions/<name>.zip [--official]
 python -m mentor_worker_benchmark verify --submission submissions/<name>.zip
 python -m mentor_worker_benchmark curate --task-pack task_pack_v1 --seed 1337
 python -m mentor_worker_benchmark provenance --task-pack task_pack_v2 [--fail-on-overlap]
@@ -193,6 +193,25 @@ python -m mentor_worker_benchmark verify --submission submissions/my_run.zip
 
 Submission details and maintainer verification flow are documented in `docs/SUBMIT_RESULTS.md`.
 
+## Community Leaderboard Automation
+
+Repository structure:
+- `submissions/`: tracked submission bundles (`.zip`).
+- `leaderboard/submissions/`: normalized per-submission JSON extracted from verified bundles.
+- `leaderboard/summary.json`: aggregated view used by docs.
+
+Automation:
+- PRs touching `submissions/` trigger `.github/workflows/submissions-pr.yml`.
+- CI verifies each changed submission zip.
+- CI regenerates `leaderboard/summary.json`, `docs/leaderboard.md`, and `docs/index.html`.
+- For same-repo PRs, CI auto-commits refreshed artifacts back to the PR branch.
+
+`docs/index.html` now includes:
+- latest official runs,
+- pack filter (`task_pack_v1` / `task_pack_v2`),
+- suite filter (`quick` / `dev` / `test`),
+- explicit `community (not official)` labeling.
+
 ## Lightweight Leaderboard Publishing
 
 Generate markdown + static HTML:
@@ -201,14 +220,20 @@ Generate markdown + static HTML:
 python scripts/publish_leaderboard.py \
   --results results/results.json \
   --markdown-out results/leaderboard.md \
-  --html-out docs/index.html
+  --html-out docs/single_run.html
 ```
 
 Enable GitHub Pages (repo settings):
 1. Open **Settings → Pages**.
 2. Set **Source** to “Deploy from a branch”.
 3. Select `main` branch and `/docs` folder.
-4. Save. GitHub publishes `docs/index.html`.
+4. Save. GitHub publishes `docs/index.html` (community leaderboard).
+
+Regenerate community artifacts from tracked `submissions/*.zip`:
+
+```bash
+python scripts/build_community_leaderboard.py --strict
+```
 
 ## Methodology Guardrails
 

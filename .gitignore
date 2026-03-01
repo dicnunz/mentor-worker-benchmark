@@ -25,9 +25,9 @@ results/*
 !results/curation_report.md
 !results/curation_report.json
 
-# Submission bundles
-submissions/*
-!submissions/.gitkeep
+# Local scratch submissions
+submissions/tmp_*
+submissions/local_*
 
 # OS files
 .DS_Store

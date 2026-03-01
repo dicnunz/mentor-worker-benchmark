@@ -179,7 +179,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Publish leaderboard markdown + docs HTML from results JSON.")
     parser.add_argument("--results", default="results/results.json")
     parser.add_argument("--markdown-out", default="results/leaderboard.md")
-    parser.add_argument("--html-out", default="docs/index.html")
+    parser.add_argument("--html-out", default="docs/single_run.html")
     args = parser.parse_args()
 
     results_path = Path(args.results)

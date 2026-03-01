@@ -19,7 +19,8 @@ or:
 Both scripts:
 - run the benchmark with standardized config (`task_pack_v2`, fixed seed, repro mode),
 - export a submission zip,
-- verify that zip locally.
+- verify that zip locally,
+- mark the submission as `official`.
 
 Environment variables:
 - `PYTHON_BIN` (default: `python3`)
@@ -43,6 +44,9 @@ Submission zip contents:
 - `environment.json`
 - `submission_manifest.json` (commit, task-pack version, CLI command)
 
+By default, manual exports are labeled `community (not official)`.
+Only maintainers should use `--official` for standardized official runs.
+
 ## 3. Open a submission issue
 
 Use the **Benchmark Result Submission** issue template and attach/link your `.zip`.
@@ -65,3 +69,8 @@ python -m mentor_worker_benchmark verify --submission submissions/<name>.zip
 Or use GitHub Actions manual workflow: **Verify Submission Bundle** (`workflow_dispatch`) with either:
 - `submission_url` (public zip URL), or
 - `submission_path` (path in repo).
+
+For submission PRs, CI also runs **Submissions PR Check** to:
+- verify changed bundles,
+- regenerate normalized leaderboard artifacts,
+- refresh `docs/index.html` and `docs/leaderboard.md`.

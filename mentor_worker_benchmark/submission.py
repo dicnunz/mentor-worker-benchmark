@@ -150,6 +150,7 @@ def export_submission_bundle(
     results_path: Path,
     out_path: Path,
     cli_command: str | None = None,
+    official_submission: bool = False,
 ) -> dict[str, Any]:
     if not results_path.exists():
         raise RuntimeError(f"Results file not found: {results_path}")
@@ -189,6 +190,7 @@ def export_submission_bundle(
         "task_pack_version": task_pack_version,
         "git_commit_hash": commit_hash,
         "cli_command": command_used,
+        "official_submission": bool(official_submission),
         "source_results_path": str(results_path),
     }
 
@@ -201,34 +203,46 @@ def export_submission_bundle(
     return manifest
 
 
-def verify_submission_bundle(submission_path: Path) -> dict[str, Any]:
-    errors: list[str] = []
-    details: dict[str, Any] = {"submission_path": str(submission_path)}
-
+def read_submission_bundle(submission_path: Path) -> dict[str, Any]:
     if not submission_path.exists():
-        return {
-            "ok": False,
-            "errors": [f"Submission file not found: {submission_path}"],
-            "details": details,
-        }
+        raise RuntimeError(f"Submission file not found: {submission_path}")
 
     try:
         with zipfile.ZipFile(submission_path, "r") as archive:
             names = set(archive.namelist())
-            for required in REQUIRED_SUBMISSION_FILES:
-                if required not in names:
-                    errors.append(f"Missing required archive file: {required}")
-
-            if errors:
-                return {"ok": False, "errors": errors, "details": details}
+            missing = [required for required in REQUIRED_SUBMISSION_FILES if required not in names]
+            if missing:
+                missing_label = ", ".join(missing)
+                raise RuntimeError(f"Missing required archive file(s): {missing_label}")
 
             results_payload = json.loads(archive.read("results.json").decode("utf-8"))
             environment_payload = json.loads(archive.read("environment.json").decode("utf-8"))
             manifest_payload = json.loads(archive.read("submission_manifest.json").decode("utf-8"))
     except zipfile.BadZipFile:
-        return {"ok": False, "errors": [f"Invalid zip archive: {submission_path}"], "details": details}
+        raise RuntimeError(f"Invalid zip archive: {submission_path}") from None
     except json.JSONDecodeError as exc:
-        return {"ok": False, "errors": [f"Invalid JSON in submission archive: {exc}"], "details": details}
+        raise RuntimeError(f"Invalid JSON in submission archive: {exc}") from exc
+
+    return {
+        "submission_path": str(submission_path),
+        "results": results_payload,
+        "environment": environment_payload,
+        "manifest": manifest_payload,
+    }
+
+
+def verify_submission_bundle(submission_path: Path) -> dict[str, Any]:
+    errors: list[str] = []
+    details: dict[str, Any] = {"submission_path": str(submission_path)}
+
+    try:
+        bundle = read_submission_bundle(submission_path)
+    except RuntimeError as exc:
+        return {"ok": False, "errors": [str(exc)], "details": details}
+
+    results_payload = bundle["results"]
+    environment_payload = bundle["environment"]
+    manifest_payload = bundle["manifest"]
 
     result_errors = validate_results_payload(results_payload)
     errors.extend(result_errors)
@@ -265,6 +279,9 @@ def verify_submission_bundle(submission_path: Path) -> dict[str, Any]:
             errors.append(f"Manifest git_commit_hash has invalid format: {commit_hash}")
         if not cli_command:
             errors.append("Manifest cli_command cannot be empty")
+        official_submission = manifest.get("official_submission")
+        if official_submission is not None and not isinstance(official_submission, bool):
+            errors.append("Manifest official_submission must be a boolean when present")
 
         if task_pack:
             discovered_version = resolve_task_pack_version(task_pack)
@@ -293,6 +310,7 @@ def verify_submission_bundle(submission_path: Path) -> dict[str, Any]:
         details["task_pack_version"] = task_pack_version
         details["git_commit_hash"] = commit_hash
         details["cli_command"] = cli_command
+        details["official_submission"] = bool(official_submission)
 
     return {"ok": len(errors) == 0, "errors": errors, "details": details}
 
@@ -305,6 +323,7 @@ def render_verification_report(report: dict[str, Any]) -> str:
             f"- Submission: {details.get('submission_path')}",
             f"- Task pack: {details.get('task_pack')} ({details.get('task_pack_version')})",
             f"- Commit: {details.get('git_commit_hash')}",
+            f"- Label: {'official' if details.get('official_submission') else 'community (not official)'}",
             f"- Command: {details.get('cli_command')}",
         ]
         return "\n".join(lines)

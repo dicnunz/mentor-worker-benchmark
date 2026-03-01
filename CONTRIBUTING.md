@@ -21,6 +21,7 @@ python -m mentor_worker_benchmark.tasks.task_pack_v2.validate
 python -m mentor_worker_benchmark provenance --task-pack task_pack_v2
 python -m mentor_worker_benchmark sanity --task-pack task_pack_v2 --suite quick --seed 1337
 python -m mentor_worker_benchmark verify --submission submissions/<name>.zip  # when touching submission tooling
+python scripts/build_community_leaderboard.py --strict  # when touching submissions/*
 python -m mentor_worker_benchmark.tasks.task_pack_v1.validate
 python -m mentor_worker_benchmark sanity --task-pack task_pack_v1 --suite quick --seed 1337
 python -m mentor_worker_benchmark curate --task-pack task_pack_v1 --seed 1337

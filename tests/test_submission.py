@@ -97,9 +97,27 @@ def test_export_and_verify_submission_round_trip(tmp_path: Path) -> None:
     )
     assert out_path.exists()
     assert manifest["task_pack"] == "task_pack_v2"
+    assert manifest["official_submission"] is False
 
     report = verify_submission_bundle(out_path)
     assert report["ok"], report["errors"]
+
+
+def test_export_supports_official_submission_flag(tmp_path: Path) -> None:
+    results_path = tmp_path / "results.json"
+    out_path = tmp_path / "official_submission.zip"
+    results_path.write_text(json.dumps(_sample_results_payload(), indent=2), encoding="utf-8")
+
+    manifest = export_submission_bundle(
+        results_path=results_path,
+        out_path=out_path,
+        official_submission=True,
+    )
+    assert manifest["official_submission"] is True
+
+    report = verify_submission_bundle(out_path)
+    assert report["ok"], report["errors"]
+    assert report["details"]["official_submission"] is True
 
 
 def test_verify_rejects_manifest_with_missing_commit(tmp_path: Path) -> None:

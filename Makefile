@@ -1,4 +1,4 @@
-.PHONY: setup quick curate lock generate-pack sanity run-quick run-dev run-test run-all leaderboard compare lint test
+.PHONY: setup quick curate lock generate-pack sanity run-quick run-dev run-test run-all leaderboard community-leaderboard compare lint test
 
 setup:
 	python -m mentor_worker_benchmark setup
@@ -32,6 +32,9 @@ run-all:
 
 leaderboard:
 	python -m mentor_worker_benchmark leaderboard --results results/results.json --output results/leaderboard.md
+
+community-leaderboard:
+	python scripts/build_community_leaderboard.py --strict
 
 compare:
 	python -m mentor_worker_benchmark compare --before results/before.json --after results/results.json

@@ -203,6 +203,7 @@ def cmd_export(args: argparse.Namespace) -> int:
             results_path=Path(args.results),
             out_path=Path(args.out),
             cli_command=args.command,
+            official_submission=args.official,
         )
     except RuntimeError as exc:
         print(str(exc))
@@ -357,6 +358,11 @@ def build_parser() -> argparse.ArgumentParser:
     export.add_argument("--results", default="results/results.json")
     export.add_argument("--out", required=True)
     export.add_argument("--command", default=None, help="Optional explicit CLI command used for the run.")
+    export.add_argument(
+        "--official",
+        action="store_true",
+        help="Mark bundle as official (maintainer-approved standardized run).",
+    )
     export.set_defaults(func=cmd_export)
 
     verify = subparsers.add_parser("verify", help="Verify a standardized submission zip.")

@@ -3,72 +3,269 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Mentor Worker Benchmark Leaderboard</title>
+  <title>Mentor Worker Benchmark Community Leaderboard</title>
   <style>
     :root {
-      --bg: #f7f8fa;
+      --bg: #f6f8fb;
       --card: #ffffff;
-      --text: #1f2430;
-      --muted: #5c667a;
-      --line: #dde3ee;
+      --text: #1d2433;
+      --muted: #5b6782;
+      --line: #dbe2ef;
       --accent: #0f5cc0;
+      --warn: #b45309;
+      --ok: #0f766e;
     }
     body {
       margin: 0;
-      font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      background: radial-gradient(circle at 0% 0%, #e9eef8 0, var(--bg) 45%);
+      font-family: "SF Pro Text", "Segoe UI", -apple-system, BlinkMacSystemFont, sans-serif;
+      background: radial-gradient(circle at 0% 0%, #e7eefb 0, var(--bg) 46%);
       color: var(--text);
     }
     main {
-      max-width: 1080px;
+      max-width: 1200px;
       margin: 0 auto;
-      padding: 2rem 1rem 3rem;
+      padding: 1.6rem 1rem 2.4rem;
     }
-    h1 { margin: 0 0 0.5rem; font-size: 1.9rem; }
-    .meta { color: var(--muted); margin-bottom: 1.5rem; }
+    h1 { margin: 0; font-size: 2rem; }
+    .meta {
+      color: var(--muted);
+      margin-top: 0.45rem;
+      margin-bottom: 1.2rem;
+    }
     .card {
       background: var(--card);
       border: 1px solid var(--line);
       border-radius: 12px;
       padding: 1rem;
-      margin: 0 0 1rem;
-      overflow-x: auto;
+      margin-bottom: 1rem;
       box-shadow: 0 3px 12px rgba(15, 34, 68, 0.06);
+      overflow-x: auto;
     }
-    table { border-collapse: collapse; width: 100%; min-width: 600px; }
-    th, td { border-bottom: 1px solid var(--line); text-align: left; padding: 0.55rem; font-size: 0.92rem; }
-    th { color: var(--muted); font-weight: 600; }
-    td { color: var(--text); }
-    a { color: var(--accent); text-decoration: none; }
+    .controls {
+      display: flex;
+      gap: 0.8rem;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    label {
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+    select {
+      padding: 0.35rem 0.55rem;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      background: #fff;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      min-width: 760px;
+    }
+    th, td {
+      text-align: left;
+      border-bottom: 1px solid var(--line);
+      padding: 0.5rem;
+      font-size: 0.92rem;
+      vertical-align: top;
+    }
+    th {
+      color: var(--muted);
+      font-weight: 600;
+    }
+    .badge {
+      display: inline-block;
+      padding: 0.18rem 0.5rem;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      border: 1px solid transparent;
+    }
+    .badge-official {
+      color: var(--ok);
+      border-color: #99f6e4;
+      background: #f0fdfa;
+    }
+    .badge-community {
+      color: var(--warn);
+      border-color: #fde68a;
+      background: #fffbeb;
+    }
+    .small {
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+    a {
+      color: var(--accent);
+      text-decoration: none;
+    }
     a:hover { text-decoration: underline; }
   </style>
 </head>
 <body>
   <main>
-    <h1>Mentor Worker Benchmark</h1>
-    <div class="meta">Generated: 2026-03-01T05:36:36.328447+00:00 | Runs: 54 | Wall time: 572.0695s</div>
+    <h1>Mentor Worker Benchmark Community Leaderboard</h1>
+    <p class="meta">
+      Generated: n/a |
+      Submissions: 0 |
+      Official: 0 |
+      Community: 0
+    </p>
 
     <section class="card">
-      <h2>Best Mentors</h2>
-      <table><thead><tr><th>Mentor</th><th>Avg Lift</th><th>Mentored Pass Rate</th><th>Violation Rate</th></tr></thead><tbody><tr><td>phi3:mini</td><td>0.00%</td><td>0.00%</td><td>0.00%</td></tr></tbody></table>
+      <h2>Filters</h2>
+      <div class="controls">
+        <label for="packFilter">Task Pack</label>
+        <select id="packFilter">
+          <option value="all">all</option>
+          <option value="task_pack_v1">task_pack_v1</option>
+          <option value="task_pack_v2">task_pack_v2</option>
+        </select>
+        <label for="suiteFilter">Suite</label>
+        <select id="suiteFilter">
+          <option value="all">all</option>
+          <option value="quick">quick</option>
+          <option value="dev">dev</option>
+          <option value="test">test</option>
+          <option value="mixed">mixed</option>
+        </select>
+      </div>
+      <p class="small">Community submissions are explicitly labeled <strong>community (not official)</strong>.</p>
     </section>
 
     <section class="card">
-      <h2>Best Workers</h2>
-      <table><thead><tr><th>Worker</th><th>Baseline</th><th>Mentored</th><th>Control</th><th>Lift</th></tr></thead><tbody><tr><td>phi3:mini</td><td>0.00%</td><td>0.00%</td><td>0.00%</td><td>0.00%</td></tr></tbody></table>
+      <h2>Latest Official Runs</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Submission</th>
+            <th>Pack</th>
+            <th>Suite</th>
+            <th>Top Worker</th>
+            <th>Mentored</th>
+            <th>Lift</th>
+            <th>Commit</th>
+          </tr>
+        </thead>
+        <tbody id="officialRows"></tbody>
+      </table>
     </section>
 
     <section class="card">
-      <h2>Per-Category Breakdown</h2>
-      <table><thead><tr><th>Category</th><th>Baseline</th><th>Mentored</th><th>Control</th><th>Lift</th></tr></thead><tbody><tr><td>concurrency_basics</td><td>0.00%</td><td>0.00%</td><td>0.00%</td><td>0.00%</td></tr>
-<tr><td>ds_algo</td><td>0.00%</td><td>0.00%</td><td>0.00%</td><td>0.00%</td></tr>
-<tr><td>file_io_serialization</td><td>0.00%</td><td>0.00%</td><td>0.00%</td><td>0.00%</td></tr>
-<tr><td>multi_file_mini_module</td><td>0.00%</td><td>0.00%</td><td>0.00%</td><td>0.00%</td></tr>
-<tr><td>numerical_edge_cases</td><td>0.00%</td><td>0.00%</td><td>0.00%</td><td>0.00%</td></tr>
-<tr><td>string_regex_parsing</td><td>0.00%</td><td>0.00%</td><td>0.00%</td><td>0.00%</td></tr></tbody></table>
+      <h2>All Verified Submissions</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Submission</th>
+            <th>Label</th>
+            <th>Pack</th>
+            <th>Suite</th>
+            <th>Top Worker</th>
+            <th>Baseline</th>
+            <th>Mentored</th>
+            <th>Lift</th>
+            <th>Commit</th>
+          </tr>
+        </thead>
+        <tbody id="submissionRows"></tbody>
+      </table>
     </section>
 
-    <p class="meta">Generated from <code>results/results.json</code>. Markdown version: <a href="../results/leaderboard.md">results/leaderboard.md</a></p>
+    <p class="meta">Raw normalized summaries: <a href="../leaderboard/summary.json">leaderboard/summary.json</a> | Markdown: <a href="./leaderboard.md">docs/leaderboard.md</a></p>
   </main>
+  <script>
+    const entries = [];
+    const packFilter = document.getElementById("packFilter");
+    const suiteFilter = document.getElementById("suiteFilter");
+    const officialRows = document.getElementById("officialRows");
+    const submissionRows = document.getElementById("submissionRows");
+
+    function pct(value) {
+      if (typeof value !== "number") return "";
+      return (value * 100).toFixed(2) + "%";
+    }
+
+    function normalizeSuite(value) {
+      const raw = String(value || "").trim();
+      if (raw === "quick" || raw === "dev" || raw === "test") return raw;
+      if (!raw) return "unknown";
+      return "mixed";
+    }
+
+    function rowMatches(entry) {
+      const packOk = packFilter.value === "all" || entry.task_pack === packFilter.value;
+      const suiteToken = normalizeSuite(entry.suite);
+      const suiteOk = suiteFilter.value === "all" || suiteToken === suiteFilter.value;
+      return packOk && suiteOk;
+    }
+
+    function latestOfficial(filtered) {
+      const map = new Map();
+      for (const entry of filtered) {
+        if (!entry.official_submission) continue;
+        const suiteToken = normalizeSuite(entry.suite);
+        const key = `${entry.task_pack}|${suiteToken}`;
+        const prev = map.get(key);
+        if (!prev || String(entry.generated_at) > String(prev.generated_at)) {
+          map.set(key, entry);
+        }
+      }
+      return Array.from(map.values()).sort((a, b) => String(b.generated_at).localeCompare(String(a.generated_at)));
+    }
+
+    function render() {
+      const filtered = entries.filter(rowMatches).sort((a, b) => String(b.generated_at).localeCompare(String(a.generated_at)));
+      const official = latestOfficial(filtered);
+
+      officialRows.innerHTML = "";
+      if (official.length === 0) {
+        officialRows.innerHTML = "<tr><td colspan='7'>No official runs for current filters.</td></tr>";
+      } else {
+        for (const entry of official) {
+          const worker = entry.best_worker || {};
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td>${entry.submission_id}</td>
+            <td>${entry.task_pack}</td>
+            <td>${normalizeSuite(entry.suite)}</td>
+            <td>${worker.worker_model || ""}</td>
+            <td>${pct(worker.mentored_pass_rate)}</td>
+            <td>${pct(worker.lift)}</td>
+            <td>${entry.git_commit_hash}</td>
+          `;
+          officialRows.appendChild(tr);
+        }
+      }
+
+      submissionRows.innerHTML = "";
+      if (filtered.length === 0) {
+        submissionRows.innerHTML = "<tr><td colspan='9'>No submissions for current filters.</td></tr>";
+      } else {
+        for (const entry of filtered) {
+          const worker = entry.best_worker || {};
+          const badge = entry.official_submission
+            ? "<span class='badge badge-official'>official</span>"
+            : "<span class='badge badge-community'>community (not official)</span>";
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td>${entry.submission_id}</td>
+            <td>${badge}</td>
+            <td>${entry.task_pack}</td>
+            <td>${normalizeSuite(entry.suite)}</td>
+            <td>${worker.worker_model || ""}</td>
+            <td>${pct(worker.baseline_pass_rate)}</td>
+            <td>${pct(worker.mentored_pass_rate)}</td>
+            <td>${pct(worker.lift)}</td>
+            <td>${entry.git_commit_hash}</td>
+          `;
+          submissionRows.appendChild(tr);
+        }
+      }
+    }
+
+    packFilter.addEventListener("change", render);
+    suiteFilter.addEventListener("change", render);
+    render();
+  </script>
 </body>
 </html>

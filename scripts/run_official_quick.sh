@@ -28,6 +28,7 @@ echo "Exporting submission bundle..."
 "${PYTHON_BIN}" -m mentor_worker_benchmark export \
   --results "${RESULTS_PATH}" \
   --out "${SUBMISSION_PATH}" \
+  --official \
   --command "${RUN_COMMAND}"
 
 echo "Verifying submission bundle..."
