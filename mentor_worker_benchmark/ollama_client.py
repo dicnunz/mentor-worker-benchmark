@@ -119,6 +119,7 @@ class OllamaClient:
         system: str | None = None,
         temperature: float = 0.0,
         top_p: float = 1.0,
+        num_predict: int = 512,
     ) -> str:
         request_messages = list(messages)
         if system:
@@ -131,6 +132,7 @@ class OllamaClient:
             "options": {
                 "temperature": temperature,
                 "top_p": top_p,
+                "num_predict": num_predict,
             },
         }
 

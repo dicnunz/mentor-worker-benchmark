@@ -1,81 +1,84 @@
 # mentor-worker-benchmark
 
-A reproducible, fully local benchmark for measuring how much a **mentor LLM** helps a **worker LLM** solve objective coding tasks using only natural-language messages.
+A fully local, reproducible benchmark for measuring whether a **mentor LLM** improves a **worker LLM** on objective coding tasks.
 
-- Inference server: [Ollama](https://ollama.com/) (local, free runtime)
-- Task type: Python microtasks with `pytest` tests
-- Evaluation: objective pass/fail only (no subjective judging)
-- Outputs:
-  - `results/results.json` (full run logs + metrics)
-  - `results/leaderboard.md` (human-friendly rankings)
+- Local inference: [Ollama](https://ollama.com/) only (free/local runtime)
+- Objective grading: per-task `pytest` pass/fail
+- Mentor restriction: mentor can send **guidance text only** (no code/diff output)
+- Artifacts:
+  - `results/results.json`
+  - `results/leaderboard.md`
 
-## Why this project
+## What is new in this version
 
-Many “LLM collaboration” claims are anecdotal. This benchmark isolates one question:
+This repo now includes a versioned generated task corpus:
 
-> Does mentorship-style guidance improve worker task success, compared to the same worker alone?
+- Task pack: `task_pack_v1`
+- Total tasks: **300**
+- Splits:
+  - `train`: 200
+  - `dev`: 50
+  - `test`: 50
+- Quick suite: 18 balanced eval tasks (3 per category)
 
-It does this with deterministic local settings (`temperature=0`, `top_p=1`) and test-based scoring.
+### Categories (6)
 
-## Core design
+1. `string_regex_parsing`
+2. `ds_algo`
+3. `file_io_serialization`
+4. `concurrency_basics`
+5. `numerical_edge_cases`
+6. `multi_file_mini_module`
 
-### Roles
+## Benchmark design
 
-- **Worker**: produces the actual unified diff patch.
-- **Mentor**: can only send natural-language guidance.
+For each worker model/task:
 
-### Mentor constraints
+1. **Baseline**: worker-alone patch attempt
+2. **Mentored**: turn-based mentor+worker loop (default `max_turns=4`)
 
-Mentor outputs are checked for code/diff leakage. If violations are detected (diff fences, file content patterns, code-like lines), output is sanitized to guidance-only text and logged as a violation.
+Scoring is objective:
 
-### Benchmark modes
-
-For each worker model and task:
-1. **Baseline**: worker alone
-2. **Mentored**: mentor + worker iterative loop (`max_turns=4` by default)
+- apply worker patch
+- run `pytest`
+- record pass/fail and metrics
 
 Mentorship lift is computed as:
 
 `mentored_pass_rate - baseline_pass_rate`
 
-### Task suite
+## Mentor constraint enforcement
 
-12 tasks across 3 objective categories:
-- `bugfix` (4)
-- `implement` (4)
-- `refactor` (4)
+Mentor responses are checked for violations (code fences, diff markers, file/code-like lines).
+If violated, output is sanitized into guidance-only text and violation is logged.
 
-Each task folder contains:
-- `prompt.md`
-- `src/solution.py`
-- `tests/test_solution.py`
+## Task pack versioning + generation
 
-## Repo structure
+Task pack assets live under:
 
-```text
-mentor_worker_benchmark/
-  __init__.py
-  __main__.py
-  cli.py
-  runner.py
-  ollama_client.py
-  tasks/
-    task_base.py
-    task_codegen_py/
-      task_defs.py
-      harness.py
-      templates/
-      task_cases/
-results/
-scripts/install_ollama.sh
-pyproject.toml
-README.md
-LICENSE
+- `mentor_worker_benchmark/tasks/task_pack_v1/metadata.json`
+- `mentor_worker_benchmark/tasks/task_pack_v1/tasks/<task_id>/...`
+
+Regenerate deterministically:
+
+```bash
+python -m mentor_worker_benchmark.tasks.task_pack_v1.generate_task_pack --seed 1337
 ```
 
-## Models (default)
+`metadata.json` records task id, title, category, difficulty, split, quick flag, and path.
 
-The benchmark defaults to these Ollama models:
+## Setup
+
+Python 3.11+ is required.
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -e .
+python -m mentor_worker_benchmark setup
+```
+
+Default Ollama model set:
 
 - `llama3.1:8b`
 - `qwen2.5-coder:7b`
@@ -83,62 +86,63 @@ The benchmark defaults to these Ollama models:
 - `phi3:mini`
 - `gemma2:9b`
 
-## Setup
+## Run commands
 
-Python 3.11+ is required.
+### Single command after setup (default eval)
 
-```bash
-python -m venv .venv
-source .venv/bin/activate
-pip install -e .
-python -m mentor_worker_benchmark setup
-```
-
-`setup` will:
-- verify Ollama installation
-- try to detect/start Ollama server
-- pull missing default models
-
-## Single-command benchmark run (after setup)
+By default, `run` executes **dev+test** split from `task_pack_v1`.
 
 ```bash
-python -m mentor_worker_benchmark run --models default --max-turns 4 --tasks all
+python -m mentor_worker_benchmark run --models default --max-turns 4
 ```
 
-Quick smoke run:
+### Quick/dev/test/all suites
 
 ```bash
-python -m mentor_worker_benchmark run --models default --max-turns 2 --tasks quick
+python -m mentor_worker_benchmark run --suite quick --max-turns 2
+python -m mentor_worker_benchmark run --suite dev --max-turns 4
+python -m mentor_worker_benchmark run --suite test --max-turns 4
+python -m mentor_worker_benchmark run --suite all --max-turns 4
 ```
 
-Render leaderboard from existing results:
+### Select task pack / seed
 
 ```bash
-python -m mentor_worker_benchmark leaderboard --results results/results.json
+python -m mentor_worker_benchmark run --task-pack task_pack_v1 --suite dev --seed 1337
 ```
+
+### Legacy explicit task selector (still supported)
+
+```bash
+python -m mentor_worker_benchmark run --tasks quick
+python -m mentor_worker_benchmark run --tasks v1_ds_algo_001,v1_numerical_edge_cases_010
+```
+
+## Sanity check (no model calls)
+
+Validate harness/task integrity by running starter tests for selected tasks:
+
+```bash
+python -m mentor_worker_benchmark sanity --task-pack task_pack_v1 --suite all --seed 1337
+```
+
+Expected behavior for this benchmark style: starter code is incomplete/buggy, so tests should fail with normal assertion failures (not harness errors).
 
 ## CLI reference
 
 ```bash
 python -m mentor_worker_benchmark setup [--models default|m1,m2] [--skip-pull]
-python -m mentor_worker_benchmark run --models default --max-turns 4 --tasks all
+python -m mentor_worker_benchmark run [--models ...] [--suite quick|dev|test|all] [--task-pack task_pack_v1] [--seed 1337]
+python -m mentor_worker_benchmark sanity [--suite quick|dev|test|all] [--task-pack task_pack_v1] [--seed 1337]
 python -m mentor_worker_benchmark leaderboard --results results/results.json --output results/leaderboard.md
 ```
 
-## Metrics recorded
+## Output artifacts
 
-Per run (`mentor`, `worker`, `task`, `mode`):
-- `pass` (bool)
-- `turns_used`
-- `wall_time_seconds`
-- `total_tokens_estimate` (chars/4 approximation)
+- `results/results.json`: full config, run logs, pass/fail metrics, aggregates
+- `results/leaderboard.md`: mentor ranking, worker ranking, pair matrix
 
-Aggregates:
-- best mentors (avg lift across workers + mentored pass rate)
-- best workers (baseline vs mentored pass rates)
-- mentor-worker pair matrix
-
-## Example leaderboard snippet
+Example leaderboard snippet:
 
 ```md
 ## Best Workers
@@ -148,11 +152,12 @@ Aggregates:
 | phi3:mini | 0.42 | 0.51 | 0.09 |
 ```
 
-## Notes on reproducibility
+## Reproducibility notes
 
-- Runs are local-only and offline after model pulls.
-- Task execution is isolated in temporary directories.
-- Deterministic generation parameters are used by default.
+- Benchmark execution is 100% local once models are pulled.
+- Task materialization uses temporary directories and cleanup.
+- Task ordering is deterministic per `--seed`.
+- Task pack generation is deterministic per seed.
 
 ## License
 

@@ -6,8 +6,13 @@ import sys
 from pathlib import Path
 
 from mentor_worker_benchmark.ollama_client import OllamaClient
-from mentor_worker_benchmark.runner import BenchmarkConfig, DEFAULT_MODELS, run_benchmark, write_leaderboard
-from mentor_worker_benchmark.tasks.task_codegen_py.task_defs import all_tasks
+from mentor_worker_benchmark.runner import (
+    BenchmarkConfig,
+    DEFAULT_MODELS,
+    run_benchmark,
+    run_sanity_check,
+    write_leaderboard,
+)
 
 
 def _parse_models(raw: str) -> list[str]:
@@ -53,6 +58,8 @@ def cmd_run(args: argparse.Namespace) -> int:
     if args.max_turns < 1:
         print("--max-turns must be >= 1")
         return 1
+    if args.tasks and args.suite:
+        print("--tasks provided; ignoring --suite for task selection.")
 
     client = OllamaClient(timeout_seconds=args.timeout)
     status = client.ensure_server_running(auto_start=False)
@@ -72,7 +79,10 @@ def cmd_run(args: argparse.Namespace) -> int:
     config = BenchmarkConfig(
         models=models,
         max_turns=args.max_turns,
+        task_pack=args.task_pack,
+        suite=args.suite,
         task_selector=args.tasks,
+        seed=args.seed,
         results_path=Path(args.results_path),
     )
 
@@ -86,6 +96,36 @@ def cmd_run(args: argparse.Namespace) -> int:
     print(f"Results JSON: {config.results_path}")
     print(f"Leaderboard: {config.results_path.parent / 'leaderboard.md'}")
     return 0
+
+
+def cmd_sanity(args: argparse.Namespace) -> int:
+    if args.tasks and args.suite:
+        print("--tasks provided; ignoring --suite for task selection.")
+    try:
+        summary = run_sanity_check(
+            task_pack=args.task_pack,
+            suite=args.suite,
+            task_selector=args.tasks,
+            seed=args.seed,
+        )
+    except ValueError as exc:
+        print(str(exc))
+        return 1
+    except RuntimeError as exc:
+        print(str(exc))
+        return 1
+
+    print(
+        f"Sanity checked {summary['task_count']} tasks from `{summary['task_pack']}` "
+        f"(suite={summary['suite']})."
+    )
+    print(
+        f"Expected failures: {summary['expected_failures']}, "
+        f"unexpected passes: {summary['unexpected_passes']}, "
+        f"broken harness tasks: {summary['broken_tasks']}"
+    )
+    print(f"Wall time: {summary['wall_time_seconds']}s")
+    return 0 if summary["unexpected_passes"] == 0 and summary["broken_tasks"] == 0 else 1
 
 
 def cmd_leaderboard(args: argparse.Namespace) -> int:
@@ -116,7 +156,14 @@ def build_parser() -> argparse.ArgumentParser:
     run = subparsers.add_parser("run", help="Run baseline and mentored benchmark suites.")
     run.add_argument("--models", default="default", help="Comma-separated model list or `default`.")
     run.add_argument("--max-turns", type=int, default=4)
-    run.add_argument("--tasks", default="all", help="Task selector: all, quick, or comma-separated task ids.")
+    run.add_argument("--task-pack", default="task_pack_v1")
+    run.add_argument("--suite", choices=["quick", "dev", "test", "all"], default=None)
+    run.add_argument(
+        "--tasks",
+        default=None,
+        help="Legacy explicit selector: all, quick, or comma-separated task ids. Overrides --suite.",
+    )
+    run.add_argument("--seed", type=int, default=1337)
     run.add_argument("--results-path", default="results/results.json")
     run.add_argument("--timeout", type=int, default=180)
     run.add_argument(
@@ -125,6 +172,20 @@ def build_parser() -> argparse.ArgumentParser:
         help="Skip local model presence check (advanced).",
     )
     run.set_defaults(func=cmd_run)
+
+    sanity = subparsers.add_parser(
+        "sanity",
+        help="Run pytest sanity checks on task starters (no model interaction).",
+    )
+    sanity.add_argument("--task-pack", default="task_pack_v1")
+    sanity.add_argument("--suite", choices=["quick", "dev", "test", "all"], default="all")
+    sanity.add_argument(
+        "--tasks",
+        default=None,
+        help="Legacy explicit selector: all, quick, or comma-separated task ids. Overrides --suite.",
+    )
+    sanity.add_argument("--seed", type=int, default=1337)
+    sanity.set_defaults(func=cmd_sanity)
 
     leaderboard = subparsers.add_parser("leaderboard", help="Render leaderboard markdown from JSON results.")
     leaderboard.add_argument("--results", default="results/results.json")

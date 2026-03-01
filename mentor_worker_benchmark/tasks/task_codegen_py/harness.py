@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import shutil
 import subprocess
+import sys
 import tempfile
 import time
 from dataclasses import dataclass
@@ -16,6 +17,7 @@ class TestRunResult:
     passed: bool
     output: str
     duration_seconds: float
+    timed_out: bool = False
 
 
 def materialize_task(task: TaskDefinition) -> tuple[tempfile.TemporaryDirectory[str], Path]:
@@ -54,19 +56,32 @@ def project_snapshot(workdir: Path, max_total_chars: int = 24000) -> str:
     return "".join(chunks).strip()
 
 
-def run_pytest(workdir: Path) -> TestRunResult:
+def run_pytest(workdir: Path, timeout_seconds: int = 20) -> TestRunResult:
     start = time.perf_counter()
-    process = subprocess.run(
-        ["python", "-m", "pytest", "-q"],
-        cwd=workdir,
-        text=True,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.STDOUT,
-    )
-    duration = time.perf_counter() - start
-    return TestRunResult(
-        exit_code=process.returncode,
-        passed=process.returncode == 0,
-        output=process.stdout,
-        duration_seconds=duration,
-    )
+    try:
+        process = subprocess.run(
+            [sys.executable, "-m", "pytest", "-q"],
+            cwd=workdir,
+            text=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            timeout=timeout_seconds,
+        )
+        duration = time.perf_counter() - start
+        return TestRunResult(
+            exit_code=process.returncode,
+            passed=process.returncode == 0,
+            output=process.stdout,
+            duration_seconds=duration,
+            timed_out=False,
+        )
+    except subprocess.TimeoutExpired as exc:
+        duration = time.perf_counter() - start
+        stdout_text = exc.stdout if isinstance(exc.stdout, str) else ""
+        return TestRunResult(
+            exit_code=124,
+            passed=False,
+            output=(stdout_text + "\n[timeout] pytest exceeded timeout budget.").strip(),
+            duration_seconds=duration,
+            timed_out=True,
+        )

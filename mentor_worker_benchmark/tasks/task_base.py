@@ -2,15 +2,15 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Literal
-
-TaskCategory = Literal["bugfix", "implement", "refactor"]
 
 
 @dataclass(frozen=True, slots=True)
 class TaskDefinition:
     task_id: str
     title: str
-    category: TaskCategory
+    category: str
     path: Path
+    split: str = "train"
+    difficulty: str = "medium"
+    pack_name: str = "legacy_codegen_py"
     quick: bool = False

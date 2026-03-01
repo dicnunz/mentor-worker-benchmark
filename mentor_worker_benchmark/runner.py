@@ -11,13 +11,13 @@ from statistics import mean
 from typing import Any
 
 from mentor_worker_benchmark.ollama_client import OllamaClient
+from mentor_worker_benchmark.tasks.task_registry import resolve_tasks
 from mentor_worker_benchmark.tasks.task_codegen_py.harness import (
     materialize_task,
     project_snapshot,
     read_task_prompt,
     run_pytest,
 )
-from mentor_worker_benchmark.tasks.task_codegen_py.task_defs import select_tasks
 
 DEFAULT_MODELS = [
     "llama3.1:8b",
@@ -43,7 +43,10 @@ DIFF_BLOCK_RE = re.compile(r"```(?:diff)?\n(.*?)```", re.DOTALL | re.IGNORECASE)
 class BenchmarkConfig:
     models: list[str]
     max_turns: int = 4
-    task_selector: str = "all"
+    task_pack: str = "task_pack_v1"
+    suite: str | None = None
+    task_selector: str | None = None
+    seed: int = 1337
     results_path: Path = Path("results/results.json")
 
 
@@ -189,18 +192,27 @@ def _baseline_run(
         mentor_guidance="(none)",
     )
 
-    worker_response = client.chat(
-        model=worker_model,
-        messages=[{"role": "user", "content": worker_prompt}],
-        system=WORKER_SYSTEM_PROMPT,
-        temperature=0.0,
-        top_p=1.0,
-    )
+    worker_error: str | None = None
+    try:
+        worker_response = client.chat(
+            model=worker_model,
+            messages=[{"role": "user", "content": worker_prompt}],
+            system=WORKER_SYSTEM_PROMPT,
+            temperature=0.0,
+            top_p=1.0,
+            num_predict=700,
+        )
+    except RuntimeError as exc:
+        worker_response = f"[worker_error] {exc}"
+        worker_error = str(exc)
+
     extracted = _extract_diff(worker_response)
     patch_applied = False
     patch_log = "No valid unified diff found in worker response."
     if extracted:
         patch_applied, patch_log = _apply_patch(workdir, extracted)
+    elif worker_error:
+        patch_log = worker_error
 
     final_tests = run_pytest(workdir)
     elapsed = time.perf_counter() - start
@@ -225,6 +237,7 @@ def _baseline_run(
             "initial_test_output": initial_tests.output,
             "worker_prompt": worker_prompt,
             "worker_response": worker_response,
+            "worker_error": worker_error,
             "extracted_patch": extracted,
             "patch_applied": patch_applied,
             "patch_log": patch_log,
@@ -262,13 +275,19 @@ def _mentored_run(
             mentor_guidance="\n".join(guidance_history[-3:]),
         )
 
-        worker_response = client.chat(
-            model=worker_model,
-            messages=[{"role": "user", "content": worker_prompt}],
-            system=WORKER_SYSTEM_PROMPT,
-            temperature=0.0,
-            top_p=1.0,
-        )
+        worker_error: str | None = None
+        try:
+            worker_response = client.chat(
+                model=worker_model,
+                messages=[{"role": "user", "content": worker_prompt}],
+                system=WORKER_SYSTEM_PROMPT,
+                temperature=0.0,
+                top_p=1.0,
+                num_predict=700,
+            )
+        except RuntimeError as exc:
+            worker_response = f"[worker_error] {exc}"
+            worker_error = str(exc)
 
         token_accumulator += _estimate_tokens(worker_prompt) + _estimate_tokens(worker_response)
         extracted = _extract_diff(worker_response)
@@ -276,6 +295,8 @@ def _mentored_run(
         patch_log = "No valid unified diff found in worker response."
         if extracted:
             patch_applied, patch_log = _apply_patch(workdir, extracted)
+        elif worker_error:
+            patch_log = worker_error
 
         current_tests = run_pytest(workdir)
         token_accumulator += _estimate_tokens(current_tests.output)
@@ -285,6 +306,7 @@ def _mentored_run(
             "turn": turn_index,
             "worker_prompt": worker_prompt,
             "worker_response": worker_response,
+            "worker_error": worker_error,
             "extracted_patch": extracted,
             "patch_applied": patch_applied,
             "patch_log": patch_log,
@@ -304,19 +326,32 @@ def _mentored_run(
                 failure_output=current_tests.output,
             )
 
-            mentor_response = client.chat(
-                model=mentor_model,
-                messages=[{"role": "user", "content": mentor_prompt}],
-                system=MENTOR_SYSTEM_PROMPT,
-                temperature=0.0,
-                top_p=1.0,
-            )
+            mentor_error: str | None = None
+            try:
+                mentor_response = client.chat(
+                    model=mentor_model,
+                    messages=[{"role": "user", "content": mentor_prompt}],
+                    system=MENTOR_SYSTEM_PROMPT,
+                    temperature=0.0,
+                    top_p=1.0,
+                    num_predict=220,
+                )
+            except RuntimeError as exc:
+                mentor_response = f"[mentor_error] {exc}"
+                mentor_error = str(exc)
+
             mentor_guidance, violation = _sanitize_mentor_guidance(mentor_response)
+            if mentor_error:
+                mentor_guidance = (
+                    "Focus on failing assertions and apply the smallest targeted change to the likely bug source."
+                )
+                violation = False
             guidance_history.append(mentor_guidance)
             token_accumulator += _estimate_tokens(mentor_prompt) + _estimate_tokens(mentor_response)
 
             turn_log["mentor_prompt"] = mentor_prompt
             turn_log["mentor_response_raw"] = mentor_response
+            turn_log["mentor_error"] = mentor_error
             turn_log["mentor_guidance"] = mentor_guidance
             turn_log["mentor_violation"] = violation
 
@@ -488,10 +523,77 @@ Generated: {results['generated_at']}
     output_path.write_text(content, encoding="utf-8")
 
 
+def run_sanity_check(
+    *,
+    task_pack: str,
+    suite: str | None,
+    task_selector: str | None,
+    seed: int,
+) -> dict[str, Any]:
+    selection = resolve_tasks(
+        task_pack=task_pack,
+        suite=suite,
+        legacy_selector=task_selector,
+        seed=seed,
+    )
+
+    started = time.perf_counter()
+    rows: list[dict[str, Any]] = []
+    expected_failures = 0
+    unexpected_passes = 0
+    broken_tasks = 0
+
+    for task in selection.tasks:
+        temp_dir, workdir = materialize_task(task)
+        try:
+            test_result = run_pytest(workdir)
+            status = "expected_failure"
+            if test_result.exit_code == 0:
+                status = "unexpected_pass"
+                unexpected_passes += 1
+            elif test_result.exit_code == 1:
+                expected_failures += 1
+            else:
+                status = "broken_harness"
+                broken_tasks += 1
+
+            rows.append(
+                {
+                    "task_id": task.task_id,
+                    "category": task.category,
+                    "split": task.split,
+                    "status": status,
+                    "exit_code": test_result.exit_code,
+                    "duration_seconds": round(test_result.duration_seconds, 4),
+                }
+            )
+        finally:
+            temp_dir.cleanup()
+
+    elapsed = time.perf_counter() - started
+    return {
+        "task_pack": selection.task_pack,
+        "suite": selection.suite,
+        "selector_source": selection.selector_source,
+        "task_count": len(selection.tasks),
+        "expected_failures": expected_failures,
+        "unexpected_passes": unexpected_passes,
+        "broken_tasks": broken_tasks,
+        "wall_time_seconds": round(elapsed, 4),
+        "runs": rows,
+    }
+
+
 def run_benchmark(config: BenchmarkConfig, client: OllamaClient | None = None) -> dict[str, Any]:
     client = client or OllamaClient()
 
-    selected_tasks = select_tasks(config.task_selector)
+    selection = resolve_tasks(
+        task_pack=config.task_pack,
+        suite=config.suite,
+        legacy_selector=config.task_selector,
+        seed=config.seed,
+    )
+    selected_tasks = selection.tasks
     worker_template = _load_template("worker_prompt.txt")
     mentor_template = _load_template("mentor_prompt.txt")
 
@@ -552,7 +654,11 @@ def run_benchmark(config: BenchmarkConfig, client: OllamaClient | None = None) -
         "config": {
             "models": config.models,
             "max_turns": config.max_turns,
+            "task_pack": config.task_pack,
+            "suite": selection.suite,
+            "selector_source": selection.selector_source,
             "task_selector": config.task_selector,
+            "seed": config.seed,
             "task_count": len(task_ids),
         },
         "summary": {

@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "mentor-worker-benchmark"
-version = "0.1.0"
+version = "0.2.0"
 description = "Local benchmark for mentor/worker LLM collaboration with objective coding tasks"
 readme = "README.md"
 requires-python = ">=3.11"
@@ -28,6 +28,10 @@ mentor_worker_benchmark = [
   "tasks/task_codegen_py/task_cases/*/prompt.md",
   "tasks/task_codegen_py/task_cases/*/src/*.py",
   "tasks/task_codegen_py/task_cases/*/tests/*.py",
+  "tasks/task_pack_v1/metadata.json",
+  "tasks/task_pack_v1/tasks/*/prompt.md",
+  "tasks/task_pack_v1/tasks/*/src/*.py",
+  "tasks/task_pack_v1/tasks/*/tests/*.py",
 ]
 
 [tool.pytest.ini_options]
