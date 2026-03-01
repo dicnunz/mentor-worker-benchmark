@@ -17,6 +17,11 @@ from mentor_worker_benchmark.runner import (
     run_sanity_check,
     write_leaderboard,
 )
+from mentor_worker_benchmark.submission import (
+    export_submission_bundle,
+    render_verification_report,
+    verify_submission_bundle,
+)
 from mentor_worker_benchmark.tasks.task_pack_v1.curate import CurationConfig, run_curation
 from mentor_worker_benchmark.tasks.task_pack_v2.provenance import (
     DEFAULT_MAX_CLUSTERS,
@@ -192,6 +197,29 @@ def cmd_compare(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_export(args: argparse.Namespace) -> int:
+    try:
+        manifest = export_submission_bundle(
+            results_path=Path(args.results),
+            out_path=Path(args.out),
+            cli_command=args.command,
+        )
+    except RuntimeError as exc:
+        print(str(exc))
+        return 1
+
+    print(f"Submission bundle written: {args.out}")
+    print(f"Task pack: {manifest['task_pack']} ({manifest['task_pack_version']})")
+    print(f"Commit: {manifest['git_commit_hash']}")
+    return 0
+
+
+def cmd_verify(args: argparse.Namespace) -> int:
+    report = verify_submission_bundle(Path(args.submission))
+    print(render_verification_report(report))
+    return 0 if report.get("ok") else 1
+
+
 def cmd_curate(args: argparse.Namespace) -> int:
     config = CurationConfig(
         task_pack=args.task_pack,
@@ -324,6 +352,16 @@ def build_parser() -> argparse.ArgumentParser:
     compare.add_argument("--before", required=True)
     compare.add_argument("--after", required=True)
     compare.set_defaults(func=cmd_compare)
+
+    export = subparsers.add_parser("export", help="Export a standardized submission zip from results.json.")
+    export.add_argument("--results", default="results/results.json")
+    export.add_argument("--out", required=True)
+    export.add_argument("--command", default=None, help="Optional explicit CLI command used for the run.")
+    export.set_defaults(func=cmd_export)
+
+    verify = subparsers.add_parser("verify", help="Verify a standardized submission zip.")
+    verify.add_argument("--submission", required=True)
+    verify.set_defaults(func=cmd_verify)
 
     curate = subparsers.add_parser(
         "curate",

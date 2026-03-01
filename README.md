@@ -109,6 +109,17 @@ python -m mentor_worker_benchmark run \
 
 `--repro` fixes key generation/runtime settings (temperature, top_p, seeds, max tokens, max turns).
 
+## Official Suites
+
+Standardized scripts (macOS/Linux):
+
+```bash
+./scripts/run_official_quick.sh
+./scripts/run_official_dev.sh
+```
+
+Each script runs a fixed-suite benchmark in repro mode, exports a submission bundle, and verifies it.
+
 ## Sanity Check (No Model Calls)
 
 Validate task harness and starters without Ollama:
@@ -129,6 +140,8 @@ python -m mentor_worker_benchmark run [--task-pack task_pack_v2|task_pack_v1] [-
 python -m mentor_worker_benchmark sanity [--task-pack task_pack_v2|task_pack_v1] [--suite quick|dev|test|all]
 python -m mentor_worker_benchmark leaderboard --results results/results.json --output results/leaderboard.md
 python -m mentor_worker_benchmark compare --before before.json --after after.json
+python -m mentor_worker_benchmark export --results results/results.json --out submissions/<name>.zip
+python -m mentor_worker_benchmark verify --submission submissions/<name>.zip
 python -m mentor_worker_benchmark curate --task-pack task_pack_v1 --seed 1337
 python -m mentor_worker_benchmark provenance --task-pack task_pack_v2 [--fail-on-overlap]
 ```
@@ -158,6 +171,27 @@ Generated files:
 - `results/results.json`
 - `results/leaderboard.md`
 - `docs/index.html` (optional GitHub Pages view)
+
+## How To Submit Results
+
+1. Run an official suite (`./scripts/run_official_quick.sh` or `./scripts/run_official_dev.sh`).
+2. If needed, manually export:
+
+```bash
+python -m mentor_worker_benchmark export \
+  --results results/results.json \
+  --out submissions/my_run.zip
+```
+
+3. Verify your bundle:
+
+```bash
+python -m mentor_worker_benchmark verify --submission submissions/my_run.zip
+```
+
+4. Open a submission issue and attach/link the zip.
+
+Submission details and maintainer verification flow are documented in `docs/SUBMIT_RESULTS.md`.
 
 ## Lightweight Leaderboard Publishing
 

@@ -25,5 +25,9 @@ results/*
 !results/curation_report.md
 !results/curation_report.json
 
+# Submission bundles
+submissions/*
+!submissions/.gitkeep
+
 # OS files
 .DS_Store

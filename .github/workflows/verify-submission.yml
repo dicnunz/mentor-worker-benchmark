@@ -1,0 +1,61 @@
+name: Verify Submission Bundle
+
+on:
+  workflow_dispatch:
+    inputs:
+      submission_url:
+        description: "Public URL to a submission zip (optional if submission_path is set)"
+        required: false
+        type: string
+      submission_path:
+        description: "Path to a submission zip in this repository checkout (optional if submission_url is set)"
+        required: false
+        type: string
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e .
+
+      - name: Resolve submission archive
+        shell: bash
+        run: |
+          set -euo pipefail
+          URL="${{ github.event.inputs.submission_url }}"
+          PATH_INPUT="${{ github.event.inputs.submission_path }}"
+
+          if [[ -n "${URL}" ]]; then
+            curl -L --fail "${URL}" -o /tmp/submission.zip
+            echo "SUBMISSION_ZIP=/tmp/submission.zip" >> "$GITHUB_ENV"
+            exit 0
+          fi
+
+          if [[ -n "${PATH_INPUT}" ]]; then
+            if [[ ! -f "${PATH_INPUT}" ]]; then
+              echo "submission_path does not exist: ${PATH_INPUT}" >&2
+              exit 1
+            fi
+            echo "SUBMISSION_ZIP=${PATH_INPUT}" >> "$GITHUB_ENV"
+            exit 0
+          fi
+
+          echo "Provide either submission_url or submission_path." >&2
+          exit 1
+
+      - name: Verify submission
+        run: |
+          python -m mentor_worker_benchmark verify --submission "${SUBMISSION_ZIP}"
