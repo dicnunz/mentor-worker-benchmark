@@ -5,10 +5,10 @@
 - Pack: `task_pack_v2`
 - Pack version: `2.0.0`
 - Generator version: `2.0.0`
-- Git commit: `7c11cc76ff2b2b54d9988c88c214fcc3e2b66f7b`
-- Git dirty state at generation: `True`
+- Git commit: `294bac218b0903cb20ec9b0c2d1c0aa480fa5ec4`
+- Git dirty state at generation: `False`
 - Seed: `1337`
-- Manifest generated at: `2026-03-01T15:42:30.620142+00:00`
+- Manifest generated at: `2026-03-01T15:43:42.669963+00:00`
 
 ## Synthetic Data Statement
 
