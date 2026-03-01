@@ -6,6 +6,11 @@ import sys
 from pathlib import Path
 
 from mentor_worker_benchmark.ollama_client import OllamaClient
+from mentor_worker_benchmark.provider_factory import (
+    SUPPORTED_PROVIDERS,
+    build_client,
+    normalize_provider_name,
+)
 from mentor_worker_benchmark.runner import (
     BenchmarkConfig,
     DEFAULT_MODELS,
@@ -37,6 +42,26 @@ def _parse_models(raw: str) -> list[str]:
     if not models:
         raise ValueError("No models provided. Use comma-separated model names or `default`.")
     return models
+
+
+def _parse_optional_model_overrides(
+    *,
+    role: str,
+    single_model: str | None,
+    plural_models: str | None,
+) -> list[str] | None:
+    if single_model and plural_models:
+        raise ValueError(
+            f"Use either --{role}-model or --{role}-models, not both."
+        )
+    if single_model:
+        value = single_model.strip()
+        if not value:
+            raise ValueError(f"--{role}-model cannot be empty.")
+        return [value]
+    if plural_models:
+        return _parse_models(plural_models)
+    return None
 
 
 def _parse_run_modes(raw: str) -> tuple[str, ...]:
@@ -81,9 +106,33 @@ def cmd_setup(args: argparse.Namespace) -> int:
 
 
 def cmd_run(args: argparse.Namespace) -> int:
-    models = _parse_models(args.models)
-    mentor_models = _parse_models(args.mentor_models) if args.mentor_models else list(models)
-    worker_models_override = _parse_models(args.worker_models) if args.worker_models else None
+    try:
+        models = _parse_models(args.models)
+        mentor_models_override = _parse_optional_model_overrides(
+            role="mentor",
+            single_model=args.mentor_model,
+            plural_models=args.mentor_models,
+        )
+        worker_models_override = _parse_optional_model_overrides(
+            role="worker",
+            single_model=args.worker_model,
+            plural_models=args.worker_models,
+        )
+    except ValueError as exc:
+        print(str(exc))
+        return 1
+
+    mentor_models = list(mentor_models_override or models)
+    worker_models = list(worker_models_override or models)
+
+    try:
+        provider = normalize_provider_name(args.provider)
+        mentor_provider = normalize_provider_name(args.mentor_provider or provider)
+        worker_provider = normalize_provider_name(args.worker_provider or provider)
+    except ValueError as exc:
+        print(str(exc))
+        return 1
+
     run_modes = _parse_run_modes(args.run_modes)
 
     if args.max_turns < 1:
@@ -94,30 +143,66 @@ def cmd_run(args: argparse.Namespace) -> int:
     if args.repro and args.max_turns != REPRO_MAX_TURNS:
         print(f"Repro mode enabled: overriding max turns to fixed value {REPRO_MAX_TURNS}.")
 
-    client = OllamaClient(timeout_seconds=args.timeout)
-    status = client.ensure_server_running(auto_start=False)
-    if not status.reachable:
-        print(status.message)
-        print("Run `python -m mentor_worker_benchmark setup` first.")
+    try:
+        if mentor_provider == worker_provider:
+            shared_client = build_client(
+                provider=mentor_provider,
+                timeout_seconds=args.timeout,
+                reasoning_level=args.reasoning_level,
+            )
+            mentor_client = shared_client
+            worker_client = shared_client
+        else:
+            mentor_client = build_client(
+                provider=mentor_provider,
+                timeout_seconds=args.timeout,
+                reasoning_level=args.reasoning_level,
+            )
+            worker_client = build_client(
+                provider=worker_provider,
+                timeout_seconds=args.timeout,
+                reasoning_level=args.reasoning_level,
+            )
+    except RuntimeError as exc:
+        print(str(exc))
         return 1
 
-    if not args.skip_model_check:
-        local_models = client.list_local_models()
-        required_models = set(mentor_models)
-        if worker_models_override:
-            required_models.update(worker_models_override)
-        else:
-            required_models.update(models)
-        missing = [model for model in sorted(required_models) if model not in local_models]
-        if missing:
-            print("Missing models: " + ", ".join(missing))
-            print("Run `python -m mentor_worker_benchmark setup` to pull them.")
+    if isinstance(mentor_client, OllamaClient):
+        status = mentor_client.ensure_server_running(auto_start=False)
+        if not status.reachable:
+            print(status.message)
+            print("Run `python -m mentor_worker_benchmark setup` first.")
             return 1
+    if isinstance(worker_client, OllamaClient) and worker_client is not mentor_client:
+        status = worker_client.ensure_server_running(auto_start=False)
+        if not status.reachable:
+            print(status.message)
+            print("Run `python -m mentor_worker_benchmark setup` first.")
+            return 1
+
+    if not args.skip_model_check:
+        if isinstance(mentor_client, OllamaClient):
+            local_models = mentor_client.list_local_models()
+            missing = [model for model in sorted(set(mentor_models)) if model not in local_models]
+            if missing:
+                print("Missing mentor models in Ollama: " + ", ".join(missing))
+                print("Run `python -m mentor_worker_benchmark setup` to pull them.")
+                return 1
+        if isinstance(worker_client, OllamaClient):
+            local_models = worker_client.list_local_models()
+            missing = [model for model in sorted(set(worker_models)) if model not in local_models]
+            if missing:
+                print("Missing worker models in Ollama: " + ", ".join(missing))
+                print("Run `python -m mentor_worker_benchmark setup` to pull them.")
+                return 1
 
     config = BenchmarkConfig(
         models=models,
         mentor_models_override=mentor_models,
         worker_models_override=worker_models_override,
+        provider=provider,
+        mentor_provider=mentor_provider,
+        worker_provider=worker_provider,
         max_turns=args.max_turns,
         task_pack=args.task_pack,
         suite=args.suite,
@@ -130,7 +215,7 @@ def cmd_run(args: argparse.Namespace) -> int:
     )
 
     try:
-        results = run_benchmark(config, client=client)
+        results = run_benchmark(config, mentor_client=mentor_client, worker_client=worker_client)
     except (ValueError, RuntimeError) as exc:
         print(str(exc))
         return 1
@@ -308,14 +393,51 @@ def build_parser() -> argparse.ArgumentParser:
     run = subparsers.add_parser("run", help="Run benchmark suites and ablations.")
     run.add_argument("--models", default="default", help="Comma-separated model list or `default`.")
     run.add_argument(
+        "--provider",
+        choices=SUPPORTED_PROVIDERS,
+        default="ollama",
+        help="LLM provider for both roles (default: ollama).",
+    )
+    run.add_argument(
+        "--mentor-provider",
+        choices=SUPPORTED_PROVIDERS,
+        default=None,
+        help="Optional provider override for mentor role.",
+    )
+    run.add_argument(
+        "--worker-provider",
+        choices=SUPPORTED_PROVIDERS,
+        default=None,
+        help="Optional provider override for worker role.",
+    )
+    run.add_argument(
         "--mentor-models",
         default=None,
         help="Optional comma-separated mentor model list. Defaults to --models.",
     )
     run.add_argument(
+        "--mentor-model",
+        default=None,
+        help="Optional single mentor model name (use instead of --mentor-models).",
+    )
+    run.add_argument(
         "--worker-models",
         default=None,
         help="Optional comma-separated worker model list. Defaults to --models.",
+    )
+    run.add_argument(
+        "--worker-model",
+        default=None,
+        help="Optional single worker model name (use instead of --worker-models).",
+    )
+    run.add_argument(
+        "--reasoning-level",
+        choices=["none", "low", "medium", "high"],
+        default="none",
+        help=(
+            "Reasoning effort hint for providers/models that support it "
+            "(currently applies to openai)."
+        ),
     )
     run.add_argument("--max-turns", type=int, default=4)
     run.add_argument("--task-pack", default="task_pack_v2")

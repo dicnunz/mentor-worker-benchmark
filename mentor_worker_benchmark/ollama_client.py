@@ -18,6 +18,8 @@ class OllamaServerStatus:
 class OllamaClient:
     """Minimal Ollama API client for deterministic local chat completions."""
 
+    provider_name = "ollama"
+
     def __init__(self, base_url: str = "http://localhost:11434", timeout_seconds: int = 120) -> None:
         self.base_url = base_url.rstrip("/")
         self.timeout_seconds = timeout_seconds
@@ -195,3 +197,10 @@ class OllamaClient:
         if not isinstance(content, str):
             raise RuntimeError(f"Unexpected Ollama response format for model `{model}`: {body}")
         return content
+
+    def runtime_metadata(self, model_names: list[str]) -> dict[str, Any]:
+        return {
+            "base_url": self.base_url,
+            "cli_version": self.get_ollama_version(),
+            "model_tags": self.get_model_details(model_names),
+        }

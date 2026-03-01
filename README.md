@@ -114,6 +114,52 @@ python -m mentor_worker_benchmark run \
 
 `--repro` fixes key generation/runtime settings (temperature, top_p, seeds, max tokens, max turns).
 
+## Run With OpenAI SOTA Models
+
+You can run remote models by switching provider(s) from the default `ollama` to `openai`.
+
+Requirements:
+- Set `OPENAI_API_KEY` in your environment.
+- Pick explicit model names (for example `gpt-5`, `gpt-5-mini`, `o4-mini`) using role flags.
+
+Examples:
+
+```bash
+# Use OpenAI for both mentor and worker.
+python -m mentor_worker_benchmark run \
+  --provider openai \
+  --mentor-model gpt-5 \
+  --worker-model gpt-5-mini \
+  --suite quick \
+  --max-turns 1 \
+  --timeout 60
+```
+
+```bash
+# Hybrid run: local worker via Ollama, remote mentor via OpenAI.
+python -m mentor_worker_benchmark run \
+  --provider ollama \
+  --mentor-provider openai \
+  --worker-provider ollama \
+  --mentor-model gpt-5 \
+  --worker-model phi3:mini \
+  --suite quick \
+  --max-turns 1
+```
+
+```bash
+# Optional reasoning hint for supported OpenAI models.
+python -m mentor_worker_benchmark run \
+  --provider openai \
+  --mentor-model gpt-5 \
+  --worker-model gpt-5-mini \
+  --reasoning-level medium
+```
+
+Warning:
+- OpenAI runs are not free. You are responsible for API cost and rate limits.
+- Large suites can trigger throttling; start with `--suite quick` and conservative turn limits.
+
 ## Official Suites
 
 Standardized scripts (macOS/Linux):

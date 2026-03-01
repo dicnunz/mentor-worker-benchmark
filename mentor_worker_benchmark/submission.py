@@ -123,6 +123,11 @@ def _infer_cli_command(results_payload: dict[str, Any]) -> str:
     generation = config.get("generation", {}) if isinstance(config, dict) else {}
 
     models = config.get("models", [])
+    mentor_models = config.get("mentor_models", models)
+    worker_models = config.get("worker_models", models)
+    provider = str(config.get("provider", "ollama"))
+    mentor_provider = str(config.get("mentor_provider", provider))
+    worker_provider = str(config.get("worker_provider", provider))
     run_modes = config.get("run_modes", [])
     seed = generation.get("seed", 1337)
     max_turns = config.get("max_turns", 4)
@@ -140,6 +145,16 @@ def _infer_cli_command(results_payload: dict[str, Any]) -> str:
         f"--max-turns {max_turns}",
         "--results-path results/results.json",
     ]
+    if provider:
+        command.append(f"--provider {provider}")
+    if mentor_provider and mentor_provider != provider:
+        command.append(f"--mentor-provider {mentor_provider}")
+    if worker_provider and worker_provider != provider:
+        command.append(f"--worker-provider {worker_provider}")
+    if isinstance(mentor_models, list) and mentor_models and mentor_models != models:
+        command.append(f"--mentor-models {','.join(str(item) for item in mentor_models)}")
+    if isinstance(worker_models, list) and worker_models and worker_models != models:
+        command.append(f"--worker-models {','.join(str(item) for item in worker_models)}")
     if repro:
         command.append("--repro")
     return " ".join(command)

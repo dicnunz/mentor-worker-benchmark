@@ -14,6 +14,7 @@ from statistics import mean
 from typing import Any, Literal
 
 from mentor_worker_benchmark import __version__
+from mentor_worker_benchmark.llm_client import LLMClient
 from mentor_worker_benchmark.ollama_client import OllamaClient
 from mentor_worker_benchmark.tasks.task_codegen_py.harness import (
     materialize_task,
@@ -80,6 +81,9 @@ class BenchmarkConfig:
     models: list[str]
     mentor_models_override: list[str] | None = None
     worker_models_override: list[str] | None = None
+    provider: str = "ollama"
+    mentor_provider: str | None = None
+    worker_provider: str | None = None
     max_turns: int = 4
     task_pack: str = "task_pack_v1"
     suite: str | None = None
@@ -339,7 +343,7 @@ def _dummy_mentor_guidance(turn_index: int) -> str:
 
 
 def _baseline_run(
-    client: OllamaClient,
+    client: LLMClient,
     worker_model: str,
     task_prompt: str,
     task_id: str,
@@ -417,7 +421,8 @@ def _baseline_run(
 
 
 def _mentored_run(
-    client: OllamaClient,
+    worker_client: LLMClient,
+    mentor_client: LLMClient,
     mentor_model: str,
     worker_model: str,
     task_prompt: str,
@@ -457,7 +462,7 @@ def _mentored_run(
         )
         worker_error: str | None = None
         try:
-            worker_response = client.chat(
+            worker_response = worker_client.chat(
                 model=worker_model,
                 messages=[{"role": "user", "content": worker_prompt}],
                 system=WORKER_SYSTEM_PROMPT,
@@ -527,7 +532,7 @@ def _mentored_run(
                     f"mentor_turn_{turn_index}",
                 )
                 try:
-                    mentor_response = client.chat(
+                    mentor_response = mentor_client.chat(
                         model=mentor_model,
                         messages=[{"role": "user", "content": mentor_prompt}],
                         system=MENTOR_SYSTEM_PROMPT,
@@ -767,7 +772,33 @@ def _git_is_dirty() -> bool | None:
         return None
 
 
-def _capture_runtime_context(client: OllamaClient, used_models: list[str]) -> dict[str, Any]:
+def _capture_runtime_context(
+    *,
+    mentor_client: LLMClient,
+    worker_client: LLMClient,
+    mentor_models: list[str],
+    worker_models: list[str],
+    mentor_provider: str,
+    worker_provider: str,
+) -> dict[str, Any]:
+    provider_details: dict[str, dict[str, Any]] = {}
+
+    if isinstance(mentor_client, OllamaClient):
+        ollama_models = sorted(set(mentor_models + (worker_models if mentor_provider == worker_provider else [])))
+        provider_details["ollama"] = mentor_client.runtime_metadata(ollama_models)
+    elif isinstance(worker_client, OllamaClient):
+        provider_details["ollama"] = worker_client.runtime_metadata(worker_models)
+    else:
+        provider_details["ollama"] = {}
+
+    if mentor_provider == "openai":
+        openai_models = sorted(set(mentor_models + (worker_models if mentor_provider == worker_provider else [])))
+        provider_details["openai"] = mentor_client.runtime_metadata(openai_models)
+    elif worker_provider == "openai":
+        provider_details["openai"] = worker_client.runtime_metadata(worker_models)
+    else:
+        provider_details["openai"] = {}
+
     return {
         "benchmark_version": __version__,
         "python": {
@@ -781,11 +812,12 @@ def _capture_runtime_context(client: OllamaClient, used_models: list[str]) -> di
             "release": platform.release(),
             "machine": platform.machine(),
         },
-        "ollama": {
-            "base_url": client.base_url,
-            "cli_version": client.get_ollama_version(),
-            "model_tags": client.get_model_details(used_models),
+        "llm": {
+            "mentor_provider": mentor_provider,
+            "worker_provider": worker_provider,
         },
+        "ollama": provider_details["ollama"],
+        "openai": provider_details["openai"],
         "git": {
             "commit": _git_commit_hash(),
             "dirty": _git_is_dirty(),
@@ -986,10 +1018,13 @@ def run_sanity_check(
 
 def _pick_stronger_worker_model(
     *,
-    client: OllamaClient,
+    client: LLMClient,
     current_workers: list[str],
     explicit_model: str | None,
 ) -> tuple[str | None, str | None]:
+    if not isinstance(client, OllamaClient):
+        return None, "Run mode `stronger_worker` currently requires `--worker-provider ollama`."
+
     if explicit_model:
         if explicit_model in current_workers:
             return None, f"Explicit stronger worker `{explicit_model}` already present in worker set."
@@ -1016,8 +1051,19 @@ def _pick_stronger_worker_model(
     return candidates[0], None
 
 
-def run_benchmark(config: BenchmarkConfig, client: OllamaClient | None = None) -> dict[str, Any]:
-    client = client or OllamaClient()
+def run_benchmark(
+    config: BenchmarkConfig,
+    client: LLMClient | None = None,
+    *,
+    mentor_client: LLMClient | None = None,
+    worker_client: LLMClient | None = None,
+) -> dict[str, Any]:
+    if mentor_client is None and worker_client is None and client is None:
+        client = OllamaClient()
+    mentor_client = mentor_client or client
+    worker_client = worker_client or client
+    if mentor_client is None or worker_client is None:
+        raise RuntimeError("Benchmark run is missing mentor or worker client initialization.")
 
     selection = resolve_tasks(
         task_pack=config.task_pack,
@@ -1034,11 +1080,13 @@ def run_benchmark(config: BenchmarkConfig, client: OllamaClient | None = None) -
 
     mentor_models = list(config.mentor_models_override or config.models)
     worker_models = list(config.worker_models_override or config.models)
+    mentor_provider = (config.mentor_provider or config.provider).strip().lower()
+    worker_provider = (config.worker_provider or config.provider).strip().lower()
     stronger_worker_included: str | None = None
     stronger_worker_status: str | None = None
     if "stronger_worker" in run_modes:
         stronger_candidate, stronger_message = _pick_stronger_worker_model(
-            client=client,
+            client=worker_client,
             current_workers=worker_models,
             explicit_model=config.stronger_worker_model,
         )
@@ -1071,7 +1119,7 @@ def run_benchmark(config: BenchmarkConfig, client: OllamaClient | None = None) -
                 try:
                     task_prompt = read_task_prompt(task)
                     baseline = _baseline_run(
-                        client=client,
+                        client=worker_client,
                         worker_model=worker_model,
                         task_prompt=task_prompt,
                         task_id=task.task_id,
@@ -1092,7 +1140,8 @@ def run_benchmark(config: BenchmarkConfig, client: OllamaClient | None = None) -
                     try:
                         task_prompt = read_task_prompt(task)
                         mentored = _mentored_run(
-                            client=client,
+                            worker_client=worker_client,
+                            mentor_client=mentor_client,
                             mentor_model=mentor_model,
                             worker_model=worker_model,
                             task_prompt=task_prompt,
@@ -1115,7 +1164,8 @@ def run_benchmark(config: BenchmarkConfig, client: OllamaClient | None = None) -
                 try:
                     task_prompt = read_task_prompt(task)
                     control = _mentored_run(
-                        client=client,
+                        worker_client=worker_client,
+                        mentor_client=mentor_client,
                         mentor_model="dummy_control",
                         worker_model=worker_model,
                         task_prompt=task_prompt,
@@ -1158,8 +1208,14 @@ def run_benchmark(config: BenchmarkConfig, client: OllamaClient | None = None) -
             }
             all_violations.append(enriched)
 
-    used_models = sorted({*mentor_models, *worker_models})
-    environment = _capture_runtime_context(client=client, used_models=used_models)
+    environment = _capture_runtime_context(
+        mentor_client=mentor_client,
+        worker_client=worker_client,
+        mentor_models=mentor_models,
+        worker_models=worker_models,
+        mentor_provider=mentor_provider,
+        worker_provider=worker_provider,
+    )
 
     run_counts_by_mode: dict[str, int] = {}
     for run in runs:
@@ -1169,9 +1225,12 @@ def run_benchmark(config: BenchmarkConfig, client: OllamaClient | None = None) -
     results = {
         "generated_at": datetime.now(tz=UTC).isoformat(),
         "config": {
-            "models": mentor_models,
+            "models": sorted(set(mentor_models + worker_models)),
             "mentor_models": mentor_models,
             "worker_models": worker_models,
+            "provider": config.provider,
+            "mentor_provider": mentor_provider,
+            "worker_provider": worker_provider,
             "run_modes": run_modes,
             "repro_mode": config.repro_mode,
             "max_turns": generation.max_turns,
