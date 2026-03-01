@@ -78,6 +78,8 @@ MENTOR_CODE_BLOCK_MAX_LINES = 8
 @dataclass(slots=True)
 class BenchmarkConfig:
     models: list[str]
+    mentor_models_override: list[str] | None = None
+    worker_models_override: list[str] | None = None
     max_turns: int = 4
     task_pack: str = "task_pack_v1"
     suite: str | None = None
@@ -1030,7 +1032,8 @@ def run_benchmark(config: BenchmarkConfig, client: OllamaClient | None = None) -
     run_worker_only = "worker_only" in run_modes
     run_control = "mentor_only_suggestion_noise" in run_modes
 
-    worker_models = list(config.models)
+    mentor_models = list(config.mentor_models_override or config.models)
+    worker_models = list(config.worker_models_override or config.models)
     stronger_worker_included: str | None = None
     stronger_worker_status: str | None = None
     if "stronger_worker" in run_modes:
@@ -1082,7 +1085,7 @@ def run_benchmark(config: BenchmarkConfig, client: OllamaClient | None = None) -
                     temp_dir.cleanup()
 
     if run_mentor_matrix:
-        for mentor_model in config.models:
+        for mentor_model in mentor_models:
             for worker_model in worker_models:
                 for task in selected_tasks:
                     temp_dir, workdir = materialize_task(task)
@@ -1134,7 +1137,7 @@ def run_benchmark(config: BenchmarkConfig, client: OllamaClient | None = None) -
     aggregates = _compute_aggregates(
         runs=runs,
         worker_models=worker_models,
-        mentor_models=list(config.models),
+        mentor_models=mentor_models,
         task_categories=task_categories,
     )
 
@@ -1155,7 +1158,7 @@ def run_benchmark(config: BenchmarkConfig, client: OllamaClient | None = None) -
             }
             all_violations.append(enriched)
 
-    used_models = sorted({*config.models, *worker_models})
+    used_models = sorted({*mentor_models, *worker_models})
     environment = _capture_runtime_context(client=client, used_models=used_models)
 
     run_counts_by_mode: dict[str, int] = {}
@@ -1166,7 +1169,8 @@ def run_benchmark(config: BenchmarkConfig, client: OllamaClient | None = None) -
     results = {
         "generated_at": datetime.now(tz=UTC).isoformat(),
         "config": {
-            "models": config.models,
+            "models": mentor_models,
+            "mentor_models": mentor_models,
             "worker_models": worker_models,
             "run_modes": run_modes,
             "repro_mode": config.repro_mode,

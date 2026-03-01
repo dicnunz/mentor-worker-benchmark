@@ -82,6 +82,8 @@ def cmd_setup(args: argparse.Namespace) -> int:
 
 def cmd_run(args: argparse.Namespace) -> int:
     models = _parse_models(args.models)
+    mentor_models = _parse_models(args.mentor_models) if args.mentor_models else list(models)
+    worker_models_override = _parse_models(args.worker_models) if args.worker_models else None
     run_modes = _parse_run_modes(args.run_modes)
 
     if args.max_turns < 1:
@@ -101,7 +103,12 @@ def cmd_run(args: argparse.Namespace) -> int:
 
     if not args.skip_model_check:
         local_models = client.list_local_models()
-        missing = [model for model in models if model not in local_models]
+        required_models = set(mentor_models)
+        if worker_models_override:
+            required_models.update(worker_models_override)
+        else:
+            required_models.update(models)
+        missing = [model for model in sorted(required_models) if model not in local_models]
         if missing:
             print("Missing models: " + ", ".join(missing))
             print("Run `python -m mentor_worker_benchmark setup` to pull them.")
@@ -109,6 +116,8 @@ def cmd_run(args: argparse.Namespace) -> int:
 
     config = BenchmarkConfig(
         models=models,
+        mentor_models_override=mentor_models,
+        worker_models_override=worker_models_override,
         max_turns=args.max_turns,
         task_pack=args.task_pack,
         suite=args.suite,
@@ -298,6 +307,16 @@ def build_parser() -> argparse.ArgumentParser:
 
     run = subparsers.add_parser("run", help="Run benchmark suites and ablations.")
     run.add_argument("--models", default="default", help="Comma-separated model list or `default`.")
+    run.add_argument(
+        "--mentor-models",
+        default=None,
+        help="Optional comma-separated mentor model list. Defaults to --models.",
+    )
+    run.add_argument(
+        "--worker-models",
+        default=None,
+        help="Optional comma-separated worker model list. Defaults to --models.",
+    )
     run.add_argument("--max-turns", type=int, default=4)
     run.add_argument("--task-pack", default="task_pack_v2")
     run.add_argument("--suite", choices=["quick", "dev", "test", "all"], default=None)
