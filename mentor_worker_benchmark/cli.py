@@ -212,6 +212,8 @@ def cmd_run(args: argparse.Namespace) -> int:
         run_modes=run_modes,
         repro_mode=args.repro,
         stronger_worker_model=args.stronger_worker_model,
+        worker_num_predict_override=args.worker_num_predict,
+        mentor_num_predict_override=args.mentor_num_predict,
     )
 
     try:
@@ -464,6 +466,18 @@ def build_parser() -> argparse.ArgumentParser:
     )
     run.add_argument("--results-path", default="results/results.json")
     run.add_argument("--timeout", type=int, default=180)
+    run.add_argument(
+        "--worker-num-predict",
+        type=int,
+        default=None,
+        help="Optional max completion tokens for worker generations.",
+    )
+    run.add_argument(
+        "--mentor-num-predict",
+        type=int,
+        default=None,
+        help="Optional max completion tokens for mentor generations.",
+    )
     run.add_argument(
         "--skip-model-check",
         action="store_true",

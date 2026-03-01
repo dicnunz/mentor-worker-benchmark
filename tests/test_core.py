@@ -28,6 +28,20 @@ def test_patch_with_path_traversal_is_rejected() -> None:
     assert _extract_diff(raw) is None
 
 
+def test_extract_diff_repairs_common_malformed_hunk_header() -> None:
+    raw = """```diff
+--- src/solution.py
++++ src/solution.py
+@@ -1,4 +++ b/src/solution.py
+-def solve():
++def solve():
+     pass
+```"""
+    diff = _extract_diff(raw)
+    assert diff is not None
+    assert "@@ -1,4 +1,4 @@" in diff
+
+
 def test_task_selection_quick() -> None:
     selection = resolve_tasks(task_pack="task_pack_v1", suite="quick", legacy_selector=None, seed=1337)
     assert len(selection.tasks) == 18

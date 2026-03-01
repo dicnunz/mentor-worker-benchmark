@@ -178,11 +178,12 @@ class OllamaClient:
         }
 
         try:
+            request_timeout: tuple[int, int] = (5, max(10, self.timeout_seconds * 3))
             response = requests.post(
                 self._url("/api/chat"),
                 data=json.dumps(payload),
                 headers={"Content-Type": "application/json"},
-                timeout=self.timeout_seconds,
+                timeout=request_timeout,
             )
             response.raise_for_status()
         except requests.RequestException as exc:

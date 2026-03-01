@@ -73,6 +73,8 @@ FUNCTION_DEF_RE = re.compile(r"^\s*def\s+[A-Za-z0-9_]+\s*\(", re.MULTILINE)
 CLASS_DEF_RE = re.compile(r"^\s*class\s+[A-Za-z0-9_]+\s*[:(]", re.MULTILINE)
 DIFF_MARKER_RE = re.compile(r"^(diff --git|---\s|\+\+\+\s|@@)", re.MULTILINE)
 FILE_HEADER_RE = re.compile(r"^\s*#\s*File:\s+", re.MULTILINE)
+MALFORMED_HUNK_RE = re.compile(r"^@@\s*-(\d+)(?:,(\d+))?\s+\+\+\+\s+.*$")
+HUNK_HEADER_RE = re.compile(r"^@@\s*-\d+(?:,\d+)?\s+\+\d+(?:,\d+)?\s+@@")
 MENTOR_CODE_BLOCK_MAX_LINES = 8
 
 
@@ -171,6 +173,8 @@ def _validate_patch_format(diff_text: str) -> tuple[bool, str]:
 
     checked_paths = 0
     for line in diff_text.splitlines():
+        if line.startswith("@@") and not HUNK_HEADER_RE.match(line):
+            return False, f"Malformed hunk header `{line}`."
         if not line.startswith(("--- ", "+++ ")):
             continue
         normalized = _normalize_patch_path(line[4:])
@@ -190,6 +194,29 @@ def _validate_patch_format(diff_text: str) -> tuple[bool, str]:
     return True, "ok"
 
 
+def _sanitize_diff_candidate(diff_text: str) -> str:
+    normalized = diff_text.replace("\r\n", "\n").replace("\r", "\n")
+    sanitized_lines: list[str] = []
+
+    for raw_line in normalized.splitlines():
+        line = raw_line
+        # Some models escape leading diff syntax with a backslash; strip one layer.
+        if line.startswith("\\"):
+            candidate = line[1:]
+            if not candidate or candidate[0] in {" ", "+", "-", "@", "#", "\t"}:
+                line = candidate
+
+        malformed_hunk = MALFORMED_HUNK_RE.match(line)
+        if malformed_hunk:
+            start = malformed_hunk.group(1)
+            count = malformed_hunk.group(2) or "1"
+            line = f"@@ -{start},{count} +{start},{count} @@"
+
+        sanitized_lines.append(line.rstrip())
+
+    return "\n".join(sanitized_lines).strip() + "\n"
+
+
 def _extract_diff(text: str) -> str | None:
     text = text.strip()
     blocks = [block.strip() for block in DIFF_BLOCK_RE.findall(text)]
@@ -199,6 +226,10 @@ def _extract_diff(text: str) -> str | None:
         valid, _ = _validate_patch_format(candidate)
         if valid:
             return f"{candidate}\n"
+        repaired = _sanitize_diff_candidate(candidate)
+        valid_repaired, _ = _validate_patch_format(repaired)
+        if valid_repaired:
+            return repaired
     return None
 
 
