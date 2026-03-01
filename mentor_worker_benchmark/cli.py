@@ -9,6 +9,10 @@ from mentor_worker_benchmark.ollama_client import OllamaClient
 from mentor_worker_benchmark.runner import (
     BenchmarkConfig,
     DEFAULT_MODELS,
+    DEFAULT_RUN_MODES,
+    REPRO_MAX_TURNS,
+    compare_results,
+    render_compare_report,
     run_benchmark,
     run_sanity_check,
     write_leaderboard,
@@ -22,6 +26,18 @@ def _parse_models(raw: str) -> list[str]:
     if not models:
         raise ValueError("No models provided. Use comma-separated model names or `default`.")
     return models
+
+
+def _parse_run_modes(raw: str) -> tuple[str, ...]:
+    if not raw.strip():
+        return tuple(DEFAULT_RUN_MODES)
+    if raw.strip().lower() == "default":
+        return tuple(DEFAULT_RUN_MODES)
+
+    entries = [token.strip() for token in raw.split(",") if token.strip()]
+    if not entries:
+        return tuple(DEFAULT_RUN_MODES)
+    return tuple(entries)
 
 
 def cmd_setup(args: argparse.Namespace) -> int:
@@ -55,11 +71,15 @@ def cmd_setup(args: argparse.Namespace) -> int:
 
 def cmd_run(args: argparse.Namespace) -> int:
     models = _parse_models(args.models)
+    run_modes = _parse_run_modes(args.run_modes)
+
     if args.max_turns < 1:
         print("--max-turns must be >= 1")
         return 1
     if args.tasks and args.suite:
         print("--tasks provided; ignoring --suite for task selection.")
+    if args.repro and args.max_turns != REPRO_MAX_TURNS:
+        print(f"Repro mode enabled: overriding max turns to fixed value {REPRO_MAX_TURNS}.")
 
     client = OllamaClient(timeout_seconds=args.timeout)
     status = client.ensure_server_running(auto_start=False)
@@ -84,15 +104,21 @@ def cmd_run(args: argparse.Namespace) -> int:
         task_selector=args.tasks,
         seed=args.seed,
         results_path=Path(args.results_path),
+        run_modes=run_modes,
+        repro_mode=args.repro,
+        stronger_worker_model=args.stronger_worker_model,
     )
 
     try:
         results = run_benchmark(config, client=client)
-    except ValueError as exc:
+    except (ValueError, RuntimeError) as exc:
         print(str(exc))
         return 1
 
     print(f"Completed {results['summary']['total_runs']} runs.")
+    print("Runs by mode:")
+    for mode, count in sorted(results["summary"]["runs_by_mode"].items()):
+        print(f"- {mode}: {count}")
     print(f"Results JSON: {config.results_path}")
     print(f"Leaderboard: {config.results_path.parent / 'leaderboard.md'}")
     return 0
@@ -141,6 +167,25 @@ def cmd_leaderboard(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_compare(args: argparse.Namespace) -> int:
+    before_path = Path(args.before)
+    after_path = Path(args.after)
+    if not before_path.exists():
+        print(f"Before results file not found: {before_path}")
+        return 1
+    if not after_path.exists():
+        print(f"After results file not found: {after_path}")
+        return 1
+
+    before = json.loads(before_path.read_text(encoding="utf-8"))
+    after = json.loads(after_path.read_text(encoding="utf-8"))
+
+    comparison = compare_results(before, after)
+    report = render_compare_report(comparison)
+    print(report)
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="mentor-worker-benchmark",
@@ -153,7 +198,7 @@ def build_parser() -> argparse.ArgumentParser:
     setup.add_argument("--skip-pull", action="store_true", help="Skip `ollama pull` checks.")
     setup.set_defaults(func=cmd_setup)
 
-    run = subparsers.add_parser("run", help="Run baseline and mentored benchmark suites.")
+    run = subparsers.add_parser("run", help="Run benchmark suites and ablations.")
     run.add_argument("--models", default="default", help="Comma-separated model list or `default`.")
     run.add_argument("--max-turns", type=int, default=4)
     run.add_argument("--task-pack", default="task_pack_v1")
@@ -164,6 +209,20 @@ def build_parser() -> argparse.ArgumentParser:
         help="Legacy explicit selector: all, quick, or comma-separated task ids. Overrides --suite.",
     )
     run.add_argument("--seed", type=int, default=1337)
+    run.add_argument("--repro", action="store_true", help="Enable deterministic reproducibility mode.")
+    run.add_argument(
+        "--run-modes",
+        default="default",
+        help=(
+            "Comma-separated run modes. "
+            "Allowed: worker_only,mentor_worker,mentor_only_suggestion_noise,stronger_worker,mentor_swap"
+        ),
+    )
+    run.add_argument(
+        "--stronger-worker-model",
+        default=None,
+        help="Optional explicit stronger worker model to use when run mode includes stronger_worker.",
+    )
     run.add_argument("--results-path", default="results/results.json")
     run.add_argument("--timeout", type=int, default=180)
     run.add_argument(
@@ -191,6 +250,11 @@ def build_parser() -> argparse.ArgumentParser:
     leaderboard.add_argument("--results", default="results/results.json")
     leaderboard.add_argument("--output", default="results/leaderboard.md")
     leaderboard.set_defaults(func=cmd_leaderboard)
+
+    compare = subparsers.add_parser("compare", help="Compare two results JSON files and report deltas.")
+    compare.add_argument("--before", required=True)
+    compare.add_argument("--after", required=True)
+    compare.set_defaults(func=cmd_compare)
 
     return parser
 

@@ -76,6 +76,14 @@ class OllamaClient:
             return False
 
     def list_local_models(self) -> set[str]:
+        catalog = self.get_model_catalog()
+        names: set[str] = set()
+        for item in catalog:
+            if isinstance(item, dict) and isinstance(item.get("name"), str):
+                names.add(item["name"])
+        return names
+
+    def get_model_catalog(self) -> list[dict[str, Any]]:
         try:
             response = requests.get(self._url("/api/tags"), timeout=10)
             response.raise_for_status()
@@ -86,11 +94,33 @@ class OllamaClient:
 
         payload = response.json()
         models = payload.get("models", [])
-        names: set[str] = set()
-        for item in models:
-            if isinstance(item, dict) and isinstance(item.get("name"), str):
-                names.add(item["name"])
-        return names
+        if not isinstance(models, list):
+            return []
+        return [item for item in models if isinstance(item, dict)]
+
+    def get_model_details(self, model_names: list[str]) -> list[dict[str, Any]]:
+        by_name = {str(item.get("name")): item for item in self.get_model_catalog()}
+        details: list[dict[str, Any]] = []
+        for model_name in model_names:
+            if model_name in by_name:
+                details.append(by_name[model_name])
+            else:
+                details.append({"name": model_name, "missing": True})
+        return details
+
+    @staticmethod
+    def get_ollama_version() -> str | None:
+        try:
+            process = subprocess.run(
+                ["ollama", "--version"],
+                check=True,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                text=True,
+            )
+            return process.stdout.strip()
+        except (OSError, subprocess.CalledProcessError):
+            return None
 
     def pull_model(self, model: str) -> None:
         process = subprocess.run(
@@ -120,20 +150,25 @@ class OllamaClient:
         temperature: float = 0.0,
         top_p: float = 1.0,
         num_predict: int = 512,
+        seed: int | None = None,
     ) -> str:
         request_messages = list(messages)
         if system:
             request_messages = [{"role": "system", "content": system}] + request_messages
 
+        options: dict[str, Any] = {
+            "temperature": temperature,
+            "top_p": top_p,
+            "num_predict": num_predict,
+        }
+        if seed is not None:
+            options["seed"] = seed
+
         payload: dict[str, Any] = {
             "model": model,
             "messages": request_messages,
             "stream": False,
-            "options": {
-                "temperature": temperature,
-                "top_p": top_p,
-                "num_predict": num_predict,
-            },
+            "options": options,
         }
 
         try:

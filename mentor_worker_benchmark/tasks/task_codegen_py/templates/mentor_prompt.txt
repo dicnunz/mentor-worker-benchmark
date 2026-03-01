@@ -10,4 +10,4 @@ Latest test output:
 {failure_output}
 
 Give concise strategy guidance ONLY in natural language.
-Do not include code, file contents, or diffs.
+Do not include code, file contents, imports, function definitions, or diffs.

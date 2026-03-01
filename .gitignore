@@ -21,6 +21,7 @@ dist/
 results/*
 !results/.gitkeep
 !results/leaderboard.example.md
+!results/schema.md
 
 # OS files
 .DS_Store

@@ -13,7 +13,19 @@ def test_mentor_violation_is_sanitized() -> None:
     raw = "```python\ndef solve():\n    pass\n```\nTry handling edge cases first."
     sanitized, violated = _sanitize_mentor_guidance(raw)
     assert violated
-    assert "edge cases" in sanitized.lower()
+    assert "failing assertions" in sanitized.lower() or "focus" in sanitized.lower()
+    assert "def solve" not in sanitized
+
+
+def test_patch_with_path_traversal_is_rejected() -> None:
+    raw = """```diff
+--- ../outside.py
++++ ../outside.py
+@@ -1 +1 @@
+-print('a')
++print('b')
+```"""
+    assert _extract_diff(raw) is None
 
 
 def test_task_selection_quick() -> None:

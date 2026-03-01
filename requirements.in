@@ -1,0 +1,3 @@
+# Runtime + benchmark tooling dependencies
+requests>=2.32.0
+pytest>=9.0.0

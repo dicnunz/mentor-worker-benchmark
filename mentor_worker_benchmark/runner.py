@@ -1,23 +1,27 @@
 from __future__ import annotations
 
+import hashlib
 import json
+import platform
 import re
 import subprocess
+import sys
 import time
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
 from statistics import mean
-from typing import Any
+from typing import Any, Literal
 
+from mentor_worker_benchmark import __version__
 from mentor_worker_benchmark.ollama_client import OllamaClient
-from mentor_worker_benchmark.tasks.task_registry import resolve_tasks
 from mentor_worker_benchmark.tasks.task_codegen_py.harness import (
     materialize_task,
     project_snapshot,
     read_task_prompt,
     run_pytest,
 )
+from mentor_worker_benchmark.tasks.task_registry import resolve_tasks
 
 DEFAULT_MODELS = [
     "llama3.1:8b",
@@ -27,16 +31,48 @@ DEFAULT_MODELS = [
     "gemma2:9b",
 ]
 
+DEFAULT_RUN_MODES = (
+    "worker_only",
+    "mentor_worker",
+    "mentor_only_suggestion_noise",
+)
+
+VALID_RUN_MODES = {
+    "worker_only",
+    "mentor_worker",
+    "mentor_only_suggestion_noise",
+    "stronger_worker",
+    "mentor_swap",
+}
+
+REPRO_MAX_TURNS = 2
+REPRO_WORKER_MAX_TOKENS = 640
+REPRO_MENTOR_MAX_TOKENS = 220
+REPRO_TEMPERATURE = 0.0
+REPRO_TOP_P = 1.0
+
 WORKER_SYSTEM_PROMPT = (
-    "You are a precise coding agent. Return only valid unified diff patches unless explicitly asked otherwise."
+    "You are a precise coding agent. Return only a valid unified diff patch and nothing else."
 )
 
 MENTOR_SYSTEM_PROMPT = (
     "You are a software mentor. You are forbidden from writing code snippets, full file content, or diff patches. "
-    "Provide only high-level natural language guidance."
+    "Provide only concise high-level natural-language guidance."
+)
+
+MENTOR_SAFE_SUMMARY = (
+    "Focus on the failing assertions and propose one small strategy: identify the likely bug source, "
+    "apply the minimal change, and re-run tests."
 )
 
 DIFF_BLOCK_RE = re.compile(r"```(?:diff)?\n(.*?)```", re.DOTALL | re.IGNORECASE)
+FENCED_BLOCK_RE = re.compile(r"```[a-zA-Z0-9_-]*\n(.*?)```", re.DOTALL)
+IMPORT_RE = re.compile(r"^\s*(import|from)\s+[A-Za-z0-9_.]+", re.MULTILINE)
+FUNCTION_DEF_RE = re.compile(r"^\s*def\s+[A-Za-z0-9_]+\s*\(", re.MULTILINE)
+CLASS_DEF_RE = re.compile(r"^\s*class\s+[A-Za-z0-9_]+\s*[:(]", re.MULTILINE)
+DIFF_MARKER_RE = re.compile(r"^(diff --git|---\s|\+\+\+\s|@@)", re.MULTILINE)
+FILE_HEADER_RE = re.compile(r"^\s*#\s*File:\s+", re.MULTILINE)
+MENTOR_CODE_BLOCK_MAX_LINES = 8
 
 
 @dataclass(slots=True)
@@ -48,6 +84,27 @@ class BenchmarkConfig:
     task_selector: str | None = None
     seed: int = 1337
     results_path: Path = Path("results/results.json")
+    run_modes: tuple[str, ...] = DEFAULT_RUN_MODES
+    repro_mode: bool = False
+    stronger_worker_model: str | None = None
+
+
+@dataclass(slots=True)
+class GenerationSettings:
+    temperature: float
+    top_p: float
+    worker_num_predict: int
+    mentor_num_predict: int
+    max_turns: int
+    seed: int
+
+
+@dataclass(slots=True)
+class MentorValidation:
+    guidance: str
+    violated: bool
+    reasons: list[str]
+    original: str | None
 
 
 def _estimate_tokens(text: str) -> int:
@@ -66,81 +123,175 @@ def _load_template(name: str) -> str:
     return template_path.read_text(encoding="utf-8")
 
 
+def _normalize_run_modes(run_modes: tuple[str, ...] | list[str]) -> list[str]:
+    ordered: list[str] = []
+    for mode in run_modes:
+        mode_normalized = mode.strip()
+        if not mode_normalized:
+            continue
+        if mode_normalized not in VALID_RUN_MODES:
+            known = ", ".join(sorted(VALID_RUN_MODES))
+            raise ValueError(f"Unknown run mode `{mode_normalized}`. Allowed values: {known}")
+        if mode_normalized not in ordered:
+            ordered.append(mode_normalized)
+
+    if not ordered:
+        raise ValueError("No run modes selected.")
+    return ordered
+
+
+def _seed_for_call(base_seed: int, *parts: str) -> int:
+    joined = "|".join(parts)
+    digest = hashlib.sha256(f"{base_seed}|{joined}".encode("utf-8")).hexdigest()
+    return int(digest[:8], 16)
+
+
+def _normalize_patch_path(raw_path: str) -> str | None:
+    token = raw_path.split("\t", 1)[0].strip()
+    if token == "/dev/null":
+        return None
+    if token.startswith("a/") or token.startswith("b/"):
+        token = token[2:]
+    return token
+
+
+def _validate_patch_format(diff_text: str) -> tuple[bool, str]:
+    if "--- " not in diff_text or "+++ " not in diff_text:
+        return False, "Patch missing unified diff file headers (`---`/`+++`)."
+    if "@@" not in diff_text:
+        return False, "Patch missing hunk markers (`@@`)."
+
+    checked_paths = 0
+    for line in diff_text.splitlines():
+        if not line.startswith(("--- ", "+++ ")):
+            continue
+        normalized = _normalize_patch_path(line[4:])
+        if not normalized:
+            continue
+
+        checked_paths += 1
+        candidate = Path(normalized)
+        if candidate.is_absolute() or normalized.startswith("~"):
+            return False, f"Unsafe patch path `{normalized}` (absolute/home path)."
+        if any(part == ".." for part in candidate.parts):
+            return False, f"Unsafe patch path `{normalized}` (path traversal)."
+
+    if checked_paths == 0:
+        return False, "Patch did not reference any project file paths."
+
+    return True, "ok"
+
+
 def _extract_diff(text: str) -> str | None:
     text = text.strip()
     blocks = [block.strip() for block in DIFF_BLOCK_RE.findall(text)]
     candidates = blocks + [text]
 
     for candidate in candidates:
-        if "--- " in candidate and "+++ " in candidate:
-            return f"{candidate}\n"
-        if "diff --git" in candidate:
+        valid, _ = _validate_patch_format(candidate)
+        if valid:
             return f"{candidate}\n"
     return None
 
 
 def _apply_patch(workdir: Path, diff_text: str) -> tuple[bool, str]:
+    valid, reason = _validate_patch_format(diff_text)
+    if not valid:
+        return False, reason
+
     attempts = [
-        ["patch", "-p0", "--batch", "--forward"],
-        ["patch", "-p1", "--batch", "--forward"],
+        ["patch", "-p0", "--batch", "--forward", "--reject-file=-"],
+        ["patch", "-p1", "--batch", "--forward", "--reject-file=-"],
     ]
 
     logs: list[str] = []
     for command in attempts:
-        process = subprocess.run(
-            command,
-            cwd=workdir,
-            input=diff_text,
-            text=True,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
-        )
-        logs.append(f"$ {' '.join(command)}\n{process.stdout}")
-        if process.returncode == 0:
-            return True, "\n".join(logs)
+        try:
+            process = subprocess.run(
+                command,
+                cwd=workdir,
+                input=diff_text,
+                text=True,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                timeout=12,
+            )
+            logs.append(f"$ {' '.join(command)}\n{process.stdout}")
+            if process.returncode == 0:
+                return True, "\n".join(logs)
+        except subprocess.TimeoutExpired:
+            logs.append(f"$ {' '.join(command)}\n[timeout] patch command timed out")
 
     return False, "\n".join(logs)
 
 
-def _is_mentor_violation(text: str) -> bool:
-    if "```" in text:
-        return True
+def _detect_mentor_violation_reasons(text: str) -> list[str]:
+    reasons: set[str] = set()
 
-    bad_patterns = [
-        r"^diff --git",
-        r"^--- ",
-        r"^\+\+\+ ",
-        r"^@@",
-        r"^\+\s*\w",
-        r"^\s*(def|class|import|from)\s+",
-    ]
-    for pattern in bad_patterns:
-        if re.search(pattern, text, flags=re.MULTILINE):
-            return True
-    return False
+    fenced_blocks = FENCED_BLOCK_RE.findall(text)
+    if fenced_blocks:
+        reasons.add("code_block")
+        for block in fenced_blocks:
+            line_count = len([line for line in block.splitlines() if line.strip()])
+            if line_count > MENTOR_CODE_BLOCK_MAX_LINES:
+                reasons.add("long_code_block")
+
+    if DIFF_MARKER_RE.search(text):
+        reasons.add("diff_syntax")
+    if FILE_HEADER_RE.search(text):
+        reasons.add("file_header")
+    if IMPORT_RE.search(text):
+        reasons.add("import_statement")
+    if FUNCTION_DEF_RE.search(text):
+        reasons.add("function_definition")
+    if CLASS_DEF_RE.search(text):
+        reasons.add("class_definition")
+
+    return sorted(reasons)
 
 
-def _sanitize_mentor_guidance(text: str) -> tuple[str, bool]:
-    violation = _is_mentor_violation(text)
-    if not violation:
-        return text.strip(), False
-
-    without_fences = re.sub(r"```.*?```", "", text, flags=re.DOTALL)
+def _summarize_guidance_text(raw_text: str) -> str:
     cleaned_lines: list[str] = []
-    for line in without_fences.splitlines():
+    for line in raw_text.splitlines():
         stripped = line.strip()
         if not stripped:
             continue
-        if stripped.startswith(("diff --git", "---", "+++", "@@", "+", "-")):
+        if stripped.startswith(("diff --git", "---", "+++", "@@", "+", "-", "# File:")):
             continue
-        if re.match(r"^(def|class|import|from)\s+", stripped):
+        if IMPORT_RE.match(stripped) or FUNCTION_DEF_RE.match(stripped) or CLASS_DEF_RE.match(stripped):
+            continue
+        if stripped.startswith("```"):
             continue
         cleaned_lines.append(stripped)
 
-    guidance = " ".join(cleaned_lines).strip()
-    if not guidance:
-        guidance = "Read the failing assertions carefully and make the smallest targeted fix needed to satisfy tests."
-    return guidance, True
+    guidance = " ".join(cleaned_lines)
+    guidance = re.sub(r"\s+", " ", guidance).strip()
+
+    if len(guidance.split()) < 8:
+        return MENTOR_SAFE_SUMMARY
+    if len(guidance) > 320:
+        guidance = guidance[:320].rsplit(" ", 1)[0].strip() + "."
+    return guidance
+
+
+def _validate_mentor_output(text: str) -> MentorValidation:
+    reasons = _detect_mentor_violation_reasons(text)
+    if not reasons:
+        guidance = re.sub(r"\s+", " ", text).strip()
+        return MentorValidation(guidance=guidance or MENTOR_SAFE_SUMMARY, violated=False, reasons=[], original=None)
+
+    summary = _summarize_guidance_text(text)
+    return MentorValidation(
+        guidance=summary,
+        violated=True,
+        reasons=reasons,
+        original=text,
+    )
+
+
+def _sanitize_mentor_guidance(text: str) -> tuple[str, bool]:
+    validation = _validate_mentor_output(text)
+    return validation.guidance, validation.violated
 
 
 def _render_worker_prompt(
@@ -173,6 +324,16 @@ def _render_mentor_prompt(
     )
 
 
+def _dummy_mentor_guidance(turn_index: int) -> str:
+    advice = [
+        "Start by reading failing assertion messages and target only one bug source.",
+        "Prefer minimal edits and keep function signatures unchanged.",
+        "After patching, verify edge cases mentioned by tests.",
+        "If a patch fails, simplify and focus on deterministic behavior.",
+    ]
+    return advice[(turn_index - 1) % len(advice)]
+
+
 def _baseline_run(
     client: OllamaClient,
     worker_model: str,
@@ -180,6 +341,7 @@ def _baseline_run(
     task_id: str,
     worker_template: str,
     workdir: Path,
+    generation: GenerationSettings,
 ) -> dict[str, Any]:
     start = time.perf_counter()
     initial_tests = run_pytest(workdir)
@@ -192,15 +354,17 @@ def _baseline_run(
         mentor_guidance="(none)",
     )
 
+    worker_seed = _seed_for_call(generation.seed, "worker_only", worker_model, task_id)
     worker_error: str | None = None
     try:
         worker_response = client.chat(
             model=worker_model,
             messages=[{"role": "user", "content": worker_prompt}],
             system=WORKER_SYSTEM_PROMPT,
-            temperature=0.0,
-            top_p=1.0,
-            num_predict=700,
+            temperature=generation.temperature,
+            top_p=generation.top_p,
+            num_predict=generation.worker_num_predict,
+            seed=worker_seed,
         )
     except RuntimeError as exc:
         worker_response = f"[worker_error] {exc}"
@@ -225,7 +389,7 @@ def _baseline_run(
     )
 
     return {
-        "mode": "baseline",
+        "mode": "worker_only",
         "task_id": task_id,
         "worker_model": worker_model,
         "mentor_model": None,
@@ -233,6 +397,8 @@ def _baseline_run(
         "turns_used": 1,
         "wall_time_seconds": round(elapsed, 4),
         "total_tokens_estimate": total_tokens,
+        "mentor_turn_count": 0,
+        "mentor_violation_count": 0,
         "log": {
             "initial_test_output": initial_tests.output,
             "worker_prompt": worker_prompt,
@@ -255,17 +421,19 @@ def _mentored_run(
     worker_template: str,
     mentor_template: str,
     workdir: Path,
-    max_turns: int,
+    generation: GenerationSettings,
+    mentor_strategy: Literal["real", "dummy_control"] = "real",
 ) -> dict[str, Any]:
     start = time.perf_counter()
     guidance_history: list[str] = []
     turns: list[dict[str, Any]] = []
+    violations: list[dict[str, Any]] = []
 
     current_tests = run_pytest(workdir)
     token_accumulator = _estimate_tokens(current_tests.output)
     passed = current_tests.passed
 
-    for turn_index in range(1, max_turns + 1):
+    for turn_index in range(1, generation.max_turns + 1):
         snapshot = project_snapshot(workdir)
         worker_prompt = _render_worker_prompt(
             template=worker_template,
@@ -275,15 +443,24 @@ def _mentored_run(
             mentor_guidance="\n".join(guidance_history[-3:]),
         )
 
+        worker_seed = _seed_for_call(
+            generation.seed,
+            mentor_strategy,
+            mentor_model,
+            worker_model,
+            task_id,
+            f"worker_turn_{turn_index}",
+        )
         worker_error: str | None = None
         try:
             worker_response = client.chat(
                 model=worker_model,
                 messages=[{"role": "user", "content": worker_prompt}],
                 system=WORKER_SYSTEM_PROMPT,
-                temperature=0.0,
-                top_p=1.0,
-                num_predict=700,
+                temperature=generation.temperature,
+                top_p=generation.top_p,
+                num_predict=generation.worker_num_predict,
+                seed=worker_seed,
             )
         except RuntimeError as exc:
             worker_response = f"[worker_error] {exc}"
@@ -318,7 +495,7 @@ def _mentored_run(
             turns.append(turn_log)
             break
 
-        if turn_index < max_turns:
+        if turn_index < generation.max_turns:
             mentor_prompt = _render_mentor_prompt(
                 template=mentor_template,
                 task_prompt=task_prompt,
@@ -327,39 +504,76 @@ def _mentored_run(
             )
 
             mentor_error: str | None = None
-            try:
-                mentor_response = client.chat(
-                    model=mentor_model,
-                    messages=[{"role": "user", "content": mentor_prompt}],
-                    system=MENTOR_SYSTEM_PROMPT,
-                    temperature=0.0,
-                    top_p=1.0,
-                    num_predict=220,
+            validation: MentorValidation
+            if mentor_strategy == "dummy_control":
+                mentor_response = _dummy_mentor_guidance(turn_index)
+                validation = MentorValidation(
+                    guidance=mentor_response,
+                    violated=False,
+                    reasons=[],
+                    original=None,
                 )
-            except RuntimeError as exc:
-                mentor_response = f"[mentor_error] {exc}"
-                mentor_error = str(exc)
+            else:
+                mentor_seed = _seed_for_call(
+                    generation.seed,
+                    mentor_strategy,
+                    mentor_model,
+                    worker_model,
+                    task_id,
+                    f"mentor_turn_{turn_index}",
+                )
+                try:
+                    mentor_response = client.chat(
+                        model=mentor_model,
+                        messages=[{"role": "user", "content": mentor_prompt}],
+                        system=MENTOR_SYSTEM_PROMPT,
+                        temperature=generation.temperature,
+                        top_p=generation.top_p,
+                        num_predict=generation.mentor_num_predict,
+                        seed=mentor_seed,
+                    )
+                except RuntimeError as exc:
+                    mentor_response = f"[mentor_error] {exc}"
+                    mentor_error = str(exc)
 
-            mentor_guidance, violation = _sanitize_mentor_guidance(mentor_response)
-            if mentor_error:
-                mentor_guidance = (
-                    "Focus on failing assertions and apply the smallest targeted change to the likely bug source."
-                )
-                violation = False
-            guidance_history.append(mentor_guidance)
-            token_accumulator += _estimate_tokens(mentor_prompt) + _estimate_tokens(mentor_response)
+                validation = _validate_mentor_output(mentor_response)
+                if mentor_error:
+                    validation = MentorValidation(
+                        guidance=MENTOR_SAFE_SUMMARY,
+                        violated=False,
+                        reasons=["mentor_request_error"],
+                        original=None,
+                    )
+
+            guidance_history.append(validation.guidance)
+            token_accumulator += _estimate_tokens(mentor_prompt) + _estimate_tokens(validation.guidance)
 
             turn_log["mentor_prompt"] = mentor_prompt
-            turn_log["mentor_response_raw"] = mentor_response
+            turn_log["mentor_response_raw"] = mentor_response if mentor_strategy == "real" else None
             turn_log["mentor_error"] = mentor_error
-            turn_log["mentor_guidance"] = mentor_guidance
-            turn_log["mentor_violation"] = violation
+            turn_log["mentor_guidance"] = validation.guidance
+            turn_log["mentor_violation"] = validation.violated
+            turn_log["mentor_violation_reasons"] = validation.reasons
+
+            if validation.violated:
+                violations.append(
+                    {
+                        "turn": turn_index,
+                        "mentor_model": mentor_model,
+                        "reasons": validation.reasons,
+                        "original": validation.original,
+                        "replacement_guidance": validation.guidance,
+                    }
+                )
 
         turns.append(turn_log)
 
     elapsed = time.perf_counter() - start
+    mode_name = "mentor_worker" if mentor_strategy == "real" else "mentor_only_suggestion_noise"
+    mentor_turn_count = sum(1 for turn in turns if "mentor_prompt" in turn)
+
     return {
-        "mode": "mentored",
+        "mode": mode_name,
         "task_id": task_id,
         "worker_model": worker_model,
         "mentor_model": mentor_model,
@@ -367,88 +581,148 @@ def _mentored_run(
         "turns_used": len(turns),
         "wall_time_seconds": round(elapsed, 4),
         "total_tokens_estimate": token_accumulator,
+        "mentor_turn_count": mentor_turn_count,
+        "mentor_violation_count": len(violations),
         "log": {
             "task_prompt": task_prompt,
             "turns": turns,
+            "violations": violations,
         },
     }
 
 
-def _compute_aggregates(
-    runs: list[dict[str, Any]], models: list[str], task_ids: list[str]
-) -> dict[str, Any]:
-    baseline_runs = [run for run in runs if run["mode"] == "baseline"]
-    mentored_runs = [run for run in runs if run["mode"] == "mentored"]
+def _rate(rows: list[dict[str, Any]]) -> float:
+    if not rows:
+        return 0.0
+    return mean(1.0 if row.get("pass") else 0.0 for row in rows)
 
-    baseline_by_worker: dict[str, float] = {}
-    for worker in models:
-        worker_baselines = [run for run in baseline_runs if run["worker_model"] == worker]
-        if worker_baselines:
-            baseline_by_worker[worker] = mean(1.0 if run["pass"] else 0.0 for run in worker_baselines)
-        else:
-            baseline_by_worker[worker] = 0.0
+
+def _compute_aggregates(
+    *,
+    runs: list[dict[str, Any]],
+    worker_models: list[str],
+    mentor_models: list[str],
+    task_categories: dict[str, str],
+) -> dict[str, Any]:
+    worker_only_runs = [run for run in runs if run["mode"] == "worker_only"]
+    mentor_worker_runs = [run for run in runs if run["mode"] == "mentor_worker"]
+    control_runs = [run for run in runs if run["mode"] == "mentor_only_suggestion_noise"]
+
+    baseline_by_worker = {
+        worker: _rate([row for row in worker_only_runs if row["worker_model"] == worker])
+        for worker in worker_models
+    }
+    control_by_worker = {
+        worker: _rate([row for row in control_runs if row["worker_model"] == worker])
+        for worker in worker_models
+    }
 
     mentor_worker_pairs: list[dict[str, Any]] = []
-    for mentor in models:
-        for worker in models:
+    for mentor in mentor_models:
+        for worker in worker_models:
             pair_runs = [
                 run
-                for run in mentored_runs
+                for run in mentor_worker_runs
                 if run["mentor_model"] == mentor and run["worker_model"] == worker
             ]
-            pass_rate = mean(1.0 if run["pass"] else 0.0 for run in pair_runs) if pair_runs else 0.0
-            baseline_rate = baseline_by_worker[worker]
+            pass_rate = _rate(pair_runs)
+            violation_turns = sum(int(run.get("mentor_turn_count", 0)) for run in pair_runs)
+            violation_count = sum(int(run.get("mentor_violation_count", 0)) for run in pair_runs)
+            violation_rate = (violation_count / violation_turns) if violation_turns else 0.0
+            baseline_rate = baseline_by_worker.get(worker, 0.0)
+            control_rate = control_by_worker.get(worker, 0.0)
             mentor_worker_pairs.append(
                 {
                     "mentor_model": mentor,
                     "worker_model": worker,
-                    "mentored_pass_rate": round(pass_rate, 4),
                     "baseline_pass_rate": round(baseline_rate, 4),
+                    "mentored_pass_rate": round(pass_rate, 4),
+                    "control_pass_rate": round(control_rate, 4),
                     "mentorship_lift": round(pass_rate - baseline_rate, 4),
+                    "mentor_violation_rate": round(violation_rate, 4),
                 }
             )
 
     mentor_rankings: list[dict[str, Any]] = []
-    for mentor in models:
+    for mentor in mentor_models:
         mentor_pairs = [row for row in mentor_worker_pairs if row["mentor_model"] == mentor]
-        mentor_runs = [row for row in mentored_runs if row["mentor_model"] == mentor]
+        mentor_runs = [row for row in mentor_worker_runs if row["mentor_model"] == mentor]
         avg_lift = mean(row["mentorship_lift"] for row in mentor_pairs) if mentor_pairs else 0.0
-        pass_rate = mean(1.0 if row["pass"] else 0.0 for row in mentor_runs) if mentor_runs else 0.0
+        pass_rate = _rate(mentor_runs)
+
+        total_turns = sum(int(run.get("mentor_turn_count", 0)) for run in mentor_runs)
+        total_violations = sum(int(run.get("mentor_violation_count", 0)) for run in mentor_runs)
+        violation_rate = (total_violations / total_turns) if total_turns else 0.0
+
         mentor_rankings.append(
             {
                 "mentor_model": mentor,
                 "avg_lift_across_workers": round(avg_lift, 4),
                 "overall_mentored_pass_rate": round(pass_rate, 4),
+                "mentor_violation_rate": round(violation_rate, 4),
             }
         )
 
     mentor_rankings.sort(
-        key=lambda row: (row["avg_lift_across_workers"], row["overall_mentored_pass_rate"]),
+        key=lambda row: (
+            row["avg_lift_across_workers"],
+            row["overall_mentored_pass_rate"],
+            -row["mentor_violation_rate"],
+        ),
         reverse=True,
     )
 
     worker_rankings: list[dict[str, Any]] = []
-    for worker in models:
-        worker_mentored = [run for run in mentored_runs if run["worker_model"] == worker]
-        mentored_rate = mean(1.0 if run["pass"] else 0.0 for run in worker_mentored) if worker_mentored else 0.0
+    for worker in worker_models:
+        worker_mentored = [run for run in mentor_worker_runs if run["worker_model"] == worker]
+        mentored_rate = _rate(worker_mentored)
+        baseline = baseline_by_worker.get(worker, 0.0)
+        control = control_by_worker.get(worker, 0.0)
         worker_rankings.append(
             {
                 "worker_model": worker,
-                "baseline_pass_rate": round(baseline_by_worker[worker], 4),
+                "baseline_pass_rate": round(baseline, 4),
                 "mentored_pass_rate": round(mentored_rate, 4),
-                "delta": round(mentored_rate - baseline_by_worker[worker], 4),
+                "control_pass_rate": round(control, 4),
+                "delta": round(mentored_rate - baseline, 4),
             }
         )
 
     worker_rankings.sort(key=lambda row: (row["mentored_pass_rate"], row["baseline_pass_rate"]), reverse=True)
 
+    categories = sorted(set(task_categories.values()))
+    category_breakdown: list[dict[str, Any]] = []
+    for category in categories:
+        ids = {task_id for task_id, task_category in task_categories.items() if task_category == category}
+        baseline_cat = [run for run in worker_only_runs if run["task_id"] in ids]
+        mentored_cat = [run for run in mentor_worker_runs if run["task_id"] in ids]
+        control_cat = [run for run in control_runs if run["task_id"] in ids]
+
+        baseline_rate = _rate(baseline_cat)
+        mentored_rate = _rate(mentored_cat)
+        control_rate = _rate(control_cat)
+
+        category_breakdown.append(
+            {
+                "category": category,
+                "baseline_pass_rate": round(baseline_rate, 4),
+                "mentored_pass_rate": round(mentored_rate, 4),
+                "control_pass_rate": round(control_rate, 4),
+                "mentorship_lift": round(mentored_rate - baseline_rate, 4),
+            }
+        )
+
+    category_breakdown.sort(key=lambda row: row["mentorship_lift"], reverse=True)
+
     return {
-        "task_count": len(task_ids),
-        "tasks": task_ids,
+        "task_count": len(task_categories),
+        "tasks": sorted(task_categories),
         "baseline_by_worker": baseline_by_worker,
+        "control_by_worker": control_by_worker,
         "mentor_worker_pairs": mentor_worker_pairs,
         "best_mentors": mentor_rankings,
         "best_workers": worker_rankings,
+        "category_breakdown": category_breakdown,
     }
 
 
@@ -461,6 +735,64 @@ def _to_markdown_table(rows: list[dict[str, Any]], columns: list[tuple[str, str]
     return "\n".join(lines)
 
 
+def _git_commit_hash() -> str | None:
+    try:
+        process = subprocess.run(
+            ["git", "rev-parse", "HEAD"],
+            check=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.DEVNULL,
+            text=True,
+        )
+        return process.stdout.strip()
+    except (OSError, subprocess.CalledProcessError):
+        return None
+
+
+def _git_is_dirty() -> bool | None:
+    try:
+        process = subprocess.run(
+            ["git", "status", "--porcelain"],
+            check=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.DEVNULL,
+            text=True,
+        )
+        return bool(process.stdout.strip())
+    except (OSError, subprocess.CalledProcessError):
+        return None
+
+
+def _capture_runtime_context(client: OllamaClient, used_models: list[str]) -> dict[str, Any]:
+    return {
+        "benchmark_version": __version__,
+        "python": {
+            "version": platform.python_version(),
+            "implementation": platform.python_implementation(),
+            "executable": sys.executable,
+        },
+        "platform": {
+            "platform": platform.platform(),
+            "system": platform.system(),
+            "release": platform.release(),
+            "machine": platform.machine(),
+        },
+        "ollama": {
+            "base_url": client.base_url,
+            "cli_version": client.get_ollama_version(),
+            "model_tags": client.get_model_details(used_models),
+        },
+        "git": {
+            "commit": _git_commit_hash(),
+            "dirty": _git_is_dirty(),
+        },
+    }
+
+
+def _format_rate(value: float) -> str:
+    return f"{value:.2%}"
+
+
 def write_leaderboard(results: dict[str, Any], output_path: Path) -> None:
     output_path.parent.mkdir(parents=True, exist_ok=True)
 
@@ -468,39 +800,100 @@ def write_leaderboard(results: dict[str, Any], output_path: Path) -> None:
     mentors = aggregates["best_mentors"]
     workers = aggregates["best_workers"]
     pairs = aggregates["mentor_worker_pairs"]
+    categories = aggregates.get("category_breakdown", [])
 
     top_line = "No runs completed."
     if mentors:
         top = mentors[0]
         top_line = (
-            f"Top mentor: `{top['mentor_model']}` with average lift {top['avg_lift_across_workers']:.2%} "
-            f"and mentored pass rate {top['overall_mentored_pass_rate']:.2%}."
+            f"Top mentor: `{top['mentor_model']}` with average lift {_format_rate(top['avg_lift_across_workers'])}, "
+            f"mentored pass rate {_format_rate(top['overall_mentored_pass_rate'])}, "
+            f"violation rate {_format_rate(top['mentor_violation_rate'])}."
         )
 
+    mentor_rows = [
+        {
+            "mentor_model": row["mentor_model"],
+            "avg_lift_across_workers": _format_rate(row["avg_lift_across_workers"]),
+            "overall_mentored_pass_rate": _format_rate(row["overall_mentored_pass_rate"]),
+            "mentor_violation_rate": _format_rate(row["mentor_violation_rate"]),
+        }
+        for row in mentors
+    ]
+
+    worker_rows = [
+        {
+            "worker_model": row["worker_model"],
+            "baseline_pass_rate": _format_rate(row["baseline_pass_rate"]),
+            "mentored_pass_rate": _format_rate(row["mentored_pass_rate"]),
+            "control_pass_rate": _format_rate(row["control_pass_rate"]),
+            "delta": _format_rate(row["delta"]),
+        }
+        for row in workers
+    ]
+
+    pair_rows = [
+        {
+            "mentor_model": row["mentor_model"],
+            "worker_model": row["worker_model"],
+            "baseline_pass_rate": _format_rate(row["baseline_pass_rate"]),
+            "mentored_pass_rate": _format_rate(row["mentored_pass_rate"]),
+            "control_pass_rate": _format_rate(row["control_pass_rate"]),
+            "mentorship_lift": _format_rate(row["mentorship_lift"]),
+            "mentor_violation_rate": _format_rate(row["mentor_violation_rate"]),
+        }
+        for row in pairs
+    ]
+
+    category_rows = [
+        {
+            "category": row["category"],
+            "baseline_pass_rate": _format_rate(row["baseline_pass_rate"]),
+            "mentored_pass_rate": _format_rate(row["mentored_pass_rate"]),
+            "control_pass_rate": _format_rate(row["control_pass_rate"]),
+            "mentorship_lift": _format_rate(row["mentorship_lift"]),
+        }
+        for row in categories
+    ]
+
     mentor_table = _to_markdown_table(
-        mentors,
+        mentor_rows,
         [
             ("mentor_model", "Mentor"),
             ("avg_lift_across_workers", "Avg Lift"),
             ("overall_mentored_pass_rate", "Mentored Pass Rate"),
+            ("mentor_violation_rate", "Violation Rate"),
         ],
     )
     worker_table = _to_markdown_table(
-        workers,
+        worker_rows,
         [
             ("worker_model", "Worker"),
             ("baseline_pass_rate", "Baseline"),
             ("mentored_pass_rate", "Mentored"),
-            ("delta", "Delta"),
+            ("control_pass_rate", "Control"),
+            ("delta", "Lift"),
         ],
     )
     pair_table = _to_markdown_table(
-        pairs,
+        pair_rows,
         [
             ("mentor_model", "Mentor"),
             ("worker_model", "Worker"),
             ("baseline_pass_rate", "Baseline"),
             ("mentored_pass_rate", "Mentored"),
+            ("control_pass_rate", "Control"),
+            ("mentorship_lift", "Lift"),
+            ("mentor_violation_rate", "Violation Rate"),
+        ],
+    )
+    category_table = _to_markdown_table(
+        category_rows,
+        [
+            ("category", "Category"),
+            ("baseline_pass_rate", "Baseline"),
+            ("mentored_pass_rate", "Mentored"),
+            ("control_pass_rate", "Control"),
             ("mentorship_lift", "Lift"),
         ],
     )
@@ -516,6 +909,9 @@ Generated: {results['generated_at']}
 
 ## Best Workers
 {worker_table}
+
+## Per-Category Breakdown
+{category_table}
 
 ## Mentor + Worker Pairs
 {pair_table}
@@ -584,6 +980,38 @@ def run_sanity_check(
     }
 
 
+def _pick_stronger_worker_model(
+    *,
+    client: OllamaClient,
+    current_workers: list[str],
+    explicit_model: str | None,
+) -> tuple[str | None, str | None]:
+    if explicit_model:
+        if explicit_model in current_workers:
+            return None, f"Explicit stronger worker `{explicit_model}` already present in worker set."
+        if explicit_model not in client.list_local_models():
+            return None, f"Explicit stronger worker `{explicit_model}` is not available locally."
+        return explicit_model, None
+
+    catalog = client.get_model_catalog()
+    by_name = {str(item.get("name")): item for item in catalog if isinstance(item.get("name"), str)}
+
+    def _size(model_name: str) -> float:
+        item = by_name.get(model_name, {})
+        details = item.get("details", {}) if isinstance(item, dict) else {}
+        size_text = details.get("parameter_size", "") if isinstance(details, dict) else ""
+        match = re.search(r"([0-9]+(?:\.[0-9]+)?)B", str(size_text))
+        return float(match.group(1)) if match else 0.0
+
+    current_max = max((_size(model) for model in current_workers), default=0.0)
+    candidates = [name for name in by_name if name not in current_workers and _size(name) > current_max]
+    if not candidates:
+        return None, "No stronger local worker model detected."
+
+    candidates.sort(key=lambda name: (_size(name), name), reverse=True)
+    return candidates[0], None
+
+
 def run_benchmark(config: BenchmarkConfig, client: OllamaClient | None = None) -> dict[str, Any]:
     client = client or OllamaClient()
 
@@ -594,6 +1022,35 @@ def run_benchmark(config: BenchmarkConfig, client: OllamaClient | None = None) -
         seed=config.seed,
     )
     selected_tasks = selection.tasks
+
+    run_modes = _normalize_run_modes(list(config.run_modes))
+    run_mentor_matrix = "mentor_worker" in run_modes or "mentor_swap" in run_modes
+    run_worker_only = "worker_only" in run_modes
+    run_control = "mentor_only_suggestion_noise" in run_modes
+
+    worker_models = list(config.models)
+    stronger_worker_included: str | None = None
+    stronger_worker_status: str | None = None
+    if "stronger_worker" in run_modes:
+        stronger_candidate, stronger_message = _pick_stronger_worker_model(
+            client=client,
+            current_workers=worker_models,
+            explicit_model=config.stronger_worker_model,
+        )
+        if stronger_candidate:
+            worker_models.append(stronger_candidate)
+            stronger_worker_included = stronger_candidate
+        stronger_worker_status = stronger_message
+
+    generation = GenerationSettings(
+        temperature=REPRO_TEMPERATURE if config.repro_mode else REPRO_TEMPERATURE,
+        top_p=REPRO_TOP_P if config.repro_mode else REPRO_TOP_P,
+        worker_num_predict=REPRO_WORKER_MAX_TOKENS,
+        mentor_num_predict=REPRO_MENTOR_MAX_TOKENS,
+        max_turns=REPRO_MAX_TURNS if config.repro_mode else config.max_turns,
+        seed=config.seed,
+    )
+
     worker_template = _load_template("worker_prompt.txt")
     mentor_template = _load_template("mentor_prompt.txt")
 
@@ -602,70 +1059,140 @@ def run_benchmark(config: BenchmarkConfig, client: OllamaClient | None = None) -
 
     benchmark_start = time.perf_counter()
 
-    for worker_model in config.models:
-        for task in selected_tasks:
-            temp_dir, workdir = materialize_task(task)
-            try:
-                task_prompt = read_task_prompt(task)
-                baseline = _baseline_run(
-                    client=client,
-                    worker_model=worker_model,
-                    task_prompt=task_prompt,
-                    task_id=task.task_id,
-                    worker_template=worker_template,
-                    workdir=workdir,
-                )
-                runs.append(baseline)
-                baseline_lookup[(worker_model, task.task_id)] = bool(baseline["pass"])
-            finally:
-                temp_dir.cleanup()
-
-    for mentor_model in config.models:
-        for worker_model in config.models:
+    if run_worker_only:
+        for worker_model in worker_models:
             for task in selected_tasks:
                 temp_dir, workdir = materialize_task(task)
                 try:
                     task_prompt = read_task_prompt(task)
-                    mentored = _mentored_run(
+                    baseline = _baseline_run(
                         client=client,
-                        mentor_model=mentor_model,
+                        worker_model=worker_model,
+                        task_prompt=task_prompt,
+                        task_id=task.task_id,
+                        worker_template=worker_template,
+                        workdir=workdir,
+                        generation=generation,
+                    )
+                    runs.append(baseline)
+                    baseline_lookup[(worker_model, task.task_id)] = bool(baseline["pass"])
+                finally:
+                    temp_dir.cleanup()
+
+    if run_mentor_matrix:
+        for mentor_model in config.models:
+            for worker_model in worker_models:
+                for task in selected_tasks:
+                    temp_dir, workdir = materialize_task(task)
+                    try:
+                        task_prompt = read_task_prompt(task)
+                        mentored = _mentored_run(
+                            client=client,
+                            mentor_model=mentor_model,
+                            worker_model=worker_model,
+                            task_prompt=task_prompt,
+                            task_id=task.task_id,
+                            worker_template=worker_template,
+                            mentor_template=mentor_template,
+                            workdir=workdir,
+                            generation=generation,
+                            mentor_strategy="real",
+                        )
+                        mentored["baseline_pass"] = baseline_lookup.get((worker_model, task.task_id))
+                        runs.append(mentored)
+                    finally:
+                        temp_dir.cleanup()
+
+    if run_control:
+        for worker_model in worker_models:
+            for task in selected_tasks:
+                temp_dir, workdir = materialize_task(task)
+                try:
+                    task_prompt = read_task_prompt(task)
+                    control = _mentored_run(
+                        client=client,
+                        mentor_model="dummy_control",
                         worker_model=worker_model,
                         task_prompt=task_prompt,
                         task_id=task.task_id,
                         worker_template=worker_template,
                         mentor_template=mentor_template,
                         workdir=workdir,
-                        max_turns=config.max_turns,
+                        generation=generation,
+                        mentor_strategy="dummy_control",
                     )
-                    mentored["baseline_pass"] = baseline_lookup[(worker_model, task.task_id)]
-                    mentored["mentorship_lift"] = int(bool(mentored["pass"])) - int(
-                        bool(mentored["baseline_pass"])
-                    )
-                    runs.append(mentored)
+                    control["baseline_pass"] = baseline_lookup.get((worker_model, task.task_id))
+                    runs.append(control)
                 finally:
                     temp_dir.cleanup()
 
     elapsed = time.perf_counter() - benchmark_start
 
-    task_ids = [task.task_id for task in selected_tasks]
-    aggregates = _compute_aggregates(runs, models=config.models, task_ids=task_ids)
+    task_categories = {task.task_id: task.category for task in selected_tasks}
+    aggregates = _compute_aggregates(
+        runs=runs,
+        worker_models=worker_models,
+        mentor_models=list(config.models),
+        task_categories=task_categories,
+    )
+
+    all_violations: list[dict[str, Any]] = []
+    for run in runs:
+        violations = run.get("log", {}).get("violations", [])
+        if not isinstance(violations, list):
+            continue
+        for violation in violations:
+            if not isinstance(violation, dict):
+                continue
+            enriched = {
+                "mode": run.get("mode"),
+                "task_id": run.get("task_id"),
+                "worker_model": run.get("worker_model"),
+                "mentor_model": run.get("mentor_model"),
+                **violation,
+            }
+            all_violations.append(enriched)
+
+    used_models = sorted({*config.models, *worker_models})
+    environment = _capture_runtime_context(client=client, used_models=used_models)
+
+    run_counts_by_mode: dict[str, int] = {}
+    for run in runs:
+        mode_name = str(run.get("mode"))
+        run_counts_by_mode[mode_name] = run_counts_by_mode.get(mode_name, 0) + 1
+
     results = {
         "generated_at": datetime.now(tz=UTC).isoformat(),
         "config": {
             "models": config.models,
-            "max_turns": config.max_turns,
+            "worker_models": worker_models,
+            "run_modes": run_modes,
+            "repro_mode": config.repro_mode,
+            "max_turns": generation.max_turns,
+            "generation": {
+                "temperature": generation.temperature,
+                "top_p": generation.top_p,
+                "worker_num_predict": generation.worker_num_predict,
+                "mentor_num_predict": generation.mentor_num_predict,
+                "seed": generation.seed,
+            },
             "task_pack": config.task_pack,
             "suite": selection.suite,
             "selector_source": selection.selector_source,
             "task_selector": config.task_selector,
-            "seed": config.seed,
-            "task_count": len(task_ids),
+            "task_count": len(selected_tasks),
+            "stronger_worker_included": stronger_worker_included,
+            "stronger_worker_status": stronger_worker_status,
         },
+        "environment": environment,
         "summary": {
             "total_runs": len(runs),
+            "runs_by_mode": run_counts_by_mode,
             "benchmark_wall_time_seconds": round(elapsed, 4),
+            "violation_count": len(all_violations),
         },
         "runs": runs,
+        "violations": all_violations,
         "aggregates": aggregates,
     }
 
@@ -673,3 +1200,143 @@ def run_benchmark(config: BenchmarkConfig, client: OllamaClient | None = None) -
     config.results_path.write_text(json.dumps(results, indent=2), encoding="utf-8")
     write_leaderboard(results, config.results_path.parent / "leaderboard.md")
     return results
+
+
+def _safe_float(value: Any) -> float:
+    if isinstance(value, (int, float)):
+        return float(value)
+    return 0.0
+
+
+def compare_results(before: dict[str, Any], after: dict[str, Any]) -> dict[str, Any]:
+    before_workers = {
+        row["worker_model"]: row
+        for row in before.get("aggregates", {}).get("best_workers", [])
+        if isinstance(row, dict) and isinstance(row.get("worker_model"), str)
+    }
+    after_workers = {
+        row["worker_model"]: row
+        for row in after.get("aggregates", {}).get("best_workers", [])
+        if isinstance(row, dict) and isinstance(row.get("worker_model"), str)
+    }
+
+    before_mentors = {
+        row["mentor_model"]: row
+        for row in before.get("aggregates", {}).get("best_mentors", [])
+        if isinstance(row, dict) and isinstance(row.get("mentor_model"), str)
+    }
+    after_mentors = {
+        row["mentor_model"]: row
+        for row in after.get("aggregates", {}).get("best_mentors", [])
+        if isinstance(row, dict) and isinstance(row.get("mentor_model"), str)
+    }
+
+    worker_deltas: list[dict[str, Any]] = []
+    for worker in sorted(set(before_workers) | set(after_workers)):
+        left = before_workers.get(worker, {})
+        right = after_workers.get(worker, {})
+        worker_deltas.append(
+            {
+                "worker_model": worker,
+                "baseline_delta": round(
+                    _safe_float(right.get("baseline_pass_rate"))
+                    - _safe_float(left.get("baseline_pass_rate")),
+                    4,
+                ),
+                "mentored_delta": round(
+                    _safe_float(right.get("mentored_pass_rate"))
+                    - _safe_float(left.get("mentored_pass_rate")),
+                    4,
+                ),
+                "control_delta": round(
+                    _safe_float(right.get("control_pass_rate"))
+                    - _safe_float(left.get("control_pass_rate")),
+                    4,
+                ),
+                "lift_delta": round(
+                    _safe_float(right.get("delta")) - _safe_float(left.get("delta")),
+                    4,
+                ),
+            }
+        )
+
+    mentor_deltas: list[dict[str, Any]] = []
+    for mentor in sorted(set(before_mentors) | set(after_mentors)):
+        left = before_mentors.get(mentor, {})
+        right = after_mentors.get(mentor, {})
+        mentor_deltas.append(
+            {
+                "mentor_model": mentor,
+                "avg_lift_delta": round(
+                    _safe_float(right.get("avg_lift_across_workers"))
+                    - _safe_float(left.get("avg_lift_across_workers")),
+                    4,
+                ),
+                "pass_rate_delta": round(
+                    _safe_float(right.get("overall_mentored_pass_rate"))
+                    - _safe_float(left.get("overall_mentored_pass_rate")),
+                    4,
+                ),
+                "violation_rate_delta": round(
+                    _safe_float(right.get("mentor_violation_rate"))
+                    - _safe_float(left.get("mentor_violation_rate")),
+                    4,
+                ),
+            }
+        )
+
+    return {
+        "before": {
+            "generated_at": before.get("generated_at"),
+            "total_runs": before.get("summary", {}).get("total_runs", 0),
+            "wall_time_seconds": before.get("summary", {}).get("benchmark_wall_time_seconds", 0),
+        },
+        "after": {
+            "generated_at": after.get("generated_at"),
+            "total_runs": after.get("summary", {}).get("total_runs", 0),
+            "wall_time_seconds": after.get("summary", {}).get("benchmark_wall_time_seconds", 0),
+        },
+        "delta": {
+            "total_runs": int(after.get("summary", {}).get("total_runs", 0))
+            - int(before.get("summary", {}).get("total_runs", 0)),
+            "wall_time_seconds": round(
+                _safe_float(after.get("summary", {}).get("benchmark_wall_time_seconds", 0))
+                - _safe_float(before.get("summary", {}).get("benchmark_wall_time_seconds", 0)),
+                4,
+            ),
+        },
+        "worker_deltas": worker_deltas,
+        "mentor_deltas": mentor_deltas,
+    }
+
+
+def render_compare_report(comparison: dict[str, Any]) -> str:
+    lines = [
+        "Benchmark Comparison (after - before)",
+        f"Before: {comparison['before']['generated_at']} ({comparison['before']['total_runs']} runs)",
+        f"After:  {comparison['after']['generated_at']} ({comparison['after']['total_runs']} runs)",
+        f"Delta total runs: {comparison['delta']['total_runs']}",
+        f"Delta wall time (s): {comparison['delta']['wall_time_seconds']}",
+        "",
+        "Worker deltas:",
+    ]
+
+    for row in comparison.get("worker_deltas", []):
+        lines.append(
+            "- "
+            f"{row['worker_model']}: baseline {row['baseline_delta']:+.4f}, "
+            f"mentored {row['mentored_delta']:+.4f}, control {row['control_delta']:+.4f}, "
+            f"lift {row['lift_delta']:+.4f}"
+        )
+
+    lines.append("")
+    lines.append("Mentor deltas:")
+    for row in comparison.get("mentor_deltas", []):
+        lines.append(
+            "- "
+            f"{row['mentor_model']}: avg lift {row['avg_lift_delta']:+.4f}, "
+            f"pass rate {row['pass_rate_delta']:+.4f}, "
+            f"violation rate {row['violation_rate_delta']:+.4f}"
+        )
+
+    return "\n".join(lines)

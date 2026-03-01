@@ -16,4 +16,5 @@ Produce ONLY a unified diff patch that can be applied with `patch -p0`.
 Rules:
 - Use paths relative to the task root, e.g. `--- src/solution.py` and `+++ src/solution.py`.
 - Keep changes minimal.
-- Do not include any explanation outside the diff.
+- Include hunk markers (`@@ ... @@`) and valid diff headers.
+- Do not include markdown fences or any explanation outside the diff.

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 import shutil
 import subprocess
 import sys
@@ -56,12 +57,24 @@ def project_snapshot(workdir: Path, max_total_chars: int = 24000) -> str:
     return "".join(chunks).strip()
 
 
-def run_pytest(workdir: Path, timeout_seconds: int = 20) -> TestRunResult:
+def run_pytest(workdir: Path, timeout_seconds: int = 8) -> TestRunResult:
     start = time.perf_counter()
+    runtime_hook_dir = Path(__file__).resolve().parents[2] / "_runtime"
+    env = os.environ.copy()
+    existing_pythonpath = env.get("PYTHONPATH", "")
+    env["PYTHONPATH"] = (
+        f"{runtime_hook_dir}{os.pathsep}{existing_pythonpath}"
+        if existing_pythonpath
+        else str(runtime_hook_dir)
+    )
+    env["MWB_BLOCK_NETWORK"] = "1"
+    env["PYTEST_DISABLE_PLUGIN_AUTOLOAD"] = "1"
+
     try:
         process = subprocess.run(
             [sys.executable, "-m", "pytest", "-q"],
             cwd=workdir,
+            env=env,
             text=True,
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,

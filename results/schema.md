@@ -1,0 +1,128 @@
+# results.json Schema
+
+This document describes the structure produced by `python -m mentor_worker_benchmark run`.
+
+## Top-level
+
+- `generated_at` (`string`, ISO8601 UTC timestamp)
+- `config` (`object`)
+- `environment` (`object`)
+- `summary` (`object`)
+- `runs` (`array[object]`)
+- `violations` (`array[object]`)
+- `aggregates` (`object`)
+
+## config
+
+- `models` (`array[string]`): mentor model set
+- `worker_models` (`array[string]`): worker model set used for execution
+- `run_modes` (`array[string]`): enabled modes
+- `repro_mode` (`bool`)
+- `max_turns` (`int`): effective max turns used
+- `generation` (`object`)
+  - `temperature` (`float`)
+  - `top_p` (`float`)
+  - `worker_num_predict` (`int`)
+  - `mentor_num_predict` (`int`)
+  - `seed` (`int`)
+- `task_pack` (`string`)
+- `suite` (`string`)
+- `selector_source` (`string`)
+- `task_selector` (`string|null`)
+- `task_count` (`int`)
+- `stronger_worker_included` (`string|null`)
+- `stronger_worker_status` (`string|null`)
+
+## environment
+
+- `benchmark_version` (`string`)
+- `python` (`object`)
+  - `version`
+  - `implementation`
+  - `executable`
+- `platform` (`object`)
+  - `platform`
+  - `system`
+  - `release`
+  - `machine`
+- `ollama` (`object`)
+  - `base_url`
+  - `cli_version`
+  - `model_tags` (`array[object]` from Ollama `/api/tags` when available)
+- `git` (`object`)
+  - `commit` (`string|null`)
+  - `dirty` (`bool|null`)
+
+## summary
+
+- `total_runs` (`int`)
+- `runs_by_mode` (`object<string,int>`)
+- `benchmark_wall_time_seconds` (`float`)
+- `violation_count` (`int`)
+
+## runs[]
+
+Common fields on each run entry:
+
+- `mode` (`worker_only|mentor_worker|mentor_only_suggestion_noise`)
+- `task_id` (`string`)
+- `worker_model` (`string`)
+- `mentor_model` (`string|null`)
+- `pass` (`bool`)
+- `turns_used` (`int`)
+- `wall_time_seconds` (`float`)
+- `total_tokens_estimate` (`int`)
+- `mentor_turn_count` (`int`)
+- `mentor_violation_count` (`int`)
+- `log` (`object`)
+
+Mode-specific notes:
+
+- `worker_only` contains worker prompt/response and patch application logs.
+- `mentor_worker` and `mentor_only_suggestion_noise` include turn logs with mentor guidance.
+- `log.violations` includes full original mentor output only when a violation is detected.
+
+## violations[]
+
+Flattened list of mentor violations for easier auditing:
+
+- `mode`
+- `task_id`
+- `worker_model`
+- `mentor_model`
+- `turn` (`int`)
+- `reasons` (`array[string]`)
+- `original` (`string`)
+- `replacement_guidance` (`string`)
+
+## aggregates
+
+- `task_count` (`int`)
+- `tasks` (`array[string]`)
+- `baseline_by_worker` (`object<string,float>`)
+- `control_by_worker` (`object<string,float>`)
+- `mentor_worker_pairs` (`array[object]`)
+  - `mentor_model`
+  - `worker_model`
+  - `baseline_pass_rate`
+  - `mentored_pass_rate`
+  - `control_pass_rate`
+  - `mentorship_lift`
+  - `mentor_violation_rate`
+- `best_mentors` (`array[object]`)
+  - `mentor_model`
+  - `avg_lift_across_workers`
+  - `overall_mentored_pass_rate`
+  - `mentor_violation_rate`
+- `best_workers` (`array[object]`)
+  - `worker_model`
+  - `baseline_pass_rate`
+  - `mentored_pass_rate`
+  - `control_pass_rate`
+  - `delta`
+- `category_breakdown` (`array[object]`)
+  - `category`
+  - `baseline_pass_rate`
+  - `mentored_pass_rate`
+  - `control_pass_rate`
+  - `mentorship_lift`
