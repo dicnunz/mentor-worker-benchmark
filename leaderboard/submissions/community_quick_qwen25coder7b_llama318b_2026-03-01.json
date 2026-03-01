@@ -1,0 +1,43 @@
+{
+  "submission_id": "community_quick_qwen25coder7b_llama318b_2026-03-01",
+  "submission_file": "community_quick_qwen25coder7b_llama318b_2026-03-01.zip",
+  "submission_path": "submissions/community_quick_qwen25coder7b_llama318b_2026-03-01.zip",
+  "official_submission": false,
+  "submission_label": "community (not official)",
+  "task_pack": "task_pack_v2",
+  "task_pack_version": "2.0.0",
+  "suite": "quick",
+  "generated_at": "2026-03-01T18:09:17.255899+00:00",
+  "manifest_created_at": "2026-03-01T18:09:24.232396+00:00",
+  "verified_at": "2026-03-01T18:09:24.232396+00:00",
+  "git_commit_hash": "f8ed363c3d660d775591768f2b5f62f9696c9ea8",
+  "cli_command": ".venv/bin/python -m mentor_worker_benchmark run --task-pack task_pack_v2 --suite quick --mentor-model llama3.1:8b --worker-model qwen2.5-coder:7b --max-turns 1 --timeout 8 --seed 1337 --run-modes worker_only,mentor_worker --results-path results/community_quick_c_results.json",
+  "models": [
+    "llama3.1:8b",
+    "qwen2.5-coder:7b"
+  ],
+  "worker_models": [
+    "qwen2.5-coder:7b"
+  ],
+  "run_modes": [
+    "worker_only",
+    "mentor_worker"
+  ],
+  "total_runs": 60,
+  "benchmark_wall_time_seconds": 507.1298,
+  "violation_count": 0,
+  "benchmark_version": "0.1.0",
+  "best_worker": {
+    "worker_model": "qwen2.5-coder:7b",
+    "baseline_pass_rate": 0.0,
+    "mentored_pass_rate": 0.0,
+    "control_pass_rate": 0.0,
+    "lift": 0.0
+  },
+  "best_mentor": {
+    "mentor_model": "llama3.1:8b",
+    "avg_lift_across_workers": 0.0,
+    "overall_mentored_pass_rate": 0.0,
+    "mentor_violation_rate": 0.0
+  }
+}
