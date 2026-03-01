@@ -1,6 +1,11 @@
 # mentor-worker-benchmark
 
+[![CI](https://github.com/dicnunz/mentor-worker-benchmark/actions/workflows/ci.yml/badge.svg)](https://github.com/dicnunz/mentor-worker-benchmark/actions/workflows/ci.yml)
+[![GitHub Pages](https://img.shields.io/website?down_color=lightgrey&down_message=down&label=pages&up_color=brightgreen&up_message=live&url=https%3A%2F%2Fdicnunz.github.io%2Fmentor-worker-benchmark%2F)](https://dicnunz.github.io/mentor-worker-benchmark/)
+
 `mentor-worker-benchmark` is a fully local benchmark for measuring whether a **mentor LLM** improves a **worker LLM** on objective coding tasks.
+
+Live leaderboard: https://dicnunz.github.io/mentor-worker-benchmark/
 
 - Inference is local via [Ollama](https://ollama.com/) (no paid APIs required).
 - Scoring is objective: generated patches are applied, then `pytest` decides pass/fail.
@@ -212,6 +217,12 @@ Automation:
 - suite filter (`quick` / `dev` / `test`),
 - explicit `community (not official)` labeling.
 
+## Official Baselines
+
+Merged official baseline submissions:
+- [official_quick_m3air_2026-03-01.zip](submissions/official_quick_m3air_2026-03-01.zip) (from [PR #1](https://github.com/dicnunz/mentor-worker-benchmark/pull/1))
+- [official_quick_expanded_m3air_2026-03-01.zip](submissions/official_quick_expanded_m3air_2026-03-01.zip) (from [PR #2](https://github.com/dicnunz/mentor-worker-benchmark/pull/2))
+
 ## Lightweight Leaderboard Publishing
 
 Generate markdown + static HTML:
@@ -264,6 +275,26 @@ python -m mentor_worker_benchmark provenance --task-pack task_pack_v2
 No-overclaim policy:
 - See `docs/benchmark_policy.md` for allowed/disallowed claims and responsible citation guidance.
 - We intentionally do **not** claim zero contamination risk; models may have seen similar patterns during pretraining.
+
+## Cite / Reference
+
+Use this short reference when citing the benchmark:
+
+```text
+dicnunz. mentor-worker-benchmark: Local benchmark for mentor-worker LLM collaboration on objective coding tasks. GitHub repository, 2026. https://github.com/dicnunz/mentor-worker-benchmark
+```
+
+BibTeX:
+
+```bibtex
+@misc{dicnunz_mentor_worker_benchmark_2026,
+  author = {dicnunz},
+  title = {mentor-worker-benchmark: Local benchmark for mentor-worker LLM collaboration on objective coding tasks},
+  year = {2026},
+  howpublished = {\url{https://github.com/dicnunz/mentor-worker-benchmark}},
+  note = {Accessed: 2026-03-01}
+}
+```
 
 ## Quality Gates
 
