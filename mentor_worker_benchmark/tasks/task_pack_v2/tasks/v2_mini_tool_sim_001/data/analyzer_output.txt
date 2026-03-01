@@ -1,0 +1,1 @@
+RULE:unused_import|SEVERITY:warn|FILE:mosaic.py|LINE:11\nRULE:unsafe_eval|SEVERITY:error|FILE:jade.py|LINE:21\nRULE:line_too_long|SEVERITY:info|FILE:mosaic.py|LINE:31\nRULE:unused_import|SEVERITY:warn|FILE:jade.py|LINE:41\n

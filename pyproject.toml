@@ -33,6 +33,14 @@ mentor_worker_benchmark = [
   "tasks/task_pack_v1/tasks/*/prompt.md",
   "tasks/task_pack_v1/tasks/*/src/*.py",
   "tasks/task_pack_v1/tasks/*/tests/*.py",
+  "tasks/task_pack_v2/metadata.json",
+  "tasks/task_pack_v2/metadata.schema.json",
+  "tasks/task_pack_v2/tasks/*/prompt.md",
+  "tasks/task_pack_v2/tasks/*/README.md",
+  "tasks/task_pack_v2/tasks/*/src/*.py",
+  "tasks/task_pack_v2/tasks/*/tests/*.py",
+  "tasks/task_pack_v2/tasks/*/tools/*.py",
+  "tasks/task_pack_v2/tasks/*/data/*.txt",
 ]
 
 [tool.pytest.ini_options]

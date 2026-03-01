@@ -231,7 +231,7 @@ def build_parser() -> argparse.ArgumentParser:
     run = subparsers.add_parser("run", help="Run benchmark suites and ablations.")
     run.add_argument("--models", default="default", help="Comma-separated model list or `default`.")
     run.add_argument("--max-turns", type=int, default=4)
-    run.add_argument("--task-pack", default="task_pack_v1")
+    run.add_argument("--task-pack", default="task_pack_v2")
     run.add_argument("--suite", choices=["quick", "dev", "test", "all"], default=None)
     run.add_argument(
         "--tasks",
@@ -266,7 +266,7 @@ def build_parser() -> argparse.ArgumentParser:
         "sanity",
         help="Run pytest sanity checks on task starters (no model interaction).",
     )
-    sanity.add_argument("--task-pack", default="task_pack_v1")
+    sanity.add_argument("--task-pack", default="task_pack_v2")
     sanity.add_argument("--suite", choices=["quick", "dev", "test", "all"], default="all")
     sanity.add_argument(
         "--tasks",

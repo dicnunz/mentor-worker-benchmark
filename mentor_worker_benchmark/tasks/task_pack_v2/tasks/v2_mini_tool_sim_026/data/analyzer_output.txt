@@ -1,0 +1,1 @@
+RULE:unused_import|SEVERITY:warn|FILE:signal.py|LINE:36\nRULE:unsafe_eval|SEVERITY:error|FILE:jade.py|LINE:46\nRULE:line_too_long|SEVERITY:info|FILE:signal.py|LINE:56\nRULE:unused_import|SEVERITY:warn|FILE:jade.py|LINE:66\n

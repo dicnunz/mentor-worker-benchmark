@@ -36,25 +36,55 @@ def project_snapshot(workdir: Path, max_total_chars: int = 24000) -> str:
     tracked_files = sorted(
         p
         for p in workdir.rglob("*")
-        if p.is_file() and p.suffix in {".py", ".md", ".txt"} and ".pytest_cache" not in p.parts
+        if p.is_file()
+        and p.suffix in {".py", ".md", ".txt", ".json", ".yaml", ".yml", ".ini", ".cfg"}
+        and ".pytest_cache" not in p.parts
+        and "__pycache__" not in p.parts
     )
 
-    chunks: list[str] = []
-    total_chars = 0
-    for path in tracked_files:
-        rel = path.relative_to(workdir)
-        content = path.read_text(encoding="utf-8")
-        piece = f"\n# File: {rel}\n{content}\n"
-        if total_chars + len(piece) > max_total_chars:
-            remaining = max_total_chars - total_chars
-            if remaining > 0:
-                piece = piece[:remaining]
-                chunks.append(piece)
-            break
-        chunks.append(piece)
-        total_chars += len(piece)
+    def _priority(path: Path) -> tuple[int, str]:
+        rel = path.relative_to(workdir).as_posix()
+        if rel.startswith("tests/"):
+            return (0, rel)
+        if rel.startswith("src/"):
+            return (1, rel)
+        if rel.startswith("tools/"):
+            return (2, rel)
+        if rel.startswith("data/"):
+            return (3, rel)
+        if rel in {"prompt.md", "README.md"}:
+            return (4, rel)
+        return (5, rel)
 
-    return "".join(chunks).strip()
+    tree_lines = ["## File Tree"]
+    for path in tracked_files[:180]:
+        tree_lines.append(f"- {path.relative_to(workdir).as_posix()}")
+    if len(tracked_files) > 180:
+        tree_lines.append(f"- ... ({len(tracked_files) - 180} more files)")
+
+    blocks: list[str] = ["\n".join(tree_lines), "", "## Relevant File Excerpts"]
+    current = "\n".join(blocks)
+    remaining = max_total_chars - len(current)
+    if remaining <= 0:
+        return current[:max_total_chars]
+
+    for path in sorted(tracked_files, key=_priority):
+        rel = path.relative_to(workdir).as_posix()
+        content = path.read_text(encoding="utf-8")
+        excerpt_limit = 1200 if rel.startswith(("tests/", "src/")) else 700
+        excerpt = content[:excerpt_limit]
+        if len(content) > excerpt_limit:
+            excerpt += "\n...<truncated>"
+
+        section = f"\n### {rel}\n{excerpt}\n"
+        if len(section) > remaining:
+            if remaining > 80:
+                blocks.append(section[:remaining] + "\n...<snapshot-truncated>")
+            break
+        blocks.append(section)
+        remaining -= len(section)
+
+    return "\n".join(blocks).strip()
 
 
 def run_pytest(workdir: Path, timeout_seconds: int = 8) -> TestRunResult:

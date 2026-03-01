@@ -1,0 +1,4538 @@
+{
+  "pack_name": "task_pack_v2",
+  "pack_version": "2.0.0",
+  "generator_seed": 1337,
+  "categories": [
+    "string_regex_parsing",
+    "ds_algo",
+    "file_io_serialization",
+    "concurrency_basics",
+    "numerical_edge_cases",
+    "multi_file_mini_module",
+    "mini_repo_bugfix",
+    "mini_repo_feature",
+    "mini_repo_cli",
+    "mini_repo_tool_sim"
+  ],
+  "counts": {
+    "total": 500,
+    "train": 340,
+    "dev": 80,
+    "test": 80,
+    "quick": 30
+  },
+  "category_counts": {
+    "concurrency_basics": 50,
+    "ds_algo": 50,
+    "file_io_serialization": 50,
+    "multi_file_mini_module": 50,
+    "numerical_edge_cases": 50,
+    "string_regex_parsing": 50,
+    "mini_repo_bugfix": 50,
+    "mini_repo_cli": 50,
+    "mini_repo_feature": 50,
+    "mini_repo_tool_sim": 50
+  },
+  "tasks": [
+    {
+      "task_id": "v1_concurrency_basics_000",
+      "title": "Concurrent jobs 000",
+      "category": "concurrency_basics",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_concurrency_basics_000"
+    },
+    {
+      "task_id": "v1_concurrency_basics_001",
+      "title": "Concurrent jobs 001",
+      "category": "concurrency_basics",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_concurrency_basics_001"
+    },
+    {
+      "task_id": "v1_concurrency_basics_002",
+      "title": "Concurrent jobs 002",
+      "category": "concurrency_basics",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_concurrency_basics_002"
+    },
+    {
+      "task_id": "v1_concurrency_basics_003",
+      "title": "Concurrent jobs 003",
+      "category": "concurrency_basics",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_concurrency_basics_003"
+    },
+    {
+      "task_id": "v1_concurrency_basics_004",
+      "title": "Concurrent jobs 004",
+      "category": "concurrency_basics",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_concurrency_basics_004"
+    },
+    {
+      "task_id": "v1_concurrency_basics_005",
+      "title": "Concurrent jobs 005",
+      "category": "concurrency_basics",
+      "difficulty": "hard",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_concurrency_basics_005"
+    },
+    {
+      "task_id": "v1_concurrency_basics_006",
+      "title": "Concurrent jobs 006",
+      "category": "concurrency_basics",
+      "difficulty": "hard",
+      "split": "dev",
+      "quick": true,
+      "path": "tasks/v1_concurrency_basics_006"
+    },
+    {
+      "task_id": "v1_concurrency_basics_007",
+      "title": "Concurrent jobs 007",
+      "category": "concurrency_basics",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_concurrency_basics_007"
+    },
+    {
+      "task_id": "v1_concurrency_basics_008",
+      "title": "Concurrent jobs 008",
+      "category": "concurrency_basics",
+      "difficulty": "hard",
+      "split": "test",
+      "quick": false,
+      "path": "tasks/v1_concurrency_basics_008"
+    },
+    {
+      "task_id": "v1_concurrency_basics_009",
+      "title": "Concurrent jobs 009",
+      "category": "concurrency_basics",
+      "difficulty": "easy",
+      "split": "test",
+      "quick": false,
+      "path": "tasks/v1_concurrency_basics_009"
+    },
+    {
+      "task_id": "v1_concurrency_basics_010",
+      "title": "Concurrent jobs 010",
+      "category": "concurrency_basics",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_concurrency_basics_010"
+    },
+    {
+      "task_id": "v1_concurrency_basics_011",
+      "title": "Concurrent jobs 011",
+      "category": "concurrency_basics",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_concurrency_basics_011"
+    },
+    {
+      "task_id": "v1_concurrency_basics_012",
+      "title": "Concurrent jobs 012",
+      "category": "concurrency_basics",
+      "difficulty": "easy",
+      "split": "dev",
+      "quick": false,
+      "path": "tasks/v1_concurrency_basics_012"
+    },
+    {
+      "task_id": "v1_concurrency_basics_013",
+      "title": "Concurrent jobs 013",
+      "category": "concurrency_basics",
+      "difficulty": "hard",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_concurrency_basics_013"
+    },
+    {
+      "task_id": "v1_concurrency_basics_014",
+      "title": "Concurrent jobs 014",
+      "category": "concurrency_basics",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_concurrency_basics_014"
+    },
+    {
+      "task_id": "v1_concurrency_basics_015",
+      "title": "Concurrent jobs 015",
+      "category": "concurrency_basics",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_concurrency_basics_015"
+    },
+    {
+      "task_id": "v1_concurrency_basics_016",
+      "title": "Concurrent jobs 016",
+      "category": "concurrency_basics",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_concurrency_basics_016"
+    },
+    {
+      "task_id": "v1_concurrency_basics_017",
+      "title": "Concurrent jobs 017",
+      "category": "concurrency_basics",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_concurrency_basics_017"
+    },
+    {
+      "task_id": "v1_concurrency_basics_018",
+      "title": "Concurrent jobs 018",
+      "category": "concurrency_basics",
+      "difficulty": "hard",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_concurrency_basics_018"
+    },
+    {
+      "task_id": "v1_concurrency_basics_019",
+      "title": "Concurrent jobs 019",
+      "category": "concurrency_basics",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_concurrency_basics_019"
+    },
+    {
+      "task_id": "v1_concurrency_basics_020",
+      "title": "Concurrent jobs 020",
+      "category": "concurrency_basics",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_concurrency_basics_020"
+    },
+    {
+      "task_id": "v1_concurrency_basics_021",
+      "title": "Concurrent jobs 021",
+      "category": "concurrency_basics",
+      "difficulty": "easy",
+      "split": "dev",
+      "quick": false,
+      "path": "tasks/v1_concurrency_basics_021"
+    },
+    {
+      "task_id": "v1_concurrency_basics_022",
+      "title": "Concurrent jobs 022",
+      "category": "concurrency_basics",
+      "difficulty": "medium",
+      "split": "test",
+      "quick": true,
+      "path": "tasks/v1_concurrency_basics_022"
+    },
+    {
+      "task_id": "v1_concurrency_basics_023",
+      "title": "Concurrent jobs 023",
+      "category": "concurrency_basics",
+      "difficulty": "medium",
+      "split": "dev",
+      "quick": false,
+      "path": "tasks/v1_concurrency_basics_023"
+    },
+    {
+      "task_id": "v1_concurrency_basics_024",
+      "title": "Concurrent jobs 024",
+      "category": "concurrency_basics",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_concurrency_basics_024"
+    },
+    {
+      "task_id": "v1_concurrency_basics_025",
+      "title": "Concurrent jobs 025",
+      "category": "concurrency_basics",
+      "difficulty": "medium",
+      "split": "dev",
+      "quick": false,
+      "path": "tasks/v1_concurrency_basics_025"
+    },
+    {
+      "task_id": "v1_concurrency_basics_026",
+      "title": "Concurrent jobs 026",
+      "category": "concurrency_basics",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_concurrency_basics_026"
+    },
+    {
+      "task_id": "v1_concurrency_basics_027",
+      "title": "Concurrent jobs 027",
+      "category": "concurrency_basics",
+      "difficulty": "medium",
+      "split": "test",
+      "quick": false,
+      "path": "tasks/v1_concurrency_basics_027"
+    },
+    {
+      "task_id": "v1_concurrency_basics_028",
+      "title": "Concurrent jobs 028",
+      "category": "concurrency_basics",
+      "difficulty": "easy",
+      "split": "dev",
+      "quick": false,
+      "path": "tasks/v1_concurrency_basics_028"
+    },
+    {
+      "task_id": "v1_concurrency_basics_029",
+      "title": "Concurrent jobs 029",
+      "category": "concurrency_basics",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_concurrency_basics_029"
+    },
+    {
+      "task_id": "v1_concurrency_basics_030",
+      "title": "Concurrent jobs 030",
+      "category": "concurrency_basics",
+      "difficulty": "medium",
+      "split": "dev",
+      "quick": true,
+      "path": "tasks/v1_concurrency_basics_030"
+    },
+    {
+      "task_id": "v1_concurrency_basics_031",
+      "title": "Concurrent jobs 031",
+      "category": "concurrency_basics",
+      "difficulty": "hard",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_concurrency_basics_031"
+    },
+    {
+      "task_id": "v1_concurrency_basics_032",
+      "title": "Concurrent jobs 032",
+      "category": "concurrency_basics",
+      "difficulty": "hard",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_concurrency_basics_032"
+    },
+    {
+      "task_id": "v1_concurrency_basics_033",
+      "title": "Concurrent jobs 033",
+      "category": "concurrency_basics",
+      "difficulty": "medium",
+      "split": "test",
+      "quick": false,
+      "path": "tasks/v1_concurrency_basics_033"
+    },
+    {
+      "task_id": "v1_concurrency_basics_034",
+      "title": "Concurrent jobs 034",
+      "category": "concurrency_basics",
+      "difficulty": "hard",
+      "split": "test",
+      "quick": false,
+      "path": "tasks/v1_concurrency_basics_034"
+    },
+    {
+      "task_id": "v1_concurrency_basics_035",
+      "title": "Concurrent jobs 035",
+      "category": "concurrency_basics",
+      "difficulty": "easy",
+      "split": "dev",
+      "quick": false,
+      "path": "tasks/v1_concurrency_basics_035"
+    },
+    {
+      "task_id": "v1_concurrency_basics_036",
+      "title": "Concurrent jobs 036",
+      "category": "concurrency_basics",
+      "difficulty": "medium",
+      "split": "test",
+      "quick": false,
+      "path": "tasks/v1_concurrency_basics_036"
+    },
+    {
+      "task_id": "v1_concurrency_basics_037",
+      "title": "Concurrent jobs 037",
+      "category": "concurrency_basics",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_concurrency_basics_037"
+    },
+    {
+      "task_id": "v1_concurrency_basics_038",
+      "title": "Concurrent jobs 038",
+      "category": "concurrency_basics",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_concurrency_basics_038"
+    },
+    {
+      "task_id": "v1_concurrency_basics_039",
+      "title": "Concurrent jobs 039",
+      "category": "concurrency_basics",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_concurrency_basics_039"
+    },
+    {
+      "task_id": "v1_concurrency_basics_040",
+      "title": "Concurrent jobs 040",
+      "category": "concurrency_basics",
+      "difficulty": "medium",
+      "split": "dev",
+      "quick": false,
+      "path": "tasks/v1_concurrency_basics_040"
+    },
+    {
+      "task_id": "v1_concurrency_basics_041",
+      "title": "Concurrent jobs 041",
+      "category": "concurrency_basics",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_concurrency_basics_041"
+    },
+    {
+      "task_id": "v1_concurrency_basics_042",
+      "title": "Concurrent jobs 042",
+      "category": "concurrency_basics",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_concurrency_basics_042"
+    },
+    {
+      "task_id": "v1_concurrency_basics_043",
+      "title": "Concurrent jobs 043",
+      "category": "concurrency_basics",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_concurrency_basics_043"
+    },
+    {
+      "task_id": "v1_concurrency_basics_044",
+      "title": "Concurrent jobs 044",
+      "category": "concurrency_basics",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_concurrency_basics_044"
+    },
+    {
+      "task_id": "v1_concurrency_basics_045",
+      "title": "Concurrent jobs 045",
+      "category": "concurrency_basics",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_concurrency_basics_045"
+    },
+    {
+      "task_id": "v1_concurrency_basics_046",
+      "title": "Concurrent jobs 046",
+      "category": "concurrency_basics",
+      "difficulty": "hard",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_concurrency_basics_046"
+    },
+    {
+      "task_id": "v1_concurrency_basics_047",
+      "title": "Concurrent jobs 047",
+      "category": "concurrency_basics",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_concurrency_basics_047"
+    },
+    {
+      "task_id": "v1_concurrency_basics_048",
+      "title": "Concurrent jobs 048",
+      "category": "concurrency_basics",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_concurrency_basics_048"
+    },
+    {
+      "task_id": "v1_concurrency_basics_049",
+      "title": "Concurrent jobs 049",
+      "category": "concurrency_basics",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_concurrency_basics_049"
+    },
+    {
+      "task_id": "v1_ds_algo_000",
+      "title": "Rank products 000",
+      "category": "ds_algo",
+      "difficulty": "hard",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_ds_algo_000"
+    },
+    {
+      "task_id": "v1_ds_algo_001",
+      "title": "Rank products 001",
+      "category": "ds_algo",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_ds_algo_001"
+    },
+    {
+      "task_id": "v1_ds_algo_002",
+      "title": "Rank products 002",
+      "category": "ds_algo",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_ds_algo_002"
+    },
+    {
+      "task_id": "v1_ds_algo_003",
+      "title": "Rank products 003",
+      "category": "ds_algo",
+      "difficulty": "medium",
+      "split": "dev",
+      "quick": true,
+      "path": "tasks/v1_ds_algo_003"
+    },
+    {
+      "task_id": "v1_ds_algo_004",
+      "title": "Rank products 004",
+      "category": "ds_algo",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_ds_algo_004"
+    },
+    {
+      "task_id": "v1_ds_algo_005",
+      "title": "Rank products 005",
+      "category": "ds_algo",
+      "difficulty": "easy",
+      "split": "test",
+      "quick": false,
+      "path": "tasks/v1_ds_algo_005"
+    },
+    {
+      "task_id": "v1_ds_algo_006",
+      "title": "Rank products 006",
+      "category": "ds_algo",
+      "difficulty": "hard",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_ds_algo_006"
+    },
+    {
+      "task_id": "v1_ds_algo_007",
+      "title": "Rank products 007",
+      "category": "ds_algo",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_ds_algo_007"
+    },
+    {
+      "task_id": "v1_ds_algo_008",
+      "title": "Rank products 008",
+      "category": "ds_algo",
+      "difficulty": "hard",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_ds_algo_008"
+    },
+    {
+      "task_id": "v1_ds_algo_009",
+      "title": "Rank products 009",
+      "category": "ds_algo",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_ds_algo_009"
+    },
+    {
+      "task_id": "v1_ds_algo_010",
+      "title": "Rank products 010",
+      "category": "ds_algo",
+      "difficulty": "medium",
+      "split": "test",
+      "quick": true,
+      "path": "tasks/v1_ds_algo_010"
+    },
+    {
+      "task_id": "v1_ds_algo_011",
+      "title": "Rank products 011",
+      "category": "ds_algo",
+      "difficulty": "hard",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_ds_algo_011"
+    },
+    {
+      "task_id": "v1_ds_algo_012",
+      "title": "Rank products 012",
+      "category": "ds_algo",
+      "difficulty": "hard",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_ds_algo_012"
+    },
+    {
+      "task_id": "v1_ds_algo_013",
+      "title": "Rank products 013",
+      "category": "ds_algo",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_ds_algo_013"
+    },
+    {
+      "task_id": "v1_ds_algo_014",
+      "title": "Rank products 014",
+      "category": "ds_algo",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_ds_algo_014"
+    },
+    {
+      "task_id": "v1_ds_algo_015",
+      "title": "Rank products 015",
+      "category": "ds_algo",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_ds_algo_015"
+    },
+    {
+      "task_id": "v1_ds_algo_016",
+      "title": "Rank products 016",
+      "category": "ds_algo",
+      "difficulty": "hard",
+      "split": "dev",
+      "quick": false,
+      "path": "tasks/v1_ds_algo_016"
+    },
+    {
+      "task_id": "v1_ds_algo_017",
+      "title": "Rank products 017",
+      "category": "ds_algo",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_ds_algo_017"
+    },
+    {
+      "task_id": "v1_ds_algo_018",
+      "title": "Rank products 018",
+      "category": "ds_algo",
+      "difficulty": "hard",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_ds_algo_018"
+    },
+    {
+      "task_id": "v1_ds_algo_019",
+      "title": "Rank products 019",
+      "category": "ds_algo",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_ds_algo_019"
+    },
+    {
+      "task_id": "v1_ds_algo_020",
+      "title": "Rank products 020",
+      "category": "ds_algo",
+      "difficulty": "hard",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_ds_algo_020"
+    },
+    {
+      "task_id": "v1_ds_algo_021",
+      "title": "Rank products 021",
+      "category": "ds_algo",
+      "difficulty": "hard",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_ds_algo_021"
+    },
+    {
+      "task_id": "v1_ds_algo_022",
+      "title": "Rank products 022",
+      "category": "ds_algo",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_ds_algo_022"
+    },
+    {
+      "task_id": "v1_ds_algo_023",
+      "title": "Rank products 023",
+      "category": "ds_algo",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_ds_algo_023"
+    },
+    {
+      "task_id": "v1_ds_algo_024",
+      "title": "Rank products 024",
+      "category": "ds_algo",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_ds_algo_024"
+    },
+    {
+      "task_id": "v1_ds_algo_025",
+      "title": "Rank products 025",
+      "category": "ds_algo",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_ds_algo_025"
+    },
+    {
+      "task_id": "v1_ds_algo_026",
+      "title": "Rank products 026",
+      "category": "ds_algo",
+      "difficulty": "easy",
+      "split": "dev",
+      "quick": false,
+      "path": "tasks/v1_ds_algo_026"
+    },
+    {
+      "task_id": "v1_ds_algo_027",
+      "title": "Rank products 027",
+      "category": "ds_algo",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_ds_algo_027"
+    },
+    {
+      "task_id": "v1_ds_algo_028",
+      "title": "Rank products 028",
+      "category": "ds_algo",
+      "difficulty": "hard",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_ds_algo_028"
+    },
+    {
+      "task_id": "v1_ds_algo_029",
+      "title": "Rank products 029",
+      "category": "ds_algo",
+      "difficulty": "easy",
+      "split": "dev",
+      "quick": false,
+      "path": "tasks/v1_ds_algo_029"
+    },
+    {
+      "task_id": "v1_ds_algo_030",
+      "title": "Rank products 030",
+      "category": "ds_algo",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_ds_algo_030"
+    },
+    {
+      "task_id": "v1_ds_algo_031",
+      "title": "Rank products 031",
+      "category": "ds_algo",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_ds_algo_031"
+    },
+    {
+      "task_id": "v1_ds_algo_032",
+      "title": "Rank products 032",
+      "category": "ds_algo",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_ds_algo_032"
+    },
+    {
+      "task_id": "v1_ds_algo_033",
+      "title": "Rank products 033",
+      "category": "ds_algo",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_ds_algo_033"
+    },
+    {
+      "task_id": "v1_ds_algo_034",
+      "title": "Rank products 034",
+      "category": "ds_algo",
+      "difficulty": "easy",
+      "split": "test",
+      "quick": false,
+      "path": "tasks/v1_ds_algo_034"
+    },
+    {
+      "task_id": "v1_ds_algo_035",
+      "title": "Rank products 035",
+      "category": "ds_algo",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_ds_algo_035"
+    },
+    {
+      "task_id": "v1_ds_algo_036",
+      "title": "Rank products 036",
+      "category": "ds_algo",
+      "difficulty": "hard",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_ds_algo_036"
+    },
+    {
+      "task_id": "v1_ds_algo_037",
+      "title": "Rank products 037",
+      "category": "ds_algo",
+      "difficulty": "easy",
+      "split": "test",
+      "quick": false,
+      "path": "tasks/v1_ds_algo_037"
+    },
+    {
+      "task_id": "v1_ds_algo_038",
+      "title": "Rank products 038",
+      "category": "ds_algo",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_ds_algo_038"
+    },
+    {
+      "task_id": "v1_ds_algo_039",
+      "title": "Rank products 039",
+      "category": "ds_algo",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_ds_algo_039"
+    },
+    {
+      "task_id": "v1_ds_algo_040",
+      "title": "Rank products 040",
+      "category": "ds_algo",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_ds_algo_040"
+    },
+    {
+      "task_id": "v1_ds_algo_041",
+      "title": "Rank products 041",
+      "category": "ds_algo",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_ds_algo_041"
+    },
+    {
+      "task_id": "v1_ds_algo_042",
+      "title": "Rank products 042",
+      "category": "ds_algo",
+      "difficulty": "hard",
+      "split": "dev",
+      "quick": false,
+      "path": "tasks/v1_ds_algo_042"
+    },
+    {
+      "task_id": "v1_ds_algo_043",
+      "title": "Rank products 043",
+      "category": "ds_algo",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_ds_algo_043"
+    },
+    {
+      "task_id": "v1_ds_algo_044",
+      "title": "Rank products 044",
+      "category": "ds_algo",
+      "difficulty": "easy",
+      "split": "dev",
+      "quick": true,
+      "path": "tasks/v1_ds_algo_044"
+    },
+    {
+      "task_id": "v1_ds_algo_045",
+      "title": "Rank products 045",
+      "category": "ds_algo",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_ds_algo_045"
+    },
+    {
+      "task_id": "v1_ds_algo_046",
+      "title": "Rank products 046",
+      "category": "ds_algo",
+      "difficulty": "hard",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_ds_algo_046"
+    },
+    {
+      "task_id": "v1_ds_algo_047",
+      "title": "Rank products 047",
+      "category": "ds_algo",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_ds_algo_047"
+    },
+    {
+      "task_id": "v1_ds_algo_048",
+      "title": "Rank products 048",
+      "category": "ds_algo",
+      "difficulty": "easy",
+      "split": "dev",
+      "quick": false,
+      "path": "tasks/v1_ds_algo_048"
+    },
+    {
+      "task_id": "v1_ds_algo_049",
+      "title": "Rank products 049",
+      "category": "ds_algo",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_ds_algo_049"
+    },
+    {
+      "task_id": "v1_file_io_serialization_000",
+      "title": "CSV summary 000",
+      "category": "file_io_serialization",
+      "difficulty": "hard",
+      "split": "dev",
+      "quick": true,
+      "path": "tasks/v1_file_io_serialization_000"
+    },
+    {
+      "task_id": "v1_file_io_serialization_001",
+      "title": "CSV summary 001",
+      "category": "file_io_serialization",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_file_io_serialization_001"
+    },
+    {
+      "task_id": "v1_file_io_serialization_002",
+      "title": "CSV summary 002",
+      "category": "file_io_serialization",
+      "difficulty": "hard",
+      "split": "test",
+      "quick": false,
+      "path": "tasks/v1_file_io_serialization_002"
+    },
+    {
+      "task_id": "v1_file_io_serialization_003",
+      "title": "CSV summary 003",
+      "category": "file_io_serialization",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_file_io_serialization_003"
+    },
+    {
+      "task_id": "v1_file_io_serialization_004",
+      "title": "CSV summary 004",
+      "category": "file_io_serialization",
+      "difficulty": "easy",
+      "split": "test",
+      "quick": false,
+      "path": "tasks/v1_file_io_serialization_004"
+    },
+    {
+      "task_id": "v1_file_io_serialization_005",
+      "title": "CSV summary 005",
+      "category": "file_io_serialization",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_file_io_serialization_005"
+    },
+    {
+      "task_id": "v1_file_io_serialization_006",
+      "title": "CSV summary 006",
+      "category": "file_io_serialization",
+      "difficulty": "easy",
+      "split": "dev",
+      "quick": false,
+      "path": "tasks/v1_file_io_serialization_006"
+    },
+    {
+      "task_id": "v1_file_io_serialization_007",
+      "title": "CSV summary 007",
+      "category": "file_io_serialization",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_file_io_serialization_007"
+    },
+    {
+      "task_id": "v1_file_io_serialization_008",
+      "title": "CSV summary 008",
+      "category": "file_io_serialization",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_file_io_serialization_008"
+    },
+    {
+      "task_id": "v1_file_io_serialization_009",
+      "title": "CSV summary 009",
+      "category": "file_io_serialization",
+      "difficulty": "hard",
+      "split": "dev",
+      "quick": false,
+      "path": "tasks/v1_file_io_serialization_009"
+    },
+    {
+      "task_id": "v1_file_io_serialization_010",
+      "title": "CSV summary 010",
+      "category": "file_io_serialization",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_file_io_serialization_010"
+    },
+    {
+      "task_id": "v1_file_io_serialization_011",
+      "title": "CSV summary 011",
+      "category": "file_io_serialization",
+      "difficulty": "hard",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_file_io_serialization_011"
+    },
+    {
+      "task_id": "v1_file_io_serialization_012",
+      "title": "CSV summary 012",
+      "category": "file_io_serialization",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_file_io_serialization_012"
+    },
+    {
+      "task_id": "v1_file_io_serialization_013",
+      "title": "CSV summary 013",
+      "category": "file_io_serialization",
+      "difficulty": "hard",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_file_io_serialization_013"
+    },
+    {
+      "task_id": "v1_file_io_serialization_014",
+      "title": "CSV summary 014",
+      "category": "file_io_serialization",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_file_io_serialization_014"
+    },
+    {
+      "task_id": "v1_file_io_serialization_015",
+      "title": "CSV summary 015",
+      "category": "file_io_serialization",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_file_io_serialization_015"
+    },
+    {
+      "task_id": "v1_file_io_serialization_016",
+      "title": "CSV summary 016",
+      "category": "file_io_serialization",
+      "difficulty": "hard",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_file_io_serialization_016"
+    },
+    {
+      "task_id": "v1_file_io_serialization_017",
+      "title": "CSV summary 017",
+      "category": "file_io_serialization",
+      "difficulty": "easy",
+      "split": "dev",
+      "quick": false,
+      "path": "tasks/v1_file_io_serialization_017"
+    },
+    {
+      "task_id": "v1_file_io_serialization_018",
+      "title": "CSV summary 018",
+      "category": "file_io_serialization",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_file_io_serialization_018"
+    },
+    {
+      "task_id": "v1_file_io_serialization_019",
+      "title": "CSV summary 019",
+      "category": "file_io_serialization",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_file_io_serialization_019"
+    },
+    {
+      "task_id": "v1_file_io_serialization_020",
+      "title": "CSV summary 020",
+      "category": "file_io_serialization",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_file_io_serialization_020"
+    },
+    {
+      "task_id": "v1_file_io_serialization_021",
+      "title": "CSV summary 021",
+      "category": "file_io_serialization",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_file_io_serialization_021"
+    },
+    {
+      "task_id": "v1_file_io_serialization_022",
+      "title": "CSV summary 022",
+      "category": "file_io_serialization",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_file_io_serialization_022"
+    },
+    {
+      "task_id": "v1_file_io_serialization_023",
+      "title": "CSV summary 023",
+      "category": "file_io_serialization",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_file_io_serialization_023"
+    },
+    {
+      "task_id": "v1_file_io_serialization_024",
+      "title": "CSV summary 024",
+      "category": "file_io_serialization",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_file_io_serialization_024"
+    },
+    {
+      "task_id": "v1_file_io_serialization_025",
+      "title": "CSV summary 025",
+      "category": "file_io_serialization",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_file_io_serialization_025"
+    },
+    {
+      "task_id": "v1_file_io_serialization_026",
+      "title": "CSV summary 026",
+      "category": "file_io_serialization",
+      "difficulty": "medium",
+      "split": "test",
+      "quick": false,
+      "path": "tasks/v1_file_io_serialization_026"
+    },
+    {
+      "task_id": "v1_file_io_serialization_027",
+      "title": "CSV summary 027",
+      "category": "file_io_serialization",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_file_io_serialization_027"
+    },
+    {
+      "task_id": "v1_file_io_serialization_028",
+      "title": "CSV summary 028",
+      "category": "file_io_serialization",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_file_io_serialization_028"
+    },
+    {
+      "task_id": "v1_file_io_serialization_029",
+      "title": "CSV summary 029",
+      "category": "file_io_serialization",
+      "difficulty": "easy",
+      "split": "dev",
+      "quick": true,
+      "path": "tasks/v1_file_io_serialization_029"
+    },
+    {
+      "task_id": "v1_file_io_serialization_030",
+      "title": "CSV summary 030",
+      "category": "file_io_serialization",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_file_io_serialization_030"
+    },
+    {
+      "task_id": "v1_file_io_serialization_031",
+      "title": "CSV summary 031",
+      "category": "file_io_serialization",
+      "difficulty": "hard",
+      "split": "dev",
+      "quick": false,
+      "path": "tasks/v1_file_io_serialization_031"
+    },
+    {
+      "task_id": "v1_file_io_serialization_032",
+      "title": "CSV summary 032",
+      "category": "file_io_serialization",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_file_io_serialization_032"
+    },
+    {
+      "task_id": "v1_file_io_serialization_033",
+      "title": "CSV summary 033",
+      "category": "file_io_serialization",
+      "difficulty": "hard",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_file_io_serialization_033"
+    },
+    {
+      "task_id": "v1_file_io_serialization_034",
+      "title": "CSV summary 034",
+      "category": "file_io_serialization",
+      "difficulty": "medium",
+      "split": "dev",
+      "quick": false,
+      "path": "tasks/v1_file_io_serialization_034"
+    },
+    {
+      "task_id": "v1_file_io_serialization_035",
+      "title": "CSV summary 035",
+      "category": "file_io_serialization",
+      "difficulty": "easy",
+      "split": "test",
+      "quick": false,
+      "path": "tasks/v1_file_io_serialization_035"
+    },
+    {
+      "task_id": "v1_file_io_serialization_036",
+      "title": "CSV summary 036",
+      "category": "file_io_serialization",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_file_io_serialization_036"
+    },
+    {
+      "task_id": "v1_file_io_serialization_037",
+      "title": "CSV summary 037",
+      "category": "file_io_serialization",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_file_io_serialization_037"
+    },
+    {
+      "task_id": "v1_file_io_serialization_038",
+      "title": "CSV summary 038",
+      "category": "file_io_serialization",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_file_io_serialization_038"
+    },
+    {
+      "task_id": "v1_file_io_serialization_039",
+      "title": "CSV summary 039",
+      "category": "file_io_serialization",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_file_io_serialization_039"
+    },
+    {
+      "task_id": "v1_file_io_serialization_040",
+      "title": "CSV summary 040",
+      "category": "file_io_serialization",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_file_io_serialization_040"
+    },
+    {
+      "task_id": "v1_file_io_serialization_041",
+      "title": "CSV summary 041",
+      "category": "file_io_serialization",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_file_io_serialization_041"
+    },
+    {
+      "task_id": "v1_file_io_serialization_042",
+      "title": "CSV summary 042",
+      "category": "file_io_serialization",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_file_io_serialization_042"
+    },
+    {
+      "task_id": "v1_file_io_serialization_043",
+      "title": "CSV summary 043",
+      "category": "file_io_serialization",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_file_io_serialization_043"
+    },
+    {
+      "task_id": "v1_file_io_serialization_044",
+      "title": "CSV summary 044",
+      "category": "file_io_serialization",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_file_io_serialization_044"
+    },
+    {
+      "task_id": "v1_file_io_serialization_045",
+      "title": "CSV summary 045",
+      "category": "file_io_serialization",
+      "difficulty": "easy",
+      "split": "dev",
+      "quick": true,
+      "path": "tasks/v1_file_io_serialization_045"
+    },
+    {
+      "task_id": "v1_file_io_serialization_046",
+      "title": "CSV summary 046",
+      "category": "file_io_serialization",
+      "difficulty": "hard",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_file_io_serialization_046"
+    },
+    {
+      "task_id": "v1_file_io_serialization_047",
+      "title": "CSV summary 047",
+      "category": "file_io_serialization",
+      "difficulty": "easy",
+      "split": "dev",
+      "quick": false,
+      "path": "tasks/v1_file_io_serialization_047"
+    },
+    {
+      "task_id": "v1_file_io_serialization_048",
+      "title": "CSV summary 048",
+      "category": "file_io_serialization",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_file_io_serialization_048"
+    },
+    {
+      "task_id": "v1_file_io_serialization_049",
+      "title": "CSV summary 049",
+      "category": "file_io_serialization",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_file_io_serialization_049"
+    },
+    {
+      "task_id": "v1_multi_file_mini_module_000",
+      "title": "Mini module pipeline 000",
+      "category": "multi_file_mini_module",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_multi_file_mini_module_000"
+    },
+    {
+      "task_id": "v1_multi_file_mini_module_001",
+      "title": "Mini module pipeline 001",
+      "category": "multi_file_mini_module",
+      "difficulty": "hard",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_multi_file_mini_module_001"
+    },
+    {
+      "task_id": "v1_multi_file_mini_module_002",
+      "title": "Mini module pipeline 002",
+      "category": "multi_file_mini_module",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_multi_file_mini_module_002"
+    },
+    {
+      "task_id": "v1_multi_file_mini_module_003",
+      "title": "Mini module pipeline 003",
+      "category": "multi_file_mini_module",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_multi_file_mini_module_003"
+    },
+    {
+      "task_id": "v1_multi_file_mini_module_004",
+      "title": "Mini module pipeline 004",
+      "category": "multi_file_mini_module",
+      "difficulty": "hard",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_multi_file_mini_module_004"
+    },
+    {
+      "task_id": "v1_multi_file_mini_module_005",
+      "title": "Mini module pipeline 005",
+      "category": "multi_file_mini_module",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_multi_file_mini_module_005"
+    },
+    {
+      "task_id": "v1_multi_file_mini_module_006",
+      "title": "Mini module pipeline 006",
+      "category": "multi_file_mini_module",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_multi_file_mini_module_006"
+    },
+    {
+      "task_id": "v1_multi_file_mini_module_007",
+      "title": "Mini module pipeline 007",
+      "category": "multi_file_mini_module",
+      "difficulty": "easy",
+      "split": "test",
+      "quick": false,
+      "path": "tasks/v1_multi_file_mini_module_007"
+    },
+    {
+      "task_id": "v1_multi_file_mini_module_008",
+      "title": "Mini module pipeline 008",
+      "category": "multi_file_mini_module",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_multi_file_mini_module_008"
+    },
+    {
+      "task_id": "v1_multi_file_mini_module_009",
+      "title": "Mini module pipeline 009",
+      "category": "multi_file_mini_module",
+      "difficulty": "medium",
+      "split": "test",
+      "quick": false,
+      "path": "tasks/v1_multi_file_mini_module_009"
+    },
+    {
+      "task_id": "v1_multi_file_mini_module_010",
+      "title": "Mini module pipeline 010",
+      "category": "multi_file_mini_module",
+      "difficulty": "hard",
+      "split": "test",
+      "quick": false,
+      "path": "tasks/v1_multi_file_mini_module_010"
+    },
+    {
+      "task_id": "v1_multi_file_mini_module_011",
+      "title": "Mini module pipeline 011",
+      "category": "multi_file_mini_module",
+      "difficulty": "medium",
+      "split": "dev",
+      "quick": false,
+      "path": "tasks/v1_multi_file_mini_module_011"
+    },
+    {
+      "task_id": "v1_multi_file_mini_module_012",
+      "title": "Mini module pipeline 012",
+      "category": "multi_file_mini_module",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_multi_file_mini_module_012"
+    },
+    {
+      "task_id": "v1_multi_file_mini_module_013",
+      "title": "Mini module pipeline 013",
+      "category": "multi_file_mini_module",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_multi_file_mini_module_013"
+    },
+    {
+      "task_id": "v1_multi_file_mini_module_014",
+      "title": "Mini module pipeline 014",
+      "category": "multi_file_mini_module",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_multi_file_mini_module_014"
+    },
+    {
+      "task_id": "v1_multi_file_mini_module_015",
+      "title": "Mini module pipeline 015",
+      "category": "multi_file_mini_module",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_multi_file_mini_module_015"
+    },
+    {
+      "task_id": "v1_multi_file_mini_module_016",
+      "title": "Mini module pipeline 016",
+      "category": "multi_file_mini_module",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_multi_file_mini_module_016"
+    },
+    {
+      "task_id": "v1_multi_file_mini_module_017",
+      "title": "Mini module pipeline 017",
+      "category": "multi_file_mini_module",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_multi_file_mini_module_017"
+    },
+    {
+      "task_id": "v1_multi_file_mini_module_018",
+      "title": "Mini module pipeline 018",
+      "category": "multi_file_mini_module",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_multi_file_mini_module_018"
+    },
+    {
+      "task_id": "v1_multi_file_mini_module_019",
+      "title": "Mini module pipeline 019",
+      "category": "multi_file_mini_module",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_multi_file_mini_module_019"
+    },
+    {
+      "task_id": "v1_multi_file_mini_module_020",
+      "title": "Mini module pipeline 020",
+      "category": "multi_file_mini_module",
+      "difficulty": "easy",
+      "split": "test",
+      "quick": true,
+      "path": "tasks/v1_multi_file_mini_module_020"
+    },
+    {
+      "task_id": "v1_multi_file_mini_module_021",
+      "title": "Mini module pipeline 021",
+      "category": "multi_file_mini_module",
+      "difficulty": "hard",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_multi_file_mini_module_021"
+    },
+    {
+      "task_id": "v1_multi_file_mini_module_022",
+      "title": "Mini module pipeline 022",
+      "category": "multi_file_mini_module",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_multi_file_mini_module_022"
+    },
+    {
+      "task_id": "v1_multi_file_mini_module_023",
+      "title": "Mini module pipeline 023",
+      "category": "multi_file_mini_module",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_multi_file_mini_module_023"
+    },
+    {
+      "task_id": "v1_multi_file_mini_module_024",
+      "title": "Mini module pipeline 024",
+      "category": "multi_file_mini_module",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_multi_file_mini_module_024"
+    },
+    {
+      "task_id": "v1_multi_file_mini_module_025",
+      "title": "Mini module pipeline 025",
+      "category": "multi_file_mini_module",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_multi_file_mini_module_025"
+    },
+    {
+      "task_id": "v1_multi_file_mini_module_026",
+      "title": "Mini module pipeline 026",
+      "category": "multi_file_mini_module",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_multi_file_mini_module_026"
+    },
+    {
+      "task_id": "v1_multi_file_mini_module_027",
+      "title": "Mini module pipeline 027",
+      "category": "multi_file_mini_module",
+      "difficulty": "hard",
+      "split": "dev",
+      "quick": false,
+      "path": "tasks/v1_multi_file_mini_module_027"
+    },
+    {
+      "task_id": "v1_multi_file_mini_module_028",
+      "title": "Mini module pipeline 028",
+      "category": "multi_file_mini_module",
+      "difficulty": "medium",
+      "split": "test",
+      "quick": false,
+      "path": "tasks/v1_multi_file_mini_module_028"
+    },
+    {
+      "task_id": "v1_multi_file_mini_module_029",
+      "title": "Mini module pipeline 029",
+      "category": "multi_file_mini_module",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_multi_file_mini_module_029"
+    },
+    {
+      "task_id": "v1_multi_file_mini_module_030",
+      "title": "Mini module pipeline 030",
+      "category": "multi_file_mini_module",
+      "difficulty": "easy",
+      "split": "test",
+      "quick": false,
+      "path": "tasks/v1_multi_file_mini_module_030"
+    },
+    {
+      "task_id": "v1_multi_file_mini_module_031",
+      "title": "Mini module pipeline 031",
+      "category": "multi_file_mini_module",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_multi_file_mini_module_031"
+    },
+    {
+      "task_id": "v1_multi_file_mini_module_032",
+      "title": "Mini module pipeline 032",
+      "category": "multi_file_mini_module",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_multi_file_mini_module_032"
+    },
+    {
+      "task_id": "v1_multi_file_mini_module_033",
+      "title": "Mini module pipeline 033",
+      "category": "multi_file_mini_module",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_multi_file_mini_module_033"
+    },
+    {
+      "task_id": "v1_multi_file_mini_module_034",
+      "title": "Mini module pipeline 034",
+      "category": "multi_file_mini_module",
+      "difficulty": "medium",
+      "split": "test",
+      "quick": false,
+      "path": "tasks/v1_multi_file_mini_module_034"
+    },
+    {
+      "task_id": "v1_multi_file_mini_module_035",
+      "title": "Mini module pipeline 035",
+      "category": "multi_file_mini_module",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_multi_file_mini_module_035"
+    },
+    {
+      "task_id": "v1_multi_file_mini_module_036",
+      "title": "Mini module pipeline 036",
+      "category": "multi_file_mini_module",
+      "difficulty": "medium",
+      "split": "test",
+      "quick": true,
+      "path": "tasks/v1_multi_file_mini_module_036"
+    },
+    {
+      "task_id": "v1_multi_file_mini_module_037",
+      "title": "Mini module pipeline 037",
+      "category": "multi_file_mini_module",
+      "difficulty": "easy",
+      "split": "test",
+      "quick": true,
+      "path": "tasks/v1_multi_file_mini_module_037"
+    },
+    {
+      "task_id": "v1_multi_file_mini_module_038",
+      "title": "Mini module pipeline 038",
+      "category": "multi_file_mini_module",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_multi_file_mini_module_038"
+    },
+    {
+      "task_id": "v1_multi_file_mini_module_039",
+      "title": "Mini module pipeline 039",
+      "category": "multi_file_mini_module",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_multi_file_mini_module_039"
+    },
+    {
+      "task_id": "v1_multi_file_mini_module_040",
+      "title": "Mini module pipeline 040",
+      "category": "multi_file_mini_module",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_multi_file_mini_module_040"
+    },
+    {
+      "task_id": "v1_multi_file_mini_module_041",
+      "title": "Mini module pipeline 041",
+      "category": "multi_file_mini_module",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_multi_file_mini_module_041"
+    },
+    {
+      "task_id": "v1_multi_file_mini_module_042",
+      "title": "Mini module pipeline 042",
+      "category": "multi_file_mini_module",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_multi_file_mini_module_042"
+    },
+    {
+      "task_id": "v1_multi_file_mini_module_043",
+      "title": "Mini module pipeline 043",
+      "category": "multi_file_mini_module",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_multi_file_mini_module_043"
+    },
+    {
+      "task_id": "v1_multi_file_mini_module_044",
+      "title": "Mini module pipeline 044",
+      "category": "multi_file_mini_module",
+      "difficulty": "easy",
+      "split": "dev",
+      "quick": false,
+      "path": "tasks/v1_multi_file_mini_module_044"
+    },
+    {
+      "task_id": "v1_multi_file_mini_module_045",
+      "title": "Mini module pipeline 045",
+      "category": "multi_file_mini_module",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_multi_file_mini_module_045"
+    },
+    {
+      "task_id": "v1_multi_file_mini_module_046",
+      "title": "Mini module pipeline 046",
+      "category": "multi_file_mini_module",
+      "difficulty": "easy",
+      "split": "test",
+      "quick": false,
+      "path": "tasks/v1_multi_file_mini_module_046"
+    },
+    {
+      "task_id": "v1_multi_file_mini_module_047",
+      "title": "Mini module pipeline 047",
+      "category": "multi_file_mini_module",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_multi_file_mini_module_047"
+    },
+    {
+      "task_id": "v1_multi_file_mini_module_048",
+      "title": "Mini module pipeline 048",
+      "category": "multi_file_mini_module",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_multi_file_mini_module_048"
+    },
+    {
+      "task_id": "v1_multi_file_mini_module_049",
+      "title": "Mini module pipeline 049",
+      "category": "multi_file_mini_module",
+      "difficulty": "hard",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_multi_file_mini_module_049"
+    },
+    {
+      "task_id": "v1_numerical_edge_cases_000",
+      "title": "Trimmed mean 000",
+      "category": "numerical_edge_cases",
+      "difficulty": "easy",
+      "split": "test",
+      "quick": true,
+      "path": "tasks/v1_numerical_edge_cases_000"
+    },
+    {
+      "task_id": "v1_numerical_edge_cases_001",
+      "title": "Trimmed mean 001",
+      "category": "numerical_edge_cases",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_numerical_edge_cases_001"
+    },
+    {
+      "task_id": "v1_numerical_edge_cases_002",
+      "title": "Trimmed mean 002",
+      "category": "numerical_edge_cases",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_numerical_edge_cases_002"
+    },
+    {
+      "task_id": "v1_numerical_edge_cases_003",
+      "title": "Trimmed mean 003",
+      "category": "numerical_edge_cases",
+      "difficulty": "hard",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_numerical_edge_cases_003"
+    },
+    {
+      "task_id": "v1_numerical_edge_cases_004",
+      "title": "Trimmed mean 004",
+      "category": "numerical_edge_cases",
+      "difficulty": "hard",
+      "split": "test",
+      "quick": false,
+      "path": "tasks/v1_numerical_edge_cases_004"
+    },
+    {
+      "task_id": "v1_numerical_edge_cases_005",
+      "title": "Trimmed mean 005",
+      "category": "numerical_edge_cases",
+      "difficulty": "hard",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_numerical_edge_cases_005"
+    },
+    {
+      "task_id": "v1_numerical_edge_cases_006",
+      "title": "Trimmed mean 006",
+      "category": "numerical_edge_cases",
+      "difficulty": "hard",
+      "split": "test",
+      "quick": false,
+      "path": "tasks/v1_numerical_edge_cases_006"
+    },
+    {
+      "task_id": "v1_numerical_edge_cases_007",
+      "title": "Trimmed mean 007",
+      "category": "numerical_edge_cases",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_numerical_edge_cases_007"
+    },
+    {
+      "task_id": "v1_numerical_edge_cases_008",
+      "title": "Trimmed mean 008",
+      "category": "numerical_edge_cases",
+      "difficulty": "medium",
+      "split": "test",
+      "quick": false,
+      "path": "tasks/v1_numerical_edge_cases_008"
+    },
+    {
+      "task_id": "v1_numerical_edge_cases_009",
+      "title": "Trimmed mean 009",
+      "category": "numerical_edge_cases",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_numerical_edge_cases_009"
+    },
+    {
+      "task_id": "v1_numerical_edge_cases_010",
+      "title": "Trimmed mean 010",
+      "category": "numerical_edge_cases",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_numerical_edge_cases_010"
+    },
+    {
+      "task_id": "v1_numerical_edge_cases_011",
+      "title": "Trimmed mean 011",
+      "category": "numerical_edge_cases",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_numerical_edge_cases_011"
+    },
+    {
+      "task_id": "v1_numerical_edge_cases_012",
+      "title": "Trimmed mean 012",
+      "category": "numerical_edge_cases",
+      "difficulty": "hard",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_numerical_edge_cases_012"
+    },
+    {
+      "task_id": "v1_numerical_edge_cases_013",
+      "title": "Trimmed mean 013",
+      "category": "numerical_edge_cases",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_numerical_edge_cases_013"
+    },
+    {
+      "task_id": "v1_numerical_edge_cases_014",
+      "title": "Trimmed mean 014",
+      "category": "numerical_edge_cases",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_numerical_edge_cases_014"
+    },
+    {
+      "task_id": "v1_numerical_edge_cases_015",
+      "title": "Trimmed mean 015",
+      "category": "numerical_edge_cases",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_numerical_edge_cases_015"
+    },
+    {
+      "task_id": "v1_numerical_edge_cases_016",
+      "title": "Trimmed mean 016",
+      "category": "numerical_edge_cases",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_numerical_edge_cases_016"
+    },
+    {
+      "task_id": "v1_numerical_edge_cases_017",
+      "title": "Trimmed mean 017",
+      "category": "numerical_edge_cases",
+      "difficulty": "hard",
+      "split": "test",
+      "quick": false,
+      "path": "tasks/v1_numerical_edge_cases_017"
+    },
+    {
+      "task_id": "v1_numerical_edge_cases_018",
+      "title": "Trimmed mean 018",
+      "category": "numerical_edge_cases",
+      "difficulty": "medium",
+      "split": "dev",
+      "quick": true,
+      "path": "tasks/v1_numerical_edge_cases_018"
+    },
+    {
+      "task_id": "v1_numerical_edge_cases_019",
+      "title": "Trimmed mean 019",
+      "category": "numerical_edge_cases",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_numerical_edge_cases_019"
+    },
+    {
+      "task_id": "v1_numerical_edge_cases_020",
+      "title": "Trimmed mean 020",
+      "category": "numerical_edge_cases",
+      "difficulty": "hard",
+      "split": "dev",
+      "quick": false,
+      "path": "tasks/v1_numerical_edge_cases_020"
+    },
+    {
+      "task_id": "v1_numerical_edge_cases_021",
+      "title": "Trimmed mean 021",
+      "category": "numerical_edge_cases",
+      "difficulty": "medium",
+      "split": "dev",
+      "quick": false,
+      "path": "tasks/v1_numerical_edge_cases_021"
+    },
+    {
+      "task_id": "v1_numerical_edge_cases_022",
+      "title": "Trimmed mean 022",
+      "category": "numerical_edge_cases",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_numerical_edge_cases_022"
+    },
+    {
+      "task_id": "v1_numerical_edge_cases_023",
+      "title": "Trimmed mean 023",
+      "category": "numerical_edge_cases",
+      "difficulty": "hard",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_numerical_edge_cases_023"
+    },
+    {
+      "task_id": "v1_numerical_edge_cases_024",
+      "title": "Trimmed mean 024",
+      "category": "numerical_edge_cases",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_numerical_edge_cases_024"
+    },
+    {
+      "task_id": "v1_numerical_edge_cases_025",
+      "title": "Trimmed mean 025",
+      "category": "numerical_edge_cases",
+      "difficulty": "hard",
+      "split": "dev",
+      "quick": false,
+      "path": "tasks/v1_numerical_edge_cases_025"
+    },
+    {
+      "task_id": "v1_numerical_edge_cases_026",
+      "title": "Trimmed mean 026",
+      "category": "numerical_edge_cases",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_numerical_edge_cases_026"
+    },
+    {
+      "task_id": "v1_numerical_edge_cases_027",
+      "title": "Trimmed mean 027",
+      "category": "numerical_edge_cases",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_numerical_edge_cases_027"
+    },
+    {
+      "task_id": "v1_numerical_edge_cases_028",
+      "title": "Trimmed mean 028",
+      "category": "numerical_edge_cases",
+      "difficulty": "hard",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_numerical_edge_cases_028"
+    },
+    {
+      "task_id": "v1_numerical_edge_cases_029",
+      "title": "Trimmed mean 029",
+      "category": "numerical_edge_cases",
+      "difficulty": "hard",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_numerical_edge_cases_029"
+    },
+    {
+      "task_id": "v1_numerical_edge_cases_030",
+      "title": "Trimmed mean 030",
+      "category": "numerical_edge_cases",
+      "difficulty": "hard",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_numerical_edge_cases_030"
+    },
+    {
+      "task_id": "v1_numerical_edge_cases_031",
+      "title": "Trimmed mean 031",
+      "category": "numerical_edge_cases",
+      "difficulty": "medium",
+      "split": "dev",
+      "quick": false,
+      "path": "tasks/v1_numerical_edge_cases_031"
+    },
+    {
+      "task_id": "v1_numerical_edge_cases_032",
+      "title": "Trimmed mean 032",
+      "category": "numerical_edge_cases",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_numerical_edge_cases_032"
+    },
+    {
+      "task_id": "v1_numerical_edge_cases_033",
+      "title": "Trimmed mean 033",
+      "category": "numerical_edge_cases",
+      "difficulty": "medium",
+      "split": "dev",
+      "quick": false,
+      "path": "tasks/v1_numerical_edge_cases_033"
+    },
+    {
+      "task_id": "v1_numerical_edge_cases_034",
+      "title": "Trimmed mean 034",
+      "category": "numerical_edge_cases",
+      "difficulty": "easy",
+      "split": "test",
+      "quick": false,
+      "path": "tasks/v1_numerical_edge_cases_034"
+    },
+    {
+      "task_id": "v1_numerical_edge_cases_035",
+      "title": "Trimmed mean 035",
+      "category": "numerical_edge_cases",
+      "difficulty": "easy",
+      "split": "test",
+      "quick": false,
+      "path": "tasks/v1_numerical_edge_cases_035"
+    },
+    {
+      "task_id": "v1_numerical_edge_cases_036",
+      "title": "Trimmed mean 036",
+      "category": "numerical_edge_cases",
+      "difficulty": "medium",
+      "split": "dev",
+      "quick": true,
+      "path": "tasks/v1_numerical_edge_cases_036"
+    },
+    {
+      "task_id": "v1_numerical_edge_cases_037",
+      "title": "Trimmed mean 037",
+      "category": "numerical_edge_cases",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_numerical_edge_cases_037"
+    },
+    {
+      "task_id": "v1_numerical_edge_cases_038",
+      "title": "Trimmed mean 038",
+      "category": "numerical_edge_cases",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_numerical_edge_cases_038"
+    },
+    {
+      "task_id": "v1_numerical_edge_cases_039",
+      "title": "Trimmed mean 039",
+      "category": "numerical_edge_cases",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_numerical_edge_cases_039"
+    },
+    {
+      "task_id": "v1_numerical_edge_cases_040",
+      "title": "Trimmed mean 040",
+      "category": "numerical_edge_cases",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_numerical_edge_cases_040"
+    },
+    {
+      "task_id": "v1_numerical_edge_cases_041",
+      "title": "Trimmed mean 041",
+      "category": "numerical_edge_cases",
+      "difficulty": "hard",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_numerical_edge_cases_041"
+    },
+    {
+      "task_id": "v1_numerical_edge_cases_042",
+      "title": "Trimmed mean 042",
+      "category": "numerical_edge_cases",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_numerical_edge_cases_042"
+    },
+    {
+      "task_id": "v1_numerical_edge_cases_043",
+      "title": "Trimmed mean 043",
+      "category": "numerical_edge_cases",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_numerical_edge_cases_043"
+    },
+    {
+      "task_id": "v1_numerical_edge_cases_044",
+      "title": "Trimmed mean 044",
+      "category": "numerical_edge_cases",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_numerical_edge_cases_044"
+    },
+    {
+      "task_id": "v1_numerical_edge_cases_045",
+      "title": "Trimmed mean 045",
+      "category": "numerical_edge_cases",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_numerical_edge_cases_045"
+    },
+    {
+      "task_id": "v1_numerical_edge_cases_046",
+      "title": "Trimmed mean 046",
+      "category": "numerical_edge_cases",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_numerical_edge_cases_046"
+    },
+    {
+      "task_id": "v1_numerical_edge_cases_047",
+      "title": "Trimmed mean 047",
+      "category": "numerical_edge_cases",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_numerical_edge_cases_047"
+    },
+    {
+      "task_id": "v1_numerical_edge_cases_048",
+      "title": "Trimmed mean 048",
+      "category": "numerical_edge_cases",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_numerical_edge_cases_048"
+    },
+    {
+      "task_id": "v1_numerical_edge_cases_049",
+      "title": "Trimmed mean 049",
+      "category": "numerical_edge_cases",
+      "difficulty": "easy",
+      "split": "dev",
+      "quick": false,
+      "path": "tasks/v1_numerical_edge_cases_049"
+    },
+    {
+      "task_id": "v1_string_regex_parsing_000",
+      "title": "Extract markers 000",
+      "category": "string_regex_parsing",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_string_regex_parsing_000"
+    },
+    {
+      "task_id": "v1_string_regex_parsing_001",
+      "title": "Extract markers 001",
+      "category": "string_regex_parsing",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_string_regex_parsing_001"
+    },
+    {
+      "task_id": "v1_string_regex_parsing_002",
+      "title": "Extract markers 002",
+      "category": "string_regex_parsing",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_string_regex_parsing_002"
+    },
+    {
+      "task_id": "v1_string_regex_parsing_003",
+      "title": "Extract markers 003",
+      "category": "string_regex_parsing",
+      "difficulty": "medium",
+      "split": "dev",
+      "quick": false,
+      "path": "tasks/v1_string_regex_parsing_003"
+    },
+    {
+      "task_id": "v1_string_regex_parsing_004",
+      "title": "Extract markers 004",
+      "category": "string_regex_parsing",
+      "difficulty": "hard",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_string_regex_parsing_004"
+    },
+    {
+      "task_id": "v1_string_regex_parsing_005",
+      "title": "Extract markers 005",
+      "category": "string_regex_parsing",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_string_regex_parsing_005"
+    },
+    {
+      "task_id": "v1_string_regex_parsing_006",
+      "title": "Extract markers 006",
+      "category": "string_regex_parsing",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_string_regex_parsing_006"
+    },
+    {
+      "task_id": "v1_string_regex_parsing_007",
+      "title": "Extract markers 007",
+      "category": "string_regex_parsing",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_string_regex_parsing_007"
+    },
+    {
+      "task_id": "v1_string_regex_parsing_008",
+      "title": "Extract markers 008",
+      "category": "string_regex_parsing",
+      "difficulty": "medium",
+      "split": "test",
+      "quick": false,
+      "path": "tasks/v1_string_regex_parsing_008"
+    },
+    {
+      "task_id": "v1_string_regex_parsing_009",
+      "title": "Extract markers 009",
+      "category": "string_regex_parsing",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_string_regex_parsing_009"
+    },
+    {
+      "task_id": "v1_string_regex_parsing_010",
+      "title": "Extract markers 010",
+      "category": "string_regex_parsing",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_string_regex_parsing_010"
+    },
+    {
+      "task_id": "v1_string_regex_parsing_011",
+      "title": "Extract markers 011",
+      "category": "string_regex_parsing",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_string_regex_parsing_011"
+    },
+    {
+      "task_id": "v1_string_regex_parsing_012",
+      "title": "Extract markers 012",
+      "category": "string_regex_parsing",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_string_regex_parsing_012"
+    },
+    {
+      "task_id": "v1_string_regex_parsing_013",
+      "title": "Extract markers 013",
+      "category": "string_regex_parsing",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_string_regex_parsing_013"
+    },
+    {
+      "task_id": "v1_string_regex_parsing_014",
+      "title": "Extract markers 014",
+      "category": "string_regex_parsing",
+      "difficulty": "hard",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_string_regex_parsing_014"
+    },
+    {
+      "task_id": "v1_string_regex_parsing_015",
+      "title": "Extract markers 015",
+      "category": "string_regex_parsing",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_string_regex_parsing_015"
+    },
+    {
+      "task_id": "v1_string_regex_parsing_016",
+      "title": "Extract markers 016",
+      "category": "string_regex_parsing",
+      "difficulty": "hard",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_string_regex_parsing_016"
+    },
+    {
+      "task_id": "v1_string_regex_parsing_017",
+      "title": "Extract markers 017",
+      "category": "string_regex_parsing",
+      "difficulty": "easy",
+      "split": "dev",
+      "quick": false,
+      "path": "tasks/v1_string_regex_parsing_017"
+    },
+    {
+      "task_id": "v1_string_regex_parsing_018",
+      "title": "Extract markers 018",
+      "category": "string_regex_parsing",
+      "difficulty": "hard",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_string_regex_parsing_018"
+    },
+    {
+      "task_id": "v1_string_regex_parsing_019",
+      "title": "Extract markers 019",
+      "category": "string_regex_parsing",
+      "difficulty": "hard",
+      "split": "test",
+      "quick": false,
+      "path": "tasks/v1_string_regex_parsing_019"
+    },
+    {
+      "task_id": "v1_string_regex_parsing_020",
+      "title": "Extract markers 020",
+      "category": "string_regex_parsing",
+      "difficulty": "easy",
+      "split": "dev",
+      "quick": false,
+      "path": "tasks/v1_string_regex_parsing_020"
+    },
+    {
+      "task_id": "v1_string_regex_parsing_021",
+      "title": "Extract markers 021",
+      "category": "string_regex_parsing",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_string_regex_parsing_021"
+    },
+    {
+      "task_id": "v1_string_regex_parsing_022",
+      "title": "Extract markers 022",
+      "category": "string_regex_parsing",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_string_regex_parsing_022"
+    },
+    {
+      "task_id": "v1_string_regex_parsing_023",
+      "title": "Extract markers 023",
+      "category": "string_regex_parsing",
+      "difficulty": "easy",
+      "split": "test",
+      "quick": false,
+      "path": "tasks/v1_string_regex_parsing_023"
+    },
+    {
+      "task_id": "v1_string_regex_parsing_024",
+      "title": "Extract markers 024",
+      "category": "string_regex_parsing",
+      "difficulty": "hard",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_string_regex_parsing_024"
+    },
+    {
+      "task_id": "v1_string_regex_parsing_025",
+      "title": "Extract markers 025",
+      "category": "string_regex_parsing",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_string_regex_parsing_025"
+    },
+    {
+      "task_id": "v1_string_regex_parsing_026",
+      "title": "Extract markers 026",
+      "category": "string_regex_parsing",
+      "difficulty": "easy",
+      "split": "dev",
+      "quick": true,
+      "path": "tasks/v1_string_regex_parsing_026"
+    },
+    {
+      "task_id": "v1_string_regex_parsing_027",
+      "title": "Extract markers 027",
+      "category": "string_regex_parsing",
+      "difficulty": "easy",
+      "split": "dev",
+      "quick": false,
+      "path": "tasks/v1_string_regex_parsing_027"
+    },
+    {
+      "task_id": "v1_string_regex_parsing_028",
+      "title": "Extract markers 028",
+      "category": "string_regex_parsing",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_string_regex_parsing_028"
+    },
+    {
+      "task_id": "v1_string_regex_parsing_029",
+      "title": "Extract markers 029",
+      "category": "string_regex_parsing",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_string_regex_parsing_029"
+    },
+    {
+      "task_id": "v1_string_regex_parsing_030",
+      "title": "Extract markers 030",
+      "category": "string_regex_parsing",
+      "difficulty": "medium",
+      "split": "test",
+      "quick": false,
+      "path": "tasks/v1_string_regex_parsing_030"
+    },
+    {
+      "task_id": "v1_string_regex_parsing_031",
+      "title": "Extract markers 031",
+      "category": "string_regex_parsing",
+      "difficulty": "medium",
+      "split": "dev",
+      "quick": false,
+      "path": "tasks/v1_string_regex_parsing_031"
+    },
+    {
+      "task_id": "v1_string_regex_parsing_032",
+      "title": "Extract markers 032",
+      "category": "string_regex_parsing",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_string_regex_parsing_032"
+    },
+    {
+      "task_id": "v1_string_regex_parsing_033",
+      "title": "Extract markers 033",
+      "category": "string_regex_parsing",
+      "difficulty": "medium",
+      "split": "dev",
+      "quick": true,
+      "path": "tasks/v1_string_regex_parsing_033"
+    },
+    {
+      "task_id": "v1_string_regex_parsing_034",
+      "title": "Extract markers 034",
+      "category": "string_regex_parsing",
+      "difficulty": "hard",
+      "split": "dev",
+      "quick": false,
+      "path": "tasks/v1_string_regex_parsing_034"
+    },
+    {
+      "task_id": "v1_string_regex_parsing_035",
+      "title": "Extract markers 035",
+      "category": "string_regex_parsing",
+      "difficulty": "easy",
+      "split": "dev",
+      "quick": false,
+      "path": "tasks/v1_string_regex_parsing_035"
+    },
+    {
+      "task_id": "v1_string_regex_parsing_036",
+      "title": "Extract markers 036",
+      "category": "string_regex_parsing",
+      "difficulty": "hard",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_string_regex_parsing_036"
+    },
+    {
+      "task_id": "v1_string_regex_parsing_037",
+      "title": "Extract markers 037",
+      "category": "string_regex_parsing",
+      "difficulty": "hard",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_string_regex_parsing_037"
+    },
+    {
+      "task_id": "v1_string_regex_parsing_038",
+      "title": "Extract markers 038",
+      "category": "string_regex_parsing",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_string_regex_parsing_038"
+    },
+    {
+      "task_id": "v1_string_regex_parsing_039",
+      "title": "Extract markers 039",
+      "category": "string_regex_parsing",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_string_regex_parsing_039"
+    },
+    {
+      "task_id": "v1_string_regex_parsing_040",
+      "title": "Extract markers 040",
+      "category": "string_regex_parsing",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_string_regex_parsing_040"
+    },
+    {
+      "task_id": "v1_string_regex_parsing_041",
+      "title": "Extract markers 041",
+      "category": "string_regex_parsing",
+      "difficulty": "easy",
+      "split": "dev",
+      "quick": true,
+      "path": "tasks/v1_string_regex_parsing_041"
+    },
+    {
+      "task_id": "v1_string_regex_parsing_042",
+      "title": "Extract markers 042",
+      "category": "string_regex_parsing",
+      "difficulty": "easy",
+      "split": "test",
+      "quick": false,
+      "path": "tasks/v1_string_regex_parsing_042"
+    },
+    {
+      "task_id": "v1_string_regex_parsing_043",
+      "title": "Extract markers 043",
+      "category": "string_regex_parsing",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_string_regex_parsing_043"
+    },
+    {
+      "task_id": "v1_string_regex_parsing_044",
+      "title": "Extract markers 044",
+      "category": "string_regex_parsing",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_string_regex_parsing_044"
+    },
+    {
+      "task_id": "v1_string_regex_parsing_045",
+      "title": "Extract markers 045",
+      "category": "string_regex_parsing",
+      "difficulty": "medium",
+      "split": "test",
+      "quick": false,
+      "path": "tasks/v1_string_regex_parsing_045"
+    },
+    {
+      "task_id": "v1_string_regex_parsing_046",
+      "title": "Extract markers 046",
+      "category": "string_regex_parsing",
+      "difficulty": "hard",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_string_regex_parsing_046"
+    },
+    {
+      "task_id": "v1_string_regex_parsing_047",
+      "title": "Extract markers 047",
+      "category": "string_regex_parsing",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v1_string_regex_parsing_047"
+    },
+    {
+      "task_id": "v1_string_regex_parsing_048",
+      "title": "Extract markers 048",
+      "category": "string_regex_parsing",
+      "difficulty": "easy",
+      "split": "dev",
+      "quick": false,
+      "path": "tasks/v1_string_regex_parsing_048"
+    },
+    {
+      "task_id": "v1_string_regex_parsing_049",
+      "title": "Extract markers 049",
+      "category": "string_regex_parsing",
+      "difficulty": "medium",
+      "split": "test",
+      "quick": false,
+      "path": "tasks/v1_string_regex_parsing_049"
+    },
+    {
+      "task_id": "v2_mini_bugfix_000",
+      "title": "Mini bugfix 000",
+      "category": "mini_repo_bugfix",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_bugfix_000"
+    },
+    {
+      "task_id": "v2_mini_bugfix_001",
+      "title": "Mini bugfix 001",
+      "category": "mini_repo_bugfix",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_bugfix_001"
+    },
+    {
+      "task_id": "v2_mini_bugfix_002",
+      "title": "Mini bugfix 002",
+      "category": "mini_repo_bugfix",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_bugfix_002"
+    },
+    {
+      "task_id": "v2_mini_bugfix_003",
+      "title": "Mini bugfix 003",
+      "category": "mini_repo_bugfix",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_bugfix_003"
+    },
+    {
+      "task_id": "v2_mini_bugfix_004",
+      "title": "Mini bugfix 004",
+      "category": "mini_repo_bugfix",
+      "difficulty": "hard",
+      "split": "test",
+      "quick": false,
+      "path": "tasks/v2_mini_bugfix_004"
+    },
+    {
+      "task_id": "v2_mini_bugfix_005",
+      "title": "Mini bugfix 005",
+      "category": "mini_repo_bugfix",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_bugfix_005"
+    },
+    {
+      "task_id": "v2_mini_bugfix_006",
+      "title": "Mini bugfix 006",
+      "category": "mini_repo_bugfix",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_bugfix_006"
+    },
+    {
+      "task_id": "v2_mini_bugfix_007",
+      "title": "Mini bugfix 007",
+      "category": "mini_repo_bugfix",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_bugfix_007"
+    },
+    {
+      "task_id": "v2_mini_bugfix_008",
+      "title": "Mini bugfix 008",
+      "category": "mini_repo_bugfix",
+      "difficulty": "medium",
+      "split": "test",
+      "quick": false,
+      "path": "tasks/v2_mini_bugfix_008"
+    },
+    {
+      "task_id": "v2_mini_bugfix_009",
+      "title": "Mini bugfix 009",
+      "category": "mini_repo_bugfix",
+      "difficulty": "medium",
+      "split": "test",
+      "quick": true,
+      "path": "tasks/v2_mini_bugfix_009"
+    },
+    {
+      "task_id": "v2_mini_bugfix_010",
+      "title": "Mini bugfix 010",
+      "category": "mini_repo_bugfix",
+      "difficulty": "hard",
+      "split": "dev",
+      "quick": true,
+      "path": "tasks/v2_mini_bugfix_010"
+    },
+    {
+      "task_id": "v2_mini_bugfix_011",
+      "title": "Mini bugfix 011",
+      "category": "mini_repo_bugfix",
+      "difficulty": "hard",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_bugfix_011"
+    },
+    {
+      "task_id": "v2_mini_bugfix_012",
+      "title": "Mini bugfix 012",
+      "category": "mini_repo_bugfix",
+      "difficulty": "easy",
+      "split": "dev",
+      "quick": false,
+      "path": "tasks/v2_mini_bugfix_012"
+    },
+    {
+      "task_id": "v2_mini_bugfix_013",
+      "title": "Mini bugfix 013",
+      "category": "mini_repo_bugfix",
+      "difficulty": "hard",
+      "split": "dev",
+      "quick": false,
+      "path": "tasks/v2_mini_bugfix_013"
+    },
+    {
+      "task_id": "v2_mini_bugfix_014",
+      "title": "Mini bugfix 014",
+      "category": "mini_repo_bugfix",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_bugfix_014"
+    },
+    {
+      "task_id": "v2_mini_bugfix_015",
+      "title": "Mini bugfix 015",
+      "category": "mini_repo_bugfix",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_bugfix_015"
+    },
+    {
+      "task_id": "v2_mini_bugfix_016",
+      "title": "Mini bugfix 016",
+      "category": "mini_repo_bugfix",
+      "difficulty": "easy",
+      "split": "test",
+      "quick": false,
+      "path": "tasks/v2_mini_bugfix_016"
+    },
+    {
+      "task_id": "v2_mini_bugfix_017",
+      "title": "Mini bugfix 017",
+      "category": "mini_repo_bugfix",
+      "difficulty": "easy",
+      "split": "test",
+      "quick": false,
+      "path": "tasks/v2_mini_bugfix_017"
+    },
+    {
+      "task_id": "v2_mini_bugfix_018",
+      "title": "Mini bugfix 018",
+      "category": "mini_repo_bugfix",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_bugfix_018"
+    },
+    {
+      "task_id": "v2_mini_bugfix_019",
+      "title": "Mini bugfix 019",
+      "category": "mini_repo_bugfix",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_bugfix_019"
+    },
+    {
+      "task_id": "v2_mini_bugfix_020",
+      "title": "Mini bugfix 020",
+      "category": "mini_repo_bugfix",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_bugfix_020"
+    },
+    {
+      "task_id": "v2_mini_bugfix_021",
+      "title": "Mini bugfix 021",
+      "category": "mini_repo_bugfix",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_bugfix_021"
+    },
+    {
+      "task_id": "v2_mini_bugfix_022",
+      "title": "Mini bugfix 022",
+      "category": "mini_repo_bugfix",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_bugfix_022"
+    },
+    {
+      "task_id": "v2_mini_bugfix_023",
+      "title": "Mini bugfix 023",
+      "category": "mini_repo_bugfix",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_bugfix_023"
+    },
+    {
+      "task_id": "v2_mini_bugfix_024",
+      "title": "Mini bugfix 024",
+      "category": "mini_repo_bugfix",
+      "difficulty": "medium",
+      "split": "dev",
+      "quick": false,
+      "path": "tasks/v2_mini_bugfix_024"
+    },
+    {
+      "task_id": "v2_mini_bugfix_025",
+      "title": "Mini bugfix 025",
+      "category": "mini_repo_bugfix",
+      "difficulty": "medium",
+      "split": "test",
+      "quick": false,
+      "path": "tasks/v2_mini_bugfix_025"
+    },
+    {
+      "task_id": "v2_mini_bugfix_026",
+      "title": "Mini bugfix 026",
+      "category": "mini_repo_bugfix",
+      "difficulty": "easy",
+      "split": "test",
+      "quick": false,
+      "path": "tasks/v2_mini_bugfix_026"
+    },
+    {
+      "task_id": "v2_mini_bugfix_027",
+      "title": "Mini bugfix 027",
+      "category": "mini_repo_bugfix",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_bugfix_027"
+    },
+    {
+      "task_id": "v2_mini_bugfix_028",
+      "title": "Mini bugfix 028",
+      "category": "mini_repo_bugfix",
+      "difficulty": "hard",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_bugfix_028"
+    },
+    {
+      "task_id": "v2_mini_bugfix_029",
+      "title": "Mini bugfix 029",
+      "category": "mini_repo_bugfix",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_bugfix_029"
+    },
+    {
+      "task_id": "v2_mini_bugfix_030",
+      "title": "Mini bugfix 030",
+      "category": "mini_repo_bugfix",
+      "difficulty": "easy",
+      "split": "dev",
+      "quick": false,
+      "path": "tasks/v2_mini_bugfix_030"
+    },
+    {
+      "task_id": "v2_mini_bugfix_031",
+      "title": "Mini bugfix 031",
+      "category": "mini_repo_bugfix",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_bugfix_031"
+    },
+    {
+      "task_id": "v2_mini_bugfix_032",
+      "title": "Mini bugfix 032",
+      "category": "mini_repo_bugfix",
+      "difficulty": "hard",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_bugfix_032"
+    },
+    {
+      "task_id": "v2_mini_bugfix_033",
+      "title": "Mini bugfix 033",
+      "category": "mini_repo_bugfix",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_bugfix_033"
+    },
+    {
+      "task_id": "v2_mini_bugfix_034",
+      "title": "Mini bugfix 034",
+      "category": "mini_repo_bugfix",
+      "difficulty": "easy",
+      "split": "test",
+      "quick": false,
+      "path": "tasks/v2_mini_bugfix_034"
+    },
+    {
+      "task_id": "v2_mini_bugfix_035",
+      "title": "Mini bugfix 035",
+      "category": "mini_repo_bugfix",
+      "difficulty": "hard",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_bugfix_035"
+    },
+    {
+      "task_id": "v2_mini_bugfix_036",
+      "title": "Mini bugfix 036",
+      "category": "mini_repo_bugfix",
+      "difficulty": "easy",
+      "split": "test",
+      "quick": false,
+      "path": "tasks/v2_mini_bugfix_036"
+    },
+    {
+      "task_id": "v2_mini_bugfix_037",
+      "title": "Mini bugfix 037",
+      "category": "mini_repo_bugfix",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_bugfix_037"
+    },
+    {
+      "task_id": "v2_mini_bugfix_038",
+      "title": "Mini bugfix 038",
+      "category": "mini_repo_bugfix",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_bugfix_038"
+    },
+    {
+      "task_id": "v2_mini_bugfix_039",
+      "title": "Mini bugfix 039",
+      "category": "mini_repo_bugfix",
+      "difficulty": "hard",
+      "split": "test",
+      "quick": false,
+      "path": "tasks/v2_mini_bugfix_039"
+    },
+    {
+      "task_id": "v2_mini_bugfix_040",
+      "title": "Mini bugfix 040",
+      "category": "mini_repo_bugfix",
+      "difficulty": "hard",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_bugfix_040"
+    },
+    {
+      "task_id": "v2_mini_bugfix_041",
+      "title": "Mini bugfix 041",
+      "category": "mini_repo_bugfix",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_bugfix_041"
+    },
+    {
+      "task_id": "v2_mini_bugfix_042",
+      "title": "Mini bugfix 042",
+      "category": "mini_repo_bugfix",
+      "difficulty": "medium",
+      "split": "test",
+      "quick": false,
+      "path": "tasks/v2_mini_bugfix_042"
+    },
+    {
+      "task_id": "v2_mini_bugfix_043",
+      "title": "Mini bugfix 043",
+      "category": "mini_repo_bugfix",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_bugfix_043"
+    },
+    {
+      "task_id": "v2_mini_bugfix_044",
+      "title": "Mini bugfix 044",
+      "category": "mini_repo_bugfix",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_bugfix_044"
+    },
+    {
+      "task_id": "v2_mini_bugfix_045",
+      "title": "Mini bugfix 045",
+      "category": "mini_repo_bugfix",
+      "difficulty": "medium",
+      "split": "test",
+      "quick": false,
+      "path": "tasks/v2_mini_bugfix_045"
+    },
+    {
+      "task_id": "v2_mini_bugfix_046",
+      "title": "Mini bugfix 046",
+      "category": "mini_repo_bugfix",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_bugfix_046"
+    },
+    {
+      "task_id": "v2_mini_bugfix_047",
+      "title": "Mini bugfix 047",
+      "category": "mini_repo_bugfix",
+      "difficulty": "hard",
+      "split": "test",
+      "quick": true,
+      "path": "tasks/v2_mini_bugfix_047"
+    },
+    {
+      "task_id": "v2_mini_bugfix_048",
+      "title": "Mini bugfix 048",
+      "category": "mini_repo_bugfix",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_bugfix_048"
+    },
+    {
+      "task_id": "v2_mini_bugfix_049",
+      "title": "Mini bugfix 049",
+      "category": "mini_repo_bugfix",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_bugfix_049"
+    },
+    {
+      "task_id": "v2_mini_cli_000",
+      "title": "Mini cli 000",
+      "category": "mini_repo_cli",
+      "difficulty": "easy",
+      "split": "dev",
+      "quick": true,
+      "path": "tasks/v2_mini_cli_000"
+    },
+    {
+      "task_id": "v2_mini_cli_001",
+      "title": "Mini cli 001",
+      "category": "mini_repo_cli",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_cli_001"
+    },
+    {
+      "task_id": "v2_mini_cli_002",
+      "title": "Mini cli 002",
+      "category": "mini_repo_cli",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_cli_002"
+    },
+    {
+      "task_id": "v2_mini_cli_003",
+      "title": "Mini cli 003",
+      "category": "mini_repo_cli",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_cli_003"
+    },
+    {
+      "task_id": "v2_mini_cli_004",
+      "title": "Mini cli 004",
+      "category": "mini_repo_cli",
+      "difficulty": "easy",
+      "split": "test",
+      "quick": true,
+      "path": "tasks/v2_mini_cli_004"
+    },
+    {
+      "task_id": "v2_mini_cli_005",
+      "title": "Mini cli 005",
+      "category": "mini_repo_cli",
+      "difficulty": "hard",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_cli_005"
+    },
+    {
+      "task_id": "v2_mini_cli_006",
+      "title": "Mini cli 006",
+      "category": "mini_repo_cli",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_cli_006"
+    },
+    {
+      "task_id": "v2_mini_cli_007",
+      "title": "Mini cli 007",
+      "category": "mini_repo_cli",
+      "difficulty": "easy",
+      "split": "test",
+      "quick": false,
+      "path": "tasks/v2_mini_cli_007"
+    },
+    {
+      "task_id": "v2_mini_cli_008",
+      "title": "Mini cli 008",
+      "category": "mini_repo_cli",
+      "difficulty": "medium",
+      "split": "dev",
+      "quick": true,
+      "path": "tasks/v2_mini_cli_008"
+    },
+    {
+      "task_id": "v2_mini_cli_009",
+      "title": "Mini cli 009",
+      "category": "mini_repo_cli",
+      "difficulty": "medium",
+      "split": "test",
+      "quick": false,
+      "path": "tasks/v2_mini_cli_009"
+    },
+    {
+      "task_id": "v2_mini_cli_010",
+      "title": "Mini cli 010",
+      "category": "mini_repo_cli",
+      "difficulty": "easy",
+      "split": "test",
+      "quick": false,
+      "path": "tasks/v2_mini_cli_010"
+    },
+    {
+      "task_id": "v2_mini_cli_011",
+      "title": "Mini cli 011",
+      "category": "mini_repo_cli",
+      "difficulty": "medium",
+      "split": "test",
+      "quick": false,
+      "path": "tasks/v2_mini_cli_011"
+    },
+    {
+      "task_id": "v2_mini_cli_012",
+      "title": "Mini cli 012",
+      "category": "mini_repo_cli",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_cli_012"
+    },
+    {
+      "task_id": "v2_mini_cli_013",
+      "title": "Mini cli 013",
+      "category": "mini_repo_cli",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_cli_013"
+    },
+    {
+      "task_id": "v2_mini_cli_014",
+      "title": "Mini cli 014",
+      "category": "mini_repo_cli",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_cli_014"
+    },
+    {
+      "task_id": "v2_mini_cli_015",
+      "title": "Mini cli 015",
+      "category": "mini_repo_cli",
+      "difficulty": "hard",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_cli_015"
+    },
+    {
+      "task_id": "v2_mini_cli_016",
+      "title": "Mini cli 016",
+      "category": "mini_repo_cli",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_cli_016"
+    },
+    {
+      "task_id": "v2_mini_cli_017",
+      "title": "Mini cli 017",
+      "category": "mini_repo_cli",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_cli_017"
+    },
+    {
+      "task_id": "v2_mini_cli_018",
+      "title": "Mini cli 018",
+      "category": "mini_repo_cli",
+      "difficulty": "medium",
+      "split": "dev",
+      "quick": false,
+      "path": "tasks/v2_mini_cli_018"
+    },
+    {
+      "task_id": "v2_mini_cli_019",
+      "title": "Mini cli 019",
+      "category": "mini_repo_cli",
+      "difficulty": "hard",
+      "split": "dev",
+      "quick": false,
+      "path": "tasks/v2_mini_cli_019"
+    },
+    {
+      "task_id": "v2_mini_cli_020",
+      "title": "Mini cli 020",
+      "category": "mini_repo_cli",
+      "difficulty": "hard",
+      "split": "test",
+      "quick": false,
+      "path": "tasks/v2_mini_cli_020"
+    },
+    {
+      "task_id": "v2_mini_cli_021",
+      "title": "Mini cli 021",
+      "category": "mini_repo_cli",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_cli_021"
+    },
+    {
+      "task_id": "v2_mini_cli_022",
+      "title": "Mini cli 022",
+      "category": "mini_repo_cli",
+      "difficulty": "medium",
+      "split": "test",
+      "quick": false,
+      "path": "tasks/v2_mini_cli_022"
+    },
+    {
+      "task_id": "v2_mini_cli_023",
+      "title": "Mini cli 023",
+      "category": "mini_repo_cli",
+      "difficulty": "easy",
+      "split": "dev",
+      "quick": false,
+      "path": "tasks/v2_mini_cli_023"
+    },
+    {
+      "task_id": "v2_mini_cli_024",
+      "title": "Mini cli 024",
+      "category": "mini_repo_cli",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_cli_024"
+    },
+    {
+      "task_id": "v2_mini_cli_025",
+      "title": "Mini cli 025",
+      "category": "mini_repo_cli",
+      "difficulty": "easy",
+      "split": "dev",
+      "quick": false,
+      "path": "tasks/v2_mini_cli_025"
+    },
+    {
+      "task_id": "v2_mini_cli_026",
+      "title": "Mini cli 026",
+      "category": "mini_repo_cli",
+      "difficulty": "medium",
+      "split": "test",
+      "quick": false,
+      "path": "tasks/v2_mini_cli_026"
+    },
+    {
+      "task_id": "v2_mini_cli_027",
+      "title": "Mini cli 027",
+      "category": "mini_repo_cli",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_cli_027"
+    },
+    {
+      "task_id": "v2_mini_cli_028",
+      "title": "Mini cli 028",
+      "category": "mini_repo_cli",
+      "difficulty": "hard",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_cli_028"
+    },
+    {
+      "task_id": "v2_mini_cli_029",
+      "title": "Mini cli 029",
+      "category": "mini_repo_cli",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_cli_029"
+    },
+    {
+      "task_id": "v2_mini_cli_030",
+      "title": "Mini cli 030",
+      "category": "mini_repo_cli",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_cli_030"
+    },
+    {
+      "task_id": "v2_mini_cli_031",
+      "title": "Mini cli 031",
+      "category": "mini_repo_cli",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_cli_031"
+    },
+    {
+      "task_id": "v2_mini_cli_032",
+      "title": "Mini cli 032",
+      "category": "mini_repo_cli",
+      "difficulty": "medium",
+      "split": "dev",
+      "quick": false,
+      "path": "tasks/v2_mini_cli_032"
+    },
+    {
+      "task_id": "v2_mini_cli_033",
+      "title": "Mini cli 033",
+      "category": "mini_repo_cli",
+      "difficulty": "hard",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_cli_033"
+    },
+    {
+      "task_id": "v2_mini_cli_034",
+      "title": "Mini cli 034",
+      "category": "mini_repo_cli",
+      "difficulty": "easy",
+      "split": "dev",
+      "quick": false,
+      "path": "tasks/v2_mini_cli_034"
+    },
+    {
+      "task_id": "v2_mini_cli_035",
+      "title": "Mini cli 035",
+      "category": "mini_repo_cli",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_cli_035"
+    },
+    {
+      "task_id": "v2_mini_cli_036",
+      "title": "Mini cli 036",
+      "category": "mini_repo_cli",
+      "difficulty": "medium",
+      "split": "test",
+      "quick": false,
+      "path": "tasks/v2_mini_cli_036"
+    },
+    {
+      "task_id": "v2_mini_cli_037",
+      "title": "Mini cli 037",
+      "category": "mini_repo_cli",
+      "difficulty": "hard",
+      "split": "dev",
+      "quick": false,
+      "path": "tasks/v2_mini_cli_037"
+    },
+    {
+      "task_id": "v2_mini_cli_038",
+      "title": "Mini cli 038",
+      "category": "mini_repo_cli",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_cli_038"
+    },
+    {
+      "task_id": "v2_mini_cli_039",
+      "title": "Mini cli 039",
+      "category": "mini_repo_cli",
+      "difficulty": "hard",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_cli_039"
+    },
+    {
+      "task_id": "v2_mini_cli_040",
+      "title": "Mini cli 040",
+      "category": "mini_repo_cli",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_cli_040"
+    },
+    {
+      "task_id": "v2_mini_cli_041",
+      "title": "Mini cli 041",
+      "category": "mini_repo_cli",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_cli_041"
+    },
+    {
+      "task_id": "v2_mini_cli_042",
+      "title": "Mini cli 042",
+      "category": "mini_repo_cli",
+      "difficulty": "easy",
+      "split": "test",
+      "quick": false,
+      "path": "tasks/v2_mini_cli_042"
+    },
+    {
+      "task_id": "v2_mini_cli_043",
+      "title": "Mini cli 043",
+      "category": "mini_repo_cli",
+      "difficulty": "hard",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_cli_043"
+    },
+    {
+      "task_id": "v2_mini_cli_044",
+      "title": "Mini cli 044",
+      "category": "mini_repo_cli",
+      "difficulty": "medium",
+      "split": "dev",
+      "quick": false,
+      "path": "tasks/v2_mini_cli_044"
+    },
+    {
+      "task_id": "v2_mini_cli_045",
+      "title": "Mini cli 045",
+      "category": "mini_repo_cli",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_cli_045"
+    },
+    {
+      "task_id": "v2_mini_cli_046",
+      "title": "Mini cli 046",
+      "category": "mini_repo_cli",
+      "difficulty": "medium",
+      "split": "dev",
+      "quick": false,
+      "path": "tasks/v2_mini_cli_046"
+    },
+    {
+      "task_id": "v2_mini_cli_047",
+      "title": "Mini cli 047",
+      "category": "mini_repo_cli",
+      "difficulty": "easy",
+      "split": "dev",
+      "quick": false,
+      "path": "tasks/v2_mini_cli_047"
+    },
+    {
+      "task_id": "v2_mini_cli_048",
+      "title": "Mini cli 048",
+      "category": "mini_repo_cli",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_cli_048"
+    },
+    {
+      "task_id": "v2_mini_cli_049",
+      "title": "Mini cli 049",
+      "category": "mini_repo_cli",
+      "difficulty": "hard",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_cli_049"
+    },
+    {
+      "task_id": "v2_mini_feature_000",
+      "title": "Mini feature 000",
+      "category": "mini_repo_feature",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_feature_000"
+    },
+    {
+      "task_id": "v2_mini_feature_001",
+      "title": "Mini feature 001",
+      "category": "mini_repo_feature",
+      "difficulty": "hard",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_feature_001"
+    },
+    {
+      "task_id": "v2_mini_feature_002",
+      "title": "Mini feature 002",
+      "category": "mini_repo_feature",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_feature_002"
+    },
+    {
+      "task_id": "v2_mini_feature_003",
+      "title": "Mini feature 003",
+      "category": "mini_repo_feature",
+      "difficulty": "hard",
+      "split": "test",
+      "quick": false,
+      "path": "tasks/v2_mini_feature_003"
+    },
+    {
+      "task_id": "v2_mini_feature_004",
+      "title": "Mini feature 004",
+      "category": "mini_repo_feature",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_feature_004"
+    },
+    {
+      "task_id": "v2_mini_feature_005",
+      "title": "Mini feature 005",
+      "category": "mini_repo_feature",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_feature_005"
+    },
+    {
+      "task_id": "v2_mini_feature_006",
+      "title": "Mini feature 006",
+      "category": "mini_repo_feature",
+      "difficulty": "easy",
+      "split": "test",
+      "quick": false,
+      "path": "tasks/v2_mini_feature_006"
+    },
+    {
+      "task_id": "v2_mini_feature_007",
+      "title": "Mini feature 007",
+      "category": "mini_repo_feature",
+      "difficulty": "medium",
+      "split": "test",
+      "quick": false,
+      "path": "tasks/v2_mini_feature_007"
+    },
+    {
+      "task_id": "v2_mini_feature_008",
+      "title": "Mini feature 008",
+      "category": "mini_repo_feature",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_feature_008"
+    },
+    {
+      "task_id": "v2_mini_feature_009",
+      "title": "Mini feature 009",
+      "category": "mini_repo_feature",
+      "difficulty": "hard",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_feature_009"
+    },
+    {
+      "task_id": "v2_mini_feature_010",
+      "title": "Mini feature 010",
+      "category": "mini_repo_feature",
+      "difficulty": "medium",
+      "split": "dev",
+      "quick": false,
+      "path": "tasks/v2_mini_feature_010"
+    },
+    {
+      "task_id": "v2_mini_feature_011",
+      "title": "Mini feature 011",
+      "category": "mini_repo_feature",
+      "difficulty": "hard",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_feature_011"
+    },
+    {
+      "task_id": "v2_mini_feature_012",
+      "title": "Mini feature 012",
+      "category": "mini_repo_feature",
+      "difficulty": "medium",
+      "split": "dev",
+      "quick": false,
+      "path": "tasks/v2_mini_feature_012"
+    },
+    {
+      "task_id": "v2_mini_feature_013",
+      "title": "Mini feature 013",
+      "category": "mini_repo_feature",
+      "difficulty": "easy",
+      "split": "test",
+      "quick": true,
+      "path": "tasks/v2_mini_feature_013"
+    },
+    {
+      "task_id": "v2_mini_feature_014",
+      "title": "Mini feature 014",
+      "category": "mini_repo_feature",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_feature_014"
+    },
+    {
+      "task_id": "v2_mini_feature_015",
+      "title": "Mini feature 015",
+      "category": "mini_repo_feature",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_feature_015"
+    },
+    {
+      "task_id": "v2_mini_feature_016",
+      "title": "Mini feature 016",
+      "category": "mini_repo_feature",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_feature_016"
+    },
+    {
+      "task_id": "v2_mini_feature_017",
+      "title": "Mini feature 017",
+      "category": "mini_repo_feature",
+      "difficulty": "hard",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_feature_017"
+    },
+    {
+      "task_id": "v2_mini_feature_018",
+      "title": "Mini feature 018",
+      "category": "mini_repo_feature",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_feature_018"
+    },
+    {
+      "task_id": "v2_mini_feature_019",
+      "title": "Mini feature 019",
+      "category": "mini_repo_feature",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_feature_019"
+    },
+    {
+      "task_id": "v2_mini_feature_020",
+      "title": "Mini feature 020",
+      "category": "mini_repo_feature",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_feature_020"
+    },
+    {
+      "task_id": "v2_mini_feature_021",
+      "title": "Mini feature 021",
+      "category": "mini_repo_feature",
+      "difficulty": "easy",
+      "split": "dev",
+      "quick": false,
+      "path": "tasks/v2_mini_feature_021"
+    },
+    {
+      "task_id": "v2_mini_feature_022",
+      "title": "Mini feature 022",
+      "category": "mini_repo_feature",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_feature_022"
+    },
+    {
+      "task_id": "v2_mini_feature_023",
+      "title": "Mini feature 023",
+      "category": "mini_repo_feature",
+      "difficulty": "easy",
+      "split": "dev",
+      "quick": true,
+      "path": "tasks/v2_mini_feature_023"
+    },
+    {
+      "task_id": "v2_mini_feature_024",
+      "title": "Mini feature 024",
+      "category": "mini_repo_feature",
+      "difficulty": "easy",
+      "split": "test",
+      "quick": false,
+      "path": "tasks/v2_mini_feature_024"
+    },
+    {
+      "task_id": "v2_mini_feature_025",
+      "title": "Mini feature 025",
+      "category": "mini_repo_feature",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_feature_025"
+    },
+    {
+      "task_id": "v2_mini_feature_026",
+      "title": "Mini feature 026",
+      "category": "mini_repo_feature",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_feature_026"
+    },
+    {
+      "task_id": "v2_mini_feature_027",
+      "title": "Mini feature 027",
+      "category": "mini_repo_feature",
+      "difficulty": "easy",
+      "split": "test",
+      "quick": false,
+      "path": "tasks/v2_mini_feature_027"
+    },
+    {
+      "task_id": "v2_mini_feature_028",
+      "title": "Mini feature 028",
+      "category": "mini_repo_feature",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_feature_028"
+    },
+    {
+      "task_id": "v2_mini_feature_029",
+      "title": "Mini feature 029",
+      "category": "mini_repo_feature",
+      "difficulty": "hard",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_feature_029"
+    },
+    {
+      "task_id": "v2_mini_feature_030",
+      "title": "Mini feature 030",
+      "category": "mini_repo_feature",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_feature_030"
+    },
+    {
+      "task_id": "v2_mini_feature_031",
+      "title": "Mini feature 031",
+      "category": "mini_repo_feature",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_feature_031"
+    },
+    {
+      "task_id": "v2_mini_feature_032",
+      "title": "Mini feature 032",
+      "category": "mini_repo_feature",
+      "difficulty": "medium",
+      "split": "dev",
+      "quick": false,
+      "path": "tasks/v2_mini_feature_032"
+    },
+    {
+      "task_id": "v2_mini_feature_033",
+      "title": "Mini feature 033",
+      "category": "mini_repo_feature",
+      "difficulty": "medium",
+      "split": "dev",
+      "quick": true,
+      "path": "tasks/v2_mini_feature_033"
+    },
+    {
+      "task_id": "v2_mini_feature_034",
+      "title": "Mini feature 034",
+      "category": "mini_repo_feature",
+      "difficulty": "hard",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_feature_034"
+    },
+    {
+      "task_id": "v2_mini_feature_035",
+      "title": "Mini feature 035",
+      "category": "mini_repo_feature",
+      "difficulty": "hard",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_feature_035"
+    },
+    {
+      "task_id": "v2_mini_feature_036",
+      "title": "Mini feature 036",
+      "category": "mini_repo_feature",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_feature_036"
+    },
+    {
+      "task_id": "v2_mini_feature_037",
+      "title": "Mini feature 037",
+      "category": "mini_repo_feature",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_feature_037"
+    },
+    {
+      "task_id": "v2_mini_feature_038",
+      "title": "Mini feature 038",
+      "category": "mini_repo_feature",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_feature_038"
+    },
+    {
+      "task_id": "v2_mini_feature_039",
+      "title": "Mini feature 039",
+      "category": "mini_repo_feature",
+      "difficulty": "easy",
+      "split": "test",
+      "quick": false,
+      "path": "tasks/v2_mini_feature_039"
+    },
+    {
+      "task_id": "v2_mini_feature_040",
+      "title": "Mini feature 040",
+      "category": "mini_repo_feature",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_feature_040"
+    },
+    {
+      "task_id": "v2_mini_feature_041",
+      "title": "Mini feature 041",
+      "category": "mini_repo_feature",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_feature_041"
+    },
+    {
+      "task_id": "v2_mini_feature_042",
+      "title": "Mini feature 042",
+      "category": "mini_repo_feature",
+      "difficulty": "medium",
+      "split": "dev",
+      "quick": false,
+      "path": "tasks/v2_mini_feature_042"
+    },
+    {
+      "task_id": "v2_mini_feature_043",
+      "title": "Mini feature 043",
+      "category": "mini_repo_feature",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_feature_043"
+    },
+    {
+      "task_id": "v2_mini_feature_044",
+      "title": "Mini feature 044",
+      "category": "mini_repo_feature",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_feature_044"
+    },
+    {
+      "task_id": "v2_mini_feature_045",
+      "title": "Mini feature 045",
+      "category": "mini_repo_feature",
+      "difficulty": "hard",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_feature_045"
+    },
+    {
+      "task_id": "v2_mini_feature_046",
+      "title": "Mini feature 046",
+      "category": "mini_repo_feature",
+      "difficulty": "medium",
+      "split": "test",
+      "quick": false,
+      "path": "tasks/v2_mini_feature_046"
+    },
+    {
+      "task_id": "v2_mini_feature_047",
+      "title": "Mini feature 047",
+      "category": "mini_repo_feature",
+      "difficulty": "hard",
+      "split": "dev",
+      "quick": false,
+      "path": "tasks/v2_mini_feature_047"
+    },
+    {
+      "task_id": "v2_mini_feature_048",
+      "title": "Mini feature 048",
+      "category": "mini_repo_feature",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_feature_048"
+    },
+    {
+      "task_id": "v2_mini_feature_049",
+      "title": "Mini feature 049",
+      "category": "mini_repo_feature",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_feature_049"
+    },
+    {
+      "task_id": "v2_mini_tool_sim_000",
+      "title": "Mini tool sim 000",
+      "category": "mini_repo_tool_sim",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_tool_sim_000"
+    },
+    {
+      "task_id": "v2_mini_tool_sim_001",
+      "title": "Mini tool sim 001",
+      "category": "mini_repo_tool_sim",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_tool_sim_001"
+    },
+    {
+      "task_id": "v2_mini_tool_sim_002",
+      "title": "Mini tool sim 002",
+      "category": "mini_repo_tool_sim",
+      "difficulty": "easy",
+      "split": "dev",
+      "quick": false,
+      "path": "tasks/v2_mini_tool_sim_002"
+    },
+    {
+      "task_id": "v2_mini_tool_sim_003",
+      "title": "Mini tool sim 003",
+      "category": "mini_repo_tool_sim",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_tool_sim_003"
+    },
+    {
+      "task_id": "v2_mini_tool_sim_004",
+      "title": "Mini tool sim 004",
+      "category": "mini_repo_tool_sim",
+      "difficulty": "medium",
+      "split": "test",
+      "quick": false,
+      "path": "tasks/v2_mini_tool_sim_004"
+    },
+    {
+      "task_id": "v2_mini_tool_sim_005",
+      "title": "Mini tool sim 005",
+      "category": "mini_repo_tool_sim",
+      "difficulty": "easy",
+      "split": "dev",
+      "quick": false,
+      "path": "tasks/v2_mini_tool_sim_005"
+    },
+    {
+      "task_id": "v2_mini_tool_sim_006",
+      "title": "Mini tool sim 006",
+      "category": "mini_repo_tool_sim",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_tool_sim_006"
+    },
+    {
+      "task_id": "v2_mini_tool_sim_007",
+      "title": "Mini tool sim 007",
+      "category": "mini_repo_tool_sim",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_tool_sim_007"
+    },
+    {
+      "task_id": "v2_mini_tool_sim_008",
+      "title": "Mini tool sim 008",
+      "category": "mini_repo_tool_sim",
+      "difficulty": "medium",
+      "split": "dev",
+      "quick": false,
+      "path": "tasks/v2_mini_tool_sim_008"
+    },
+    {
+      "task_id": "v2_mini_tool_sim_009",
+      "title": "Mini tool sim 009",
+      "category": "mini_repo_tool_sim",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_tool_sim_009"
+    },
+    {
+      "task_id": "v2_mini_tool_sim_010",
+      "title": "Mini tool sim 010",
+      "category": "mini_repo_tool_sim",
+      "difficulty": "hard",
+      "split": "test",
+      "quick": false,
+      "path": "tasks/v2_mini_tool_sim_010"
+    },
+    {
+      "task_id": "v2_mini_tool_sim_011",
+      "title": "Mini tool sim 011",
+      "category": "mini_repo_tool_sim",
+      "difficulty": "hard",
+      "split": "test",
+      "quick": false,
+      "path": "tasks/v2_mini_tool_sim_011"
+    },
+    {
+      "task_id": "v2_mini_tool_sim_012",
+      "title": "Mini tool sim 012",
+      "category": "mini_repo_tool_sim",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_tool_sim_012"
+    },
+    {
+      "task_id": "v2_mini_tool_sim_013",
+      "title": "Mini tool sim 013",
+      "category": "mini_repo_tool_sim",
+      "difficulty": "hard",
+      "split": "dev",
+      "quick": false,
+      "path": "tasks/v2_mini_tool_sim_013"
+    },
+    {
+      "task_id": "v2_mini_tool_sim_014",
+      "title": "Mini tool sim 014",
+      "category": "mini_repo_tool_sim",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_tool_sim_014"
+    },
+    {
+      "task_id": "v2_mini_tool_sim_015",
+      "title": "Mini tool sim 015",
+      "category": "mini_repo_tool_sim",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_tool_sim_015"
+    },
+    {
+      "task_id": "v2_mini_tool_sim_016",
+      "title": "Mini tool sim 016",
+      "category": "mini_repo_tool_sim",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_tool_sim_016"
+    },
+    {
+      "task_id": "v2_mini_tool_sim_017",
+      "title": "Mini tool sim 017",
+      "category": "mini_repo_tool_sim",
+      "difficulty": "hard",
+      "split": "test",
+      "quick": false,
+      "path": "tasks/v2_mini_tool_sim_017"
+    },
+    {
+      "task_id": "v2_mini_tool_sim_018",
+      "title": "Mini tool sim 018",
+      "category": "mini_repo_tool_sim",
+      "difficulty": "hard",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_tool_sim_018"
+    },
+    {
+      "task_id": "v2_mini_tool_sim_019",
+      "title": "Mini tool sim 019",
+      "category": "mini_repo_tool_sim",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_tool_sim_019"
+    },
+    {
+      "task_id": "v2_mini_tool_sim_020",
+      "title": "Mini tool sim 020",
+      "category": "mini_repo_tool_sim",
+      "difficulty": "easy",
+      "split": "test",
+      "quick": false,
+      "path": "tasks/v2_mini_tool_sim_020"
+    },
+    {
+      "task_id": "v2_mini_tool_sim_021",
+      "title": "Mini tool sim 021",
+      "category": "mini_repo_tool_sim",
+      "difficulty": "medium",
+      "split": "test",
+      "quick": false,
+      "path": "tasks/v2_mini_tool_sim_021"
+    },
+    {
+      "task_id": "v2_mini_tool_sim_022",
+      "title": "Mini tool sim 022",
+      "category": "mini_repo_tool_sim",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_tool_sim_022"
+    },
+    {
+      "task_id": "v2_mini_tool_sim_023",
+      "title": "Mini tool sim 023",
+      "category": "mini_repo_tool_sim",
+      "difficulty": "medium",
+      "split": "test",
+      "quick": true,
+      "path": "tasks/v2_mini_tool_sim_023"
+    },
+    {
+      "task_id": "v2_mini_tool_sim_024",
+      "title": "Mini tool sim 024",
+      "category": "mini_repo_tool_sim",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_tool_sim_024"
+    },
+    {
+      "task_id": "v2_mini_tool_sim_025",
+      "title": "Mini tool sim 025",
+      "category": "mini_repo_tool_sim",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_tool_sim_025"
+    },
+    {
+      "task_id": "v2_mini_tool_sim_026",
+      "title": "Mini tool sim 026",
+      "category": "mini_repo_tool_sim",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_tool_sim_026"
+    },
+    {
+      "task_id": "v2_mini_tool_sim_027",
+      "title": "Mini tool sim 027",
+      "category": "mini_repo_tool_sim",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_tool_sim_027"
+    },
+    {
+      "task_id": "v2_mini_tool_sim_028",
+      "title": "Mini tool sim 028",
+      "category": "mini_repo_tool_sim",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_tool_sim_028"
+    },
+    {
+      "task_id": "v2_mini_tool_sim_029",
+      "title": "Mini tool sim 029",
+      "category": "mini_repo_tool_sim",
+      "difficulty": "hard",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_tool_sim_029"
+    },
+    {
+      "task_id": "v2_mini_tool_sim_030",
+      "title": "Mini tool sim 030",
+      "category": "mini_repo_tool_sim",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_tool_sim_030"
+    },
+    {
+      "task_id": "v2_mini_tool_sim_031",
+      "title": "Mini tool sim 031",
+      "category": "mini_repo_tool_sim",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_tool_sim_031"
+    },
+    {
+      "task_id": "v2_mini_tool_sim_032",
+      "title": "Mini tool sim 032",
+      "category": "mini_repo_tool_sim",
+      "difficulty": "medium",
+      "split": "dev",
+      "quick": false,
+      "path": "tasks/v2_mini_tool_sim_032"
+    },
+    {
+      "task_id": "v2_mini_tool_sim_033",
+      "title": "Mini tool sim 033",
+      "category": "mini_repo_tool_sim",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_tool_sim_033"
+    },
+    {
+      "task_id": "v2_mini_tool_sim_034",
+      "title": "Mini tool sim 034",
+      "category": "mini_repo_tool_sim",
+      "difficulty": "hard",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_tool_sim_034"
+    },
+    {
+      "task_id": "v2_mini_tool_sim_035",
+      "title": "Mini tool sim 035",
+      "category": "mini_repo_tool_sim",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_tool_sim_035"
+    },
+    {
+      "task_id": "v2_mini_tool_sim_036",
+      "title": "Mini tool sim 036",
+      "category": "mini_repo_tool_sim",
+      "difficulty": "hard",
+      "split": "test",
+      "quick": false,
+      "path": "tasks/v2_mini_tool_sim_036"
+    },
+    {
+      "task_id": "v2_mini_tool_sim_037",
+      "title": "Mini tool sim 037",
+      "category": "mini_repo_tool_sim",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_tool_sim_037"
+    },
+    {
+      "task_id": "v2_mini_tool_sim_038",
+      "title": "Mini tool sim 038",
+      "category": "mini_repo_tool_sim",
+      "difficulty": "easy",
+      "split": "dev",
+      "quick": false,
+      "path": "tasks/v2_mini_tool_sim_038"
+    },
+    {
+      "task_id": "v2_mini_tool_sim_039",
+      "title": "Mini tool sim 039",
+      "category": "mini_repo_tool_sim",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_tool_sim_039"
+    },
+    {
+      "task_id": "v2_mini_tool_sim_040",
+      "title": "Mini tool sim 040",
+      "category": "mini_repo_tool_sim",
+      "difficulty": "easy",
+      "split": "test",
+      "quick": false,
+      "path": "tasks/v2_mini_tool_sim_040"
+    },
+    {
+      "task_id": "v2_mini_tool_sim_041",
+      "title": "Mini tool sim 041",
+      "category": "mini_repo_tool_sim",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_tool_sim_041"
+    },
+    {
+      "task_id": "v2_mini_tool_sim_042",
+      "title": "Mini tool sim 042",
+      "category": "mini_repo_tool_sim",
+      "difficulty": "medium",
+      "split": "dev",
+      "quick": true,
+      "path": "tasks/v2_mini_tool_sim_042"
+    },
+    {
+      "task_id": "v2_mini_tool_sim_043",
+      "title": "Mini tool sim 043",
+      "category": "mini_repo_tool_sim",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_tool_sim_043"
+    },
+    {
+      "task_id": "v2_mini_tool_sim_044",
+      "title": "Mini tool sim 044",
+      "category": "mini_repo_tool_sim",
+      "difficulty": "hard",
+      "split": "dev",
+      "quick": true,
+      "path": "tasks/v2_mini_tool_sim_044"
+    },
+    {
+      "task_id": "v2_mini_tool_sim_045",
+      "title": "Mini tool sim 045",
+      "category": "mini_repo_tool_sim",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_tool_sim_045"
+    },
+    {
+      "task_id": "v2_mini_tool_sim_046",
+      "title": "Mini tool sim 046",
+      "category": "mini_repo_tool_sim",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_tool_sim_046"
+    },
+    {
+      "task_id": "v2_mini_tool_sim_047",
+      "title": "Mini tool sim 047",
+      "category": "mini_repo_tool_sim",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_tool_sim_047"
+    },
+    {
+      "task_id": "v2_mini_tool_sim_048",
+      "title": "Mini tool sim 048",
+      "category": "mini_repo_tool_sim",
+      "difficulty": "hard",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_tool_sim_048"
+    },
+    {
+      "task_id": "v2_mini_tool_sim_049",
+      "title": "Mini tool sim 049",
+      "category": "mini_repo_tool_sim",
+      "difficulty": "easy",
+      "split": "test",
+      "quick": false,
+      "path": "tasks/v2_mini_tool_sim_049"
+    }
+  ]
+}

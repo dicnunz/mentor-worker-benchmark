@@ -7,6 +7,7 @@ from pathlib import Path
 from mentor_worker_benchmark.tasks.task_base import TaskDefinition
 from mentor_worker_benchmark.tasks.task_codegen_py.task_defs import select_tasks as select_legacy_tasks
 from mentor_worker_benchmark.tasks.task_pack_v1.pack import load_task_pack_v1
+from mentor_worker_benchmark.tasks.task_pack_v2.pack import load_task_pack_v2
 
 
 @dataclass(frozen=True, slots=True)
@@ -88,6 +89,57 @@ def _select_pack_v1(
     )
 
 
+def _select_pack_v2(
+    *,
+    suite: str | None,
+    legacy_selector: str | None,
+    seed: int,
+) -> TaskSelection:
+    tasks = load_task_pack_v2()
+
+    if legacy_selector:
+        if legacy_selector == "all":
+            selected = tasks
+            selector_source = "tasks"
+            suite_label = "all"
+        elif legacy_selector == "quick":
+            selected = [task for task in tasks if task.quick]
+            selector_source = "tasks"
+            suite_label = "quick"
+        else:
+            selected = _select_by_explicit_ids(tasks, legacy_selector)
+            selector_source = "tasks"
+            suite_label = "explicit"
+    else:
+        selector_source = "suite"
+        suite_token = suite or "dev,test"
+        suite_label = suite_token
+
+        if suite_token == "all":
+            selected = tasks
+        elif suite_token == "quick":
+            selected = [task for task in tasks if task.quick]
+        else:
+            split_tokens = {token.strip() for token in suite_token.split(",") if token.strip()}
+            valid = {"train", "dev", "test"}
+            if not split_tokens:
+                raise ValueError("Suite selector resolved to no splits.")
+            if not split_tokens.issubset(valid):
+                bad = ", ".join(sorted(split_tokens - valid))
+                raise ValueError(f"Unsupported suite token(s): {bad}. Use quick, dev, test, all.")
+            selected = [task for task in tasks if task.split in split_tokens]
+
+    if not selected:
+        raise ValueError("Task selection produced zero tasks.")
+
+    return TaskSelection(
+        task_pack="task_pack_v2",
+        selector_source=selector_source,
+        suite=suite_label,
+        tasks=_stable_shuffle(selected, seed=seed),
+    )
+
+
 def resolve_tasks(
     *,
     task_pack: str,
@@ -95,6 +147,9 @@ def resolve_tasks(
     legacy_selector: str | None,
     seed: int,
 ) -> TaskSelection:
+    if task_pack == "task_pack_v2":
+        return _select_pack_v2(suite=suite, legacy_selector=legacy_selector, seed=seed)
+
     if task_pack == "task_pack_v1":
         return _select_pack_v1(suite=suite, legacy_selector=legacy_selector, seed=seed)
 
@@ -109,5 +164,5 @@ def resolve_tasks(
             tasks=selected,
         )
 
-    available = ", ".join(["task_pack_v1", "task_codegen_py"])
+    available = ", ".join(["task_pack_v2", "task_pack_v1", "task_codegen_py"])
     raise ValueError(f"Unknown task pack `{task_pack}`. Available packs: {available}")

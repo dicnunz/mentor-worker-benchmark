@@ -1,0 +1,1 @@
+RULE:unused_import|SEVERITY:warn|FILE:zenith.py|LINE:10\nRULE:unsafe_eval|SEVERITY:error|FILE:willow.py|LINE:20\nRULE:line_too_long|SEVERITY:info|FILE:zenith.py|LINE:30\nRULE:unused_import|SEVERITY:warn|FILE:willow.py|LINE:40\n

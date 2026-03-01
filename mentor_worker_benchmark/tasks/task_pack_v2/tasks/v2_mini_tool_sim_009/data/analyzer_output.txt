@@ -1,0 +1,1 @@
+RULE:unused_import|SEVERITY:warn|FILE:beacon.py|LINE:19\nRULE:unsafe_eval|SEVERITY:error|FILE:signal.py|LINE:29\nRULE:line_too_long|SEVERITY:info|FILE:beacon.py|LINE:39\nRULE:unused_import|SEVERITY:warn|FILE:signal.py|LINE:49\n

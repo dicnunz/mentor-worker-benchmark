@@ -1,0 +1,1 @@
+RULE:unused_import|SEVERITY:warn|FILE:delta.py|LINE:30\nRULE:unsafe_eval|SEVERITY:error|FILE:lumen.py|LINE:40\nRULE:line_too_long|SEVERITY:info|FILE:delta.py|LINE:50\nRULE:unused_import|SEVERITY:warn|FILE:lumen.py|LINE:60\n

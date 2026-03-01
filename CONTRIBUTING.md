@@ -17,6 +17,8 @@ Run all of these before opening a PR:
 
 ```bash
 python -m pytest tests -q
+python -m mentor_worker_benchmark.tasks.task_pack_v2.validate
+python -m mentor_worker_benchmark sanity --task-pack task_pack_v2 --suite quick --seed 1337
 python -m mentor_worker_benchmark.tasks.task_pack_v1.validate
 python -m mentor_worker_benchmark sanity --task-pack task_pack_v1 --suite quick --seed 1337
 python -m mentor_worker_benchmark curate --task-pack task_pack_v1 --seed 1337
@@ -37,7 +39,13 @@ Task quality requirements:
 - Avoid flaky timing assumptions.
 - Keep per-task runtime short.
 
-Split policy for `task_pack_v1`:
+Split policy for `task_pack_v2`:
+- `train`: 340
+- `dev`: 80
+- `test`: 80
+- `quick`: 30 balanced tasks across old + mini-repo categories
+
+Split policy for `task_pack_v1` (base corpus):
 - `train`: 200
 - `dev`: 50
 - `test`: 50
@@ -46,6 +54,8 @@ Split policy for `task_pack_v1`:
 If you edit generator logic or task definitions:
 
 ```bash
+python -m mentor_worker_benchmark.tasks.task_pack_v2.generate_task_pack --seed 1337
+python -m mentor_worker_benchmark.tasks.task_pack_v2.validate
 python -m mentor_worker_benchmark.tasks.task_pack_v1.generate_task_pack --seed 1337
 python -m mentor_worker_benchmark.tasks.task_pack_v1.validate
 ```

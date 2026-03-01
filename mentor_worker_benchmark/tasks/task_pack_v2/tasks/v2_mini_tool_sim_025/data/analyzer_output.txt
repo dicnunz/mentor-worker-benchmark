@@ -1,0 +1,1 @@
+RULE:unused_import|SEVERITY:warn|FILE:willow.py|LINE:35\nRULE:unsafe_eval|SEVERITY:error|FILE:signal.py|LINE:45\nRULE:line_too_long|SEVERITY:info|FILE:willow.py|LINE:55\nRULE:unused_import|SEVERITY:warn|FILE:signal.py|LINE:65\n

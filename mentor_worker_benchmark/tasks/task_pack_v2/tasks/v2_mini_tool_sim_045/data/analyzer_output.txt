@@ -1,0 +1,1 @@
+RULE:unused_import|SEVERITY:warn|FILE:onyx.py|LINE:55\nRULE:unsafe_eval|SEVERITY:error|FILE:atlas.py|LINE:65\nRULE:line_too_long|SEVERITY:info|FILE:onyx.py|LINE:75\nRULE:unused_import|SEVERITY:warn|FILE:atlas.py|LINE:85\n

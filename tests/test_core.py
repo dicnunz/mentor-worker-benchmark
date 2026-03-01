@@ -38,3 +38,15 @@ def test_task_selection_default_eval_split() -> None:
     assert len(selection.tasks) == 100
     splits = {task.split for task in selection.tasks}
     assert splits == {"dev", "test"}
+
+
+def test_task_selection_quick_v2() -> None:
+    selection = resolve_tasks(task_pack="task_pack_v2", suite="quick", legacy_selector=None, seed=1337)
+    assert len(selection.tasks) == 30
+
+
+def test_task_selection_default_eval_split_v2() -> None:
+    selection = resolve_tasks(task_pack="task_pack_v2", suite=None, legacy_selector=None, seed=1337)
+    assert len(selection.tasks) == 160
+    splits = {task.split for task in selection.tasks}
+    assert splits == {"dev", "test"}

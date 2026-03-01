@@ -1,0 +1,1 @@
+RULE:unused_import|SEVERITY:warn|FILE:pioneer.py|LINE:24\nRULE:unsafe_eval|SEVERITY:error|FILE:quartz.py|LINE:34\nRULE:line_too_long|SEVERITY:info|FILE:pioneer.py|LINE:44\nRULE:unused_import|SEVERITY:warn|FILE:quartz.py|LINE:54\n

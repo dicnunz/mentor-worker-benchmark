@@ -29,7 +29,13 @@ What it does not measure:
 
 ## Task Pack and Splits
 
-`task_pack_v1` contains 300 deterministic tasks across 6 categories:
+Default pack: `task_pack_v2` (mini-repo realism).
+
+`task_pack_v2` contains 500 deterministic tasks:
+- `300` curated tasks from the v1-style corpus.
+- `200` new mini-repo tasks (4-12 files) that require cross-module reasoning.
+
+Categories:
 
 1. `string_regex_parsing`
 2. `ds_algo`
@@ -37,14 +43,24 @@ What it does not measure:
 4. `concurrency_basics`
 5. `numerical_edge_cases`
 6. `multi_file_mini_module`
+7. `mini_repo_bugfix`
+8. `mini_repo_feature`
+9. `mini_repo_cli`
+10. `mini_repo_tool_sim`
 
 Splits:
-- `train`: 200
-- `dev`: 50
-- `test`: 50
-- `quick`: 18 balanced eval tasks
+- `train`: 340
+- `dev`: 80
+- `test`: 80
+- `quick`: 30 balanced eval tasks
 
 Default benchmark behavior runs `dev+test` unless overridden.
+`task_pack_v1` is still available via `--task-pack task_pack_v1`.
+
+Why v2 is more realistic:
+- Tasks include multi-module interactions and integration-style failures.
+- CLI behavior and tool-output parsing patterns mimic real local workflows.
+- Worker context now includes a concise file tree plus size-limited file excerpts.
 
 ## Install
 
@@ -82,7 +98,7 @@ Run quick suite in reproducibility mode:
 
 ```bash
 python -m mentor_worker_benchmark run \
-  --task-pack task_pack_v1 \
+  --task-pack task_pack_v2 \
   --suite quick \
   --models phi3:mini \
   --run-modes worker_only,mentor_worker,mentor_only_suggestion_noise \
@@ -99,15 +115,17 @@ Validate task harness and starters without Ollama:
 
 ```bash
 python -m mentor_worker_benchmark sanity --task-pack task_pack_v1 --suite quick --seed 1337
+python -m mentor_worker_benchmark sanity --task-pack task_pack_v2 --suite quick --seed 1337
 python -m mentor_worker_benchmark.tasks.task_pack_v1.validate
+python -m mentor_worker_benchmark.tasks.task_pack_v2.validate
 ```
 
 ## CLI
 
 ```bash
 python -m mentor_worker_benchmark setup [--models default|m1,m2] [--skip-pull]
-python -m mentor_worker_benchmark run [--task-pack task_pack_v1] [--suite quick|dev|test|all] [--repro]
-python -m mentor_worker_benchmark sanity [--task-pack task_pack_v1] [--suite quick|dev|test|all]
+python -m mentor_worker_benchmark run [--task-pack task_pack_v2|task_pack_v1] [--suite quick|dev|test|all] [--repro]
+python -m mentor_worker_benchmark sanity [--task-pack task_pack_v2|task_pack_v1] [--suite quick|dev|test|all]
 python -m mentor_worker_benchmark leaderboard --results results/results.json --output results/leaderboard.md
 python -m mentor_worker_benchmark compare --before before.json --after after.json
 python -m mentor_worker_benchmark curate --task-pack task_pack_v1 --seed 1337
@@ -166,7 +184,7 @@ Enable GitHub Pages (repo settings):
 
 ## Quality Gates
 
-`task_pack_v1` includes an automated curation pipeline to keep the 300-task corpus credible and harder to game.
+`task_pack_v1` includes an automated curation pipeline used to keep the base 300-task corpus credible before composing v2.
 
 Run:
 

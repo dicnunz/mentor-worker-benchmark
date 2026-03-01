@@ -25,8 +25,11 @@ jobs:
       - name: Unit tests (benchmark code)
         run: python -m pytest tests -q
 
-      - name: Validate task pack metadata + structure
+      - name: Validate task packs metadata + structure
         run: python -m mentor_worker_benchmark.tasks.task_pack_v1.validate
 
-      - name: Sanity check (quick subset, no Ollama)
-        run: python -m mentor_worker_benchmark sanity --task-pack task_pack_v1 --suite quick --seed 1337
+      - name: Validate task pack v2 metadata + structure
+        run: python -m mentor_worker_benchmark.tasks.task_pack_v2.validate
+
+      - name: Sanity check v2 quick subset (no Ollama)
+        run: python -m mentor_worker_benchmark sanity --task-pack task_pack_v2 --suite quick --seed 1337

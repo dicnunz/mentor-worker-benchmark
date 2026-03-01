@@ -1,0 +1,1 @@
+RULE:unused_import|SEVERITY:warn|FILE:beacon.py|LINE:57\nRULE:unsafe_eval|SEVERITY:error|FILE:timber.py|LINE:67\nRULE:line_too_long|SEVERITY:info|FILE:beacon.py|LINE:77\nRULE:unused_import|SEVERITY:warn|FILE:timber.py|LINE:87\n

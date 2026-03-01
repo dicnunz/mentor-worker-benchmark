@@ -1,0 +1,1 @@
+RULE:unused_import|SEVERITY:warn|FILE:harbor.py|LINE:20\nRULE:unsafe_eval|SEVERITY:error|FILE:atlas.py|LINE:30\nRULE:line_too_long|SEVERITY:info|FILE:harbor.py|LINE:40\nRULE:unused_import|SEVERITY:warn|FILE:atlas.py|LINE:50\n
