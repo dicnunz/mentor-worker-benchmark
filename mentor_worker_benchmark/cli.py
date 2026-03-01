@@ -18,6 +18,11 @@ from mentor_worker_benchmark.runner import (
     write_leaderboard,
 )
 from mentor_worker_benchmark.tasks.task_pack_v1.curate import CurationConfig, run_curation
+from mentor_worker_benchmark.tasks.task_pack_v2.provenance import (
+    DEFAULT_MAX_CLUSTERS,
+    DEFAULT_SIMILARITY_THRESHOLD,
+    write_provenance_artifacts,
+)
 
 
 def _parse_models(raw: str) -> list[str]:
@@ -216,6 +221,40 @@ def cmd_curate(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_provenance(args: argparse.Namespace) -> int:
+    if args.task_pack != "task_pack_v2":
+        print("`provenance` currently supports only --task-pack task_pack_v2.")
+        return 1
+
+    try:
+        payload = write_provenance_artifacts(
+            seed=args.seed,
+            similarity_threshold=args.similarity_threshold,
+            max_clusters=args.max_clusters,
+        )
+    except RuntimeError as exc:
+        print(str(exc))
+        return 1
+
+    similarity = payload["checks"]["similarity_scan"]
+    originality = payload["checks"]["originality_scan"]
+    print(
+        f"Provenance updated for {payload['pack_name']} "
+        f"(clusters={similarity['cluster_count']}, flagged_files={originality['flagged_files_count']})."
+    )
+    print("Artifacts:")
+    print("- mentor_worker_benchmark/tasks/task_pack_v2/provenance.json")
+    print("- mentor_worker_benchmark/tasks/task_pack_v2/PROVENANCE.md")
+
+    if args.fail_on_overlap and int(similarity["cluster_count"]) > 0:
+        print("Overlap clusters detected and --fail-on-overlap set.")
+        return 1
+    if int(originality["flagged_files_count"]) > 0:
+        print("Originality marker scan found potential external references.")
+        return 1
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="mentor-worker-benchmark",
@@ -300,6 +339,17 @@ def build_parser() -> argparse.ArgumentParser:
     curate.add_argument("--ollama-timeout-seconds", type=int, default=60)
     curate.add_argument("--results-dir", default="results")
     curate.set_defaults(func=cmd_curate)
+
+    provenance = subparsers.add_parser(
+        "provenance",
+        help="Generate task_pack_v2 provenance manifest and overlap/originality checks.",
+    )
+    provenance.add_argument("--task-pack", default="task_pack_v2")
+    provenance.add_argument("--seed", type=int, default=None)
+    provenance.add_argument("--similarity-threshold", type=float, default=DEFAULT_SIMILARITY_THRESHOLD)
+    provenance.add_argument("--max-clusters", type=int, default=DEFAULT_MAX_CLUSTERS)
+    provenance.add_argument("--fail-on-overlap", action="store_true")
+    provenance.set_defaults(func=cmd_provenance)
 
     return parser
 

@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+from mentor_worker_benchmark.tasks.task_pack_v2.provenance import validate_provenance_files
 from mentor_worker_benchmark.tasks.task_pack_validation import validate_task_pack_payload
 
 SCHEMA_FILE = "metadata.schema.json"
@@ -20,7 +21,9 @@ def validate_task_pack() -> tuple[bool, list[str]]:
 
     payload = json.loads(metadata_path.read_text(encoding="utf-8"))
     schema = json.loads(schema_path.read_text(encoding="utf-8"))
-    return validate_task_pack_payload(root=root, payload=payload, schema=schema)
+    ok, errors = validate_task_pack_payload(root=root, payload=payload, schema=schema)
+    provenance_ok, provenance_errors = validate_provenance_files(payload)
+    return ok and provenance_ok, errors + provenance_errors
 
 
 def main() -> None:

@@ -8,6 +8,8 @@ from dataclasses import dataclass
 from pathlib import Path
 from textwrap import dedent
 
+from mentor_worker_benchmark.tasks.task_pack_v2.provenance import write_provenance_artifacts
+
 PACK_NAME = "task_pack_v2"
 PACK_VERSION = "2.0.0"
 DEFAULT_SEED = 1337
@@ -791,6 +793,7 @@ def generate_task_pack(seed: int = DEFAULT_SEED) -> dict[str, object]:
         "tasks": metadata_tasks,
     }
     (root / "metadata.json").write_text(json.dumps(metadata, indent=2), encoding="utf-8")
+    write_provenance_artifacts(seed=seed)
     return metadata
 
 

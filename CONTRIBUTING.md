@@ -18,6 +18,7 @@ Run all of these before opening a PR:
 ```bash
 python -m pytest tests -q
 python -m mentor_worker_benchmark.tasks.task_pack_v2.validate
+python -m mentor_worker_benchmark provenance --task-pack task_pack_v2
 python -m mentor_worker_benchmark sanity --task-pack task_pack_v2 --suite quick --seed 1337
 python -m mentor_worker_benchmark.tasks.task_pack_v1.validate
 python -m mentor_worker_benchmark sanity --task-pack task_pack_v1 --suite quick --seed 1337
@@ -38,6 +39,7 @@ Task quality requirements:
 - No network dependency.
 - Avoid flaky timing assumptions.
 - Keep per-task runtime short.
+- Keep task content original and synthetic (no copied benchmark/problem text).
 
 Split policy for `task_pack_v2`:
 - `train`: 340
@@ -55,6 +57,7 @@ If you edit generator logic or task definitions:
 
 ```bash
 python -m mentor_worker_benchmark.tasks.task_pack_v2.generate_task_pack --seed 1337
+python -m mentor_worker_benchmark provenance --task-pack task_pack_v2
 python -m mentor_worker_benchmark.tasks.task_pack_v2.validate
 python -m mentor_worker_benchmark.tasks.task_pack_v1.generate_task_pack --seed 1337
 python -m mentor_worker_benchmark.tasks.task_pack_v1.validate
