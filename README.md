@@ -167,9 +167,11 @@ Standardized scripts (macOS/Linux):
 ```bash
 ./scripts/run_official_quick.sh
 ./scripts/run_official_dev.sh
+./scripts/run_official_dev_v1.sh
 ```
 
 Each script runs a fixed-suite benchmark in repro mode, exports a submission bundle, and verifies it.
+Use `official_dev_v1` as the headline baseline for model comparisons; `quick` is a smoke profile.
 
 ## Sanity Check (No Model Calls)
 
@@ -187,8 +189,8 @@ python -m mentor_worker_benchmark provenance --task-pack task_pack_v2
 
 ```bash
 python -m mentor_worker_benchmark setup [--models default|m1,m2] [--skip-pull]
-python -m mentor_worker_benchmark run [--task-pack task_pack_v2|task_pack_v1] [--suite quick|dev|test|all] [--repro] [--debug]
-python -m mentor_worker_benchmark sanity [--task-pack task_pack_v2|task_pack_v1] [--suite quick|dev|test|all]
+python -m mentor_worker_benchmark run [--task-pack task_pack_v2|task_pack_v1] [--suite quick|dev50|dev|test|all] [--repro] [--debug]
+python -m mentor_worker_benchmark sanity [--task-pack task_pack_v2|task_pack_v1] [--suite quick|dev50|dev|test|all]
 python -m mentor_worker_benchmark leaderboard --results results/results.json --output results/leaderboard.md
 python -m mentor_worker_benchmark compare --before before.json --after after.json
 python -m mentor_worker_benchmark export --results results/results.json --out submissions/<name>.zip [--official]
@@ -260,12 +262,13 @@ Automation:
 `docs/index.html` now includes:
 - latest official runs,
 - pack filter (`task_pack_v1` / `task_pack_v2`),
-- suite filter (`quick` / `dev` / `test`),
+- suite filter (`quick` / `dev50` / `dev` / `test`),
 - explicit `community (not official)` labeling.
 
 ## Official Baselines
 
 Merged official baseline submissions:
+- [official_dev_v1_m3air_2026-03-01.zip](submissions/official_dev_v1_m3air_2026-03-01.zip) (dev50 headline baseline)
 - [official_quick_m3air_2026-03-01.zip](submissions/official_quick_m3air_2026-03-01.zip) (from [PR #1](https://github.com/dicnunz/mentor-worker-benchmark/pull/1))
 - [official_quick_expanded_m3air_2026-03-01.zip](submissions/official_quick_expanded_m3air_2026-03-01.zip) (from [PR #2](https://github.com/dicnunz/mentor-worker-benchmark/pull/2))
 

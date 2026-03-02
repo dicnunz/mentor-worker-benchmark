@@ -95,3 +95,12 @@ def test_task_selection_default_eval_split_v2() -> None:
     assert len(selection.tasks) == 160
     splits = {task.split for task in selection.tasks}
     assert splits == {"dev", "test"}
+
+
+def test_task_selection_dev50_v2() -> None:
+    selection = resolve_tasks(task_pack="task_pack_v2", suite="dev50", legacy_selector=None, seed=1337)
+    assert len(selection.tasks) == 50
+    assert {task.split for task in selection.tasks} == {"dev"}
+
+    selection_again = resolve_tasks(task_pack="task_pack_v2", suite="dev50", legacy_selector=None, seed=1337)
+    assert [task.task_id for task in selection.tasks] == [task.task_id for task in selection_again.tasks]

@@ -826,6 +826,11 @@ def _mentored_run(
             "pass_after_turn": passed,
         }
 
+        if worker_error:
+            turn_log["early_stop_reason"] = "worker_request_error"
+            turns.append(turn_log)
+            break
+
         if passed:
             turns.append(turn_log)
             break

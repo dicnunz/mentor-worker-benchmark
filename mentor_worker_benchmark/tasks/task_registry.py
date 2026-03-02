@@ -38,6 +38,48 @@ def _stable_shuffle(tasks: list[TaskDefinition], seed: int) -> list[TaskDefiniti
     return ordered
 
 
+def _balanced_split_sample(
+    tasks: list[TaskDefinition],
+    *,
+    split: str,
+    target_count: int,
+    seed: int,
+) -> list[TaskDefinition]:
+    split_tasks = [task for task in tasks if task.split == split]
+    if not split_tasks:
+        raise ValueError(f"No tasks found for split `{split}`.")
+
+    by_category: dict[str, list[TaskDefinition]] = {}
+    for task in split_tasks:
+        by_category.setdefault(task.category, []).append(task)
+
+    category_names = sorted(by_category)
+    queues: list[list[TaskDefinition]] = []
+    for index, category in enumerate(category_names):
+        ordered = sorted(by_category[category], key=lambda item: item.task_id)
+        shuffled = _stable_shuffle(ordered, seed + (index + 1) * 101)
+        queues.append(shuffled)
+
+    picks: list[TaskDefinition] = []
+    while len(picks) < target_count:
+        progressed = False
+        for queue in queues:
+            if not queue:
+                continue
+            picks.append(queue.pop(0))
+            progressed = True
+            if len(picks) >= target_count:
+                break
+        if not progressed:
+            break
+
+    if len(picks) < target_count:
+        raise ValueError(
+            f"Unable to select {target_count} tasks for split `{split}`; only found {len(picks)}."
+        )
+    return picks
+
+
 def _select_pack_v1(
     *,
     suite: str | None,
@@ -152,6 +194,8 @@ def _select_pack_v2(
             selected = tasks
         elif suite_token == "quick":
             selected = _quick_suite_v2(tasks, quick_seed=seed)
+        elif suite_token == "dev50":
+            selected = _balanced_split_sample(tasks, split="dev", target_count=50, seed=seed)
         else:
             split_tokens = {token.strip() for token in suite_token.split(",") if token.strip()}
             valid = {"train", "dev", "test"}
@@ -159,7 +203,7 @@ def _select_pack_v2(
                 raise ValueError("Suite selector resolved to no splits.")
             if not split_tokens.issubset(valid):
                 bad = ", ".join(sorted(split_tokens - valid))
-                raise ValueError(f"Unsupported suite token(s): {bad}. Use quick, dev, test, all.")
+                raise ValueError(f"Unsupported suite token(s): {bad}. Use quick, dev50, dev, test, all.")
             selected = [task for task in tasks if task.split in split_tokens]
 
     if not selected:

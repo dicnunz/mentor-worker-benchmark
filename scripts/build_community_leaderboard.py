@@ -123,6 +123,27 @@ def _sort_key(entry: dict[str, Any]) -> tuple[str, str]:
     return (str(entry.get("generated_at", "")), str(entry.get("submission_id", "")))
 
 
+def _normalize_suite(value: Any) -> str:
+    raw = str(value or "").strip()
+    if raw in {"quick", "dev", "dev50", "test"}:
+        return raw
+    if not raw:
+        return "unknown"
+    return "mixed"
+
+
+def _suite_priority(suite: str) -> int:
+    priorities = {
+        "dev": 0,
+        "dev50": 1,
+        "test": 2,
+        "quick": 3,
+        "mixed": 4,
+        "unknown": 5,
+    }
+    return priorities.get(suite, 6)
+
+
 def _to_percent(value: Any) -> str:
     if isinstance(value, (int, float)):
         return f"{value:.2%}"
@@ -130,16 +151,23 @@ def _to_percent(value: Any) -> str:
 
 
 def _latest_official_runs(entries: list[dict[str, Any]]) -> list[dict[str, Any]]:
-    latest: dict[tuple[str, str], dict[str, Any]] = {}
+    by_pack: dict[str, list[dict[str, Any]]] = {}
     for row in entries:
         if not row.get("official_submission"):
             continue
-        key = (str(row.get("task_pack", "")), str(row.get("suite", "")))
-        existing = latest.get(key)
-        if existing is None or _sort_key(row) > _sort_key(existing):
-            latest[key] = row
-    rows = list(latest.values())
+        by_pack.setdefault(str(row.get("task_pack", "")), []).append(row)
+
+    rows: list[dict[str, Any]] = []
+    for _, pack_rows in by_pack.items():
+        ordered = sorted(pack_rows, key=_sort_key, reverse=True)
+        best = min(
+            ordered,
+            key=lambda item: _suite_priority(_normalize_suite(item.get("suite"))),
+        )
+        rows.append(best)
+
     rows.sort(key=lambda item: _sort_key(item), reverse=True)
+    rows.sort(key=lambda item: _suite_priority(_normalize_suite(item.get("suite"))))
     return rows
 
 
@@ -325,6 +353,7 @@ def _render_index_html(summary: dict[str, Any], output_path: Path) -> None:
           <option value="all">all</option>
           <option value="quick">quick</option>
           <option value="dev">dev</option>
+          <option value="dev50">dev50</option>
           <option value="test">test</option>
           <option value="mixed">mixed</option>
         </select>
@@ -386,9 +415,19 @@ def _render_index_html(summary: dict[str, Any], output_path: Path) -> None:
 
     function normalizeSuite(value) {{
       const raw = String(value || "").trim();
-      if (raw === "quick" || raw === "dev" || raw === "test") return raw;
+      if (raw === "quick" || raw === "dev" || raw === "dev50" || raw === "test") return raw;
       if (!raw) return "unknown";
       return "mixed";
+    }}
+
+    function suitePriority(value) {{
+      const token = normalizeSuite(value);
+      if (token === "dev") return 0;
+      if (token === "dev50") return 1;
+      if (token === "test") return 2;
+      if (token === "quick") return 3;
+      if (token === "mixed") return 4;
+      return 5;
     }}
 
     function rowMatches(entry) {{
@@ -399,17 +438,31 @@ def _render_index_html(summary: dict[str, Any], output_path: Path) -> None:
     }}
 
     function latestOfficial(filtered) {{
-      const map = new Map();
+      const byPack = new Map();
       for (const entry of filtered) {{
         if (!entry.official_submission) continue;
-        const suiteToken = normalizeSuite(entry.suite);
-        const key = `${{entry.task_pack}}|${{suiteToken}}`;
-        const prev = map.get(key);
-        if (!prev || String(entry.generated_at) > String(prev.generated_at)) {{
-          map.set(key, entry);
+        const key = String(entry.task_pack || "unknown");
+        if (!byPack.has(key)) {{
+          byPack.set(key, []);
         }}
+        byPack.get(key).push(entry);
       }}
-      return Array.from(map.values()).sort((a, b) => String(b.generated_at).localeCompare(String(a.generated_at)));
+
+      const selected = [];
+      for (const rows of byPack.values()) {{
+        rows.sort((a, b) => String(b.generated_at).localeCompare(String(a.generated_at)));
+        let best = rows[0];
+        for (const row of rows) {{
+          if (suitePriority(row.suite) < suitePriority(best.suite)) {{
+            best = row;
+          }}
+        }}
+        selected.push(best);
+      }}
+
+      selected.sort((a, b) => String(b.generated_at).localeCompare(String(a.generated_at)));
+      selected.sort((a, b) => suitePriority(a.suite) - suitePriority(b.suite));
+      return selected;
     }}
 
     function render() {{

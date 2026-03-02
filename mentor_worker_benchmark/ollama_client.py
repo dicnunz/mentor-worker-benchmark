@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import json
-import signal
 import subprocess
 import time
 from dataclasses import dataclass
@@ -178,45 +177,67 @@ class OllamaClient:
             "options": options,
         }
 
-        hard_timeout_seconds = max(5, self.timeout_seconds + 2)
-        timeout_triggered = False
-
-        def _alarm_handler(signum: int, frame: Any) -> None:
-            del signum, frame
-            raise TimeoutError("Ollama request exceeded hard timeout.")
-
+        hard_timeout_seconds = max(5, self.timeout_seconds)
+        payload_text = json.dumps(payload)
+        curl_cmd = [
+            "curl",
+            "-sS",
+            "-X",
+            "POST",
+            self._url("/api/chat"),
+            "-H",
+            "Content-Type: application/json",
+            "--max-time",
+            str(hard_timeout_seconds),
+            "--data",
+            payload_text,
+            "--write-out",
+            "\n%{http_code}",
+        ]
         try:
-            request_timeout: tuple[int, int] = (5, max(5, self.timeout_seconds))
-            previous_handler = signal.getsignal(signal.SIGALRM)
-            signal.signal(signal.SIGALRM, _alarm_handler)
-            signal.setitimer(signal.ITIMER_REAL, float(hard_timeout_seconds))
-            try:
-                response = requests.post(
-                    self._url("/api/chat"),
-                    data=json.dumps(payload),
-                    headers={"Content-Type": "application/json"},
-                    timeout=request_timeout,
-                )
-            except TimeoutError:
-                timeout_triggered = True
-                raise requests.Timeout(f"Ollama request exceeded {hard_timeout_seconds}s hard timeout.")
-            finally:
-                signal.setitimer(signal.ITIMER_REAL, 0.0)
-                signal.signal(signal.SIGALRM, previous_handler)
-            response.raise_for_status()
-        except requests.RequestException as exc:
+            process = subprocess.run(
+                curl_cmd,
+                check=False,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True,
+                timeout=hard_timeout_seconds + 2,
+            )
+        except subprocess.TimeoutExpired as exc:
+            raise RuntimeError(
+                f"Ollama chat request failed for model `{model}`. "
+                "Confirm Ollama is running (`ollama serve`) and the model is pulled (`ollama list`)."
+                f" Request timed out after {hard_timeout_seconds}s."
+            ) from exc
+
+        if process.returncode != 0:
+            stderr = process.stderr.strip()
             timeout_hint = (
                 f" Request timed out after {hard_timeout_seconds}s."
-                if timeout_triggered or isinstance(exc, requests.Timeout)
+                if "timed out" in stderr.lower()
                 else ""
             )
             raise RuntimeError(
                 f"Ollama chat request failed for model `{model}`. "
                 "Confirm Ollama is running (`ollama serve`) and the model is pulled (`ollama list`)."
-                f"{timeout_hint}"
+                f"{timeout_hint} curl stderr: {stderr or 'n/a'}"
+            )
+
+        stdout = process.stdout or ""
+        try:
+            body_text, status_text = stdout.rsplit("\n", 1)
+        except ValueError as exc:
+            raise RuntimeError(
+                f"Unexpected Ollama response format for model `{model}`: missing HTTP status trailer."
             ) from exc
 
-        body = response.json()
+        status_code = int(status_text.strip() or "0")
+        if status_code < 200 or status_code >= 300:
+            raise RuntimeError(
+                f"Ollama chat request failed for model `{model}` with HTTP {status_code}: {body_text[:300]}"
+            )
+
+        body = json.loads(body_text)
         message = body.get("message", {})
         content = message.get("content")
         if not isinstance(content, str):
