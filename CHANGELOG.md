@@ -5,6 +5,13 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.2] - 2026-03-02
+
+### Changed
+- Refined leaderboard UI v2 in `docs/index.html` generation: single-table flow with role/pack/suite/search/sort controls, highlight cards, and per-row commit copy action.
+- Kept docs generation deterministic with embedded summary JSON and retained fast UI-facing generator test coverage.
+- Added fresh dated community submissions and refreshed normalized leaderboard artifacts (`leaderboard/summary.json`, `docs/leaderboard.md`, `docs/index.html`).
+
 ## [0.2.1] - 2026-03-02
 
 ### Changed
