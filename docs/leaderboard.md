@@ -1,6 +1,6 @@
 # Community Leaderboard
 
-Generated: 2026-03-02T16:41:25.175843+00:00
+Generated: 2026-03-02T19:13:23.422911+00:00
 
 ## Latest Official Runs
 
@@ -12,6 +12,7 @@ Generated: 2026-03-02T16:41:25.175843+00:00
 
 | Submission | Label | Pack | Suite | Top Worker | Mentored | Commit |
 | --- | --- | --- | --- | --- | --- | --- |
+| official_dev_sanity_2026-03-01 | official | task_pack_v2 | dev10 | qwen2.5-coder:7b | 10.00% | 42b9d586e81f00dd02607665d701b49c7871c2aa |
 | official_dev_v1_m3air_2026-03-01 | official | task_pack_v2 | dev50 | qwen2.5-coder:7b | 0.00% | 801c41836629c4274aa08c43b8050b661e761bea |
 | official_quick_v3_m3air_2026-03-01 | official | task_pack_v2 | quick | qwen2.5-coder:7b | 0.00% | 900fb31f49058087bc3ce8b9fc58e9abe5e2b028 |
 | official_quick_v2_m3air_2026-03-01 | official | task_pack_v2 | quick | qwen2.5-coder:7b | 16.67% | ece1a7330b99bb3cd627d9934967894f59bb71ed |
