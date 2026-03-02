@@ -32,7 +32,7 @@ def read_task_prompt(task: TaskDefinition) -> str:
     return (task.path / "prompt.md").read_text(encoding="utf-8")
 
 
-def project_snapshot(workdir: Path, max_total_chars: int = 24000) -> str:
+def project_snapshot(workdir: Path, max_total_chars: int = 8000) -> str:
     tracked_files = sorted(
         p
         for p in workdir.rglob("*")
@@ -71,7 +71,7 @@ def project_snapshot(workdir: Path, max_total_chars: int = 24000) -> str:
     for path in sorted(tracked_files, key=_priority):
         rel = path.relative_to(workdir).as_posix()
         content = path.read_text(encoding="utf-8")
-        excerpt_limit = 1200 if rel.startswith(("tests/", "src/")) else 700
+        excerpt_limit = 700 if rel.startswith(("tests/", "src/")) else 400
         excerpt = content[:excerpt_limit]
         if len(content) > excerpt_limit:
             excerpt += "\n...<truncated>"

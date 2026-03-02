@@ -76,6 +76,79 @@ def _parse_run_modes(raw: str) -> tuple[str, ...]:
     return tuple(entries)
 
 
+def _head_lines(text: str, *, max_lines: int = 50) -> str:
+    lines = text.splitlines()
+    if len(lines) <= max_lines:
+        return "\n".join(lines)
+    return "\n".join(lines[:max_lines]) + f"\n... ({len(lines) - max_lines} more lines)"
+
+
+def _print_debug_report(results: dict[str, object]) -> None:
+    runs = results.get("runs", [])
+    if not isinstance(runs, list):
+        return
+
+    print("\n[DEBUG] Detailed run trace")
+    for index, run in enumerate(runs, start=1):
+        if not isinstance(run, dict):
+            continue
+        mode = str(run.get("mode", ""))
+        task_id = str(run.get("task_id", ""))
+        worker_model = str(run.get("worker_model", ""))
+        mentor_model = run.get("mentor_model")
+        final_pass = bool(run.get("pass", False))
+        print(
+            f"\n[DEBUG][Run {index}] mode={mode} task={task_id} "
+            f"worker={worker_model} mentor={mentor_model} final_pass={final_pass}"
+        )
+
+        log = run.get("log", {})
+        if not isinstance(log, dict):
+            continue
+
+        if mode == "worker_only":
+            accepted = bool(log.get("extracted_patch"))
+            reason = str(log.get("patch_log", "no patch log"))
+            print(f"[DEBUG] attempt=1 patch={'accepted' if accepted else 'rejected'}")
+            if accepted:
+                print("[DEBUG] patch_reason=valid unified diff extracted")
+            else:
+                print(f"[DEBUG] reject_reason={reason}")
+            patch_applied = bool(log.get("patch_applied", False))
+            print(f"[DEBUG] attempt=1 patch_applied={patch_applied}")
+            print("[DEBUG] attempt=1 patch_log_first_20_lines:")
+            print(_head_lines(reason, max_lines=20) or "(empty)")
+            initial_output = _head_lines(str(log.get("initial_test_output", "")))
+            final_output = _head_lines(str(log.get("final_test_output", "")))
+            print("[DEBUG] attempt=1 pytest_initial_first_50_lines:")
+            print(initial_output or "(empty)")
+            print("[DEBUG] attempt=1 pytest_after_patch_first_50_lines:")
+            print(final_output or "(empty)")
+            continue
+
+        turns = log.get("turns", [])
+        if not isinstance(turns, list):
+            continue
+        for turn in turns:
+            if not isinstance(turn, dict):
+                continue
+            turn_id = int(turn.get("turn", 0))
+            accepted = bool(turn.get("extracted_patch"))
+            reason = str(turn.get("patch_log", "no patch log"))
+            print(f"[DEBUG] attempt={turn_id} patch={'accepted' if accepted else 'rejected'}")
+            if accepted:
+                print("[DEBUG] patch_reason=valid unified diff extracted")
+            else:
+                print(f"[DEBUG] reject_reason={reason}")
+            patch_applied = bool(turn.get("patch_applied", False))
+            print(f"[DEBUG] attempt={turn_id} patch_applied={patch_applied}")
+            print(f"[DEBUG] attempt={turn_id} patch_log_first_20_lines:")
+            print(_head_lines(reason, max_lines=20) or "(empty)")
+            pytest_output = _head_lines(str(turn.get("test_output", "")))
+            print(f"[DEBUG] attempt={turn_id} pytest_first_50_lines:")
+            print(pytest_output or "(empty)")
+
+
 def cmd_setup(args: argparse.Namespace) -> int:
     models = _parse_models(args.models)
     client = OllamaClient()
@@ -228,6 +301,8 @@ def cmd_run(args: argparse.Namespace) -> int:
         print(f"- {mode}: {count}")
     print(f"Results JSON: {config.results_path}")
     print(f"Leaderboard: {config.results_path.parent / 'leaderboard.md'}")
+    if args.debug:
+        _print_debug_report(results)
     return 0
 
 
@@ -466,6 +541,11 @@ def build_parser() -> argparse.ArgumentParser:
     )
     run.add_argument("--results-path", default="results/results.json")
     run.add_argument("--timeout", type=int, default=180)
+    run.add_argument(
+        "--debug",
+        action="store_true",
+        help="Print per-attempt patch/test diagnostics for each run.",
+    )
     run.add_argument(
         "--worker-num-predict",
         type=int,

@@ -57,7 +57,7 @@ Splits:
 - `train`: 340
 - `dev`: 80
 - `test`: 80
-- `quick`: 30 balanced eval tasks
+- `quick`: 6 curated non-mini eval tasks (fast local smoke profile)
 
 Default benchmark behavior runs `dev+test` unless overridden.
 `task_pack_v1` is still available via `--task-pack task_pack_v1`.
@@ -187,7 +187,7 @@ python -m mentor_worker_benchmark provenance --task-pack task_pack_v2
 
 ```bash
 python -m mentor_worker_benchmark setup [--models default|m1,m2] [--skip-pull]
-python -m mentor_worker_benchmark run [--task-pack task_pack_v2|task_pack_v1] [--suite quick|dev|test|all] [--repro]
+python -m mentor_worker_benchmark run [--task-pack task_pack_v2|task_pack_v1] [--suite quick|dev|test|all] [--repro] [--debug]
 python -m mentor_worker_benchmark sanity [--task-pack task_pack_v2|task_pack_v1] [--suite quick|dev|test|all]
 python -m mentor_worker_benchmark leaderboard --results results/results.json --output results/leaderboard.md
 python -m mentor_worker_benchmark compare --before before.json --after after.json

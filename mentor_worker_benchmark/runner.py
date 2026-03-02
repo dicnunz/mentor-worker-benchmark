@@ -53,7 +53,8 @@ REPRO_TEMPERATURE = 0.0
 REPRO_TOP_P = 1.0
 
 WORKER_SYSTEM_PROMPT = (
-    "You are a precise coding agent. Return only a valid unified diff patch and nothing else."
+    "You are a precise coding agent. Return only a valid unified diff patch and nothing else. "
+    "Patch against the current file state shown in the prompt and remove obsolete buggy lines instead of leaving duplicate logic."
 )
 
 MENTOR_SYSTEM_PROMPT = (
@@ -75,6 +76,7 @@ DIFF_MARKER_RE = re.compile(r"^(diff --git|---\s|\+\+\+\s|@@)", re.MULTILINE)
 FILE_HEADER_RE = re.compile(r"^\s*#\s*File:\s+", re.MULTILINE)
 MALFORMED_HUNK_RE = re.compile(r"^@@\s*-(\d+)(?:,(\d+))?\s+\+\+\+\s+.*$")
 HUNK_HEADER_RE = re.compile(r"^@@\s*-\d+(?:,\d+)?\s+\+\d+(?:,\d+)?\s+@@")
+HUNK_START_RE = re.compile(r"^@@\s*-(\d+)(?:,(\d+))?\s+\+(\d+)(?:,(\d+))?\s+@@")
 MENTOR_CODE_BLOCK_MAX_LINES = 8
 
 
@@ -115,6 +117,18 @@ class MentorValidation:
     violated: bool
     reasons: list[str]
     original: str | None
+
+
+@dataclass(slots=True)
+class ParsedHunk:
+    old_start: int
+    body_lines: list[str]
+
+
+@dataclass(slots=True)
+class ParsedFilePatch:
+    path: str
+    hunks: list[ParsedHunk]
 
 
 def _estimate_tokens(text: str) -> int:
@@ -171,10 +185,61 @@ def _validate_patch_format(diff_text: str) -> tuple[bool, str]:
     if "@@" not in diff_text:
         return False, "Patch missing hunk markers (`@@`)."
 
+    in_hunk = False
+    expected_old = 0
+    expected_new = 0
+    seen_old = 0
+    seen_new = 0
     checked_paths = 0
+    def _finalize_hunk() -> tuple[bool, str]:
+        if not in_hunk:
+            return True, "ok"
+        if seen_old != expected_old or seen_new != expected_new:
+            return (
+                False,
+                (
+                    "Hunk line counts do not match header "
+                    f"(expected -{expected_old}/+{expected_new}, observed -{seen_old}/+{seen_new})."
+                ),
+            )
+        return True, "ok"
+
     for line in diff_text.splitlines():
         if line.startswith("@@") and not HUNK_HEADER_RE.match(line):
             return False, f"Malformed hunk header `{line}`."
+        if line.startswith("@@"):
+            ok, message = _finalize_hunk()
+            if not ok:
+                return False, message
+            header = HUNK_START_RE.match(line)
+            if not header:
+                return False, f"Malformed hunk header `{line}`."
+            expected_old = int(header.group(2) or "1")
+            expected_new = int(header.group(4) or "1")
+            seen_old = 0
+            seen_new = 0
+            in_hunk = True
+            continue
+
+        if line.startswith(("diff --git", "--- ", "+++ ")):
+            ok, message = _finalize_hunk()
+            if not ok:
+                return False, message
+            in_hunk = False
+
+        if in_hunk and not line:
+            return False, "Malformed hunk body line `empty`."
+        if in_hunk and line and not line.startswith((" ", "+", "-", "\\ No newline")):
+            return False, f"Malformed hunk body line `{line}`."
+        if in_hunk and line.startswith("\\ No newline"):
+            continue
+        if in_hunk:
+            marker = line[0] if line else ""
+            if marker in {" ", "-"}:
+                seen_old += 1
+            if marker in {" ", "+"}:
+                seen_new += 1
+
         if not line.startswith(("--- ", "+++ ")):
             continue
         normalized = _normalize_patch_path(line[4:])
@@ -191,28 +256,81 @@ def _validate_patch_format(diff_text: str) -> tuple[bool, str]:
     if checked_paths == 0:
         return False, "Patch did not reference any project file paths."
 
+    ok, message = _finalize_hunk()
+    if not ok:
+        return False, message
+
     return True, "ok"
 
 
 def _sanitize_diff_candidate(diff_text: str) -> str:
     normalized = diff_text.replace("\r\n", "\n").replace("\r", "\n")
-    sanitized_lines: list[str] = []
-
-    for raw_line in normalized.splitlines():
+    raw_lines = normalized.splitlines()
+    stripped_lines: list[str] = []
+    for raw_line in raw_lines:
         line = raw_line
         # Some models escape leading diff syntax with a backslash; strip one layer.
         if line.startswith("\\"):
             candidate = line[1:]
             if not candidate or candidate[0] in {" ", "+", "-", "@", "#", "\t"}:
                 line = candidate
+        stripped_lines.append(line.rstrip())
 
+    sanitized_lines: list[str] = []
+    i = 0
+    while i < len(stripped_lines):
+        line = stripped_lines[i]
         malformed_hunk = MALFORMED_HUNK_RE.match(line)
         if malformed_hunk:
             start = malformed_hunk.group(1)
             count = malformed_hunk.group(2) or "1"
             line = f"@@ -{start},{count} +{start},{count} @@"
 
-        sanitized_lines.append(line.rstrip())
+        if line.startswith("@@"):
+            start_match = HUNK_START_RE.match(line)
+            old_start = int(start_match.group(1)) if start_match else 1
+            new_start = int(start_match.group(3)) if start_match else old_start
+
+            body: list[str] = []
+            i += 1
+            while i < len(stripped_lines):
+                next_line = stripped_lines[i]
+                if next_line.startswith(("@@", "--- ")):
+                    break
+                if next_line.startswith("+++ ") and body:
+                    break
+                if next_line.startswith("\\ No newline at end of file"):
+                    body.append(next_line)
+                else:
+                    if next_line == "":
+                        # Unified diffs represent empty context/add/remove lines with a leading marker.
+                        next_line = " "
+                    elif len(next_line) >= 3 and next_line[0] in {" ", "+", "-"} and next_line[1:3] == "\\n":
+                        # Some model outputs embed a literal "\n" token after the diff marker.
+                        next_line = next_line[0] + next_line[3:]
+                    if next_line and next_line[0] not in {" ", "+", "-"}:
+                        next_line = f" {next_line}"
+                    body.append(next_line)
+                i += 1
+
+            old_count = sum(
+                1
+                for item in body
+                if item and item[0] in {" ", "-"}
+            )
+            new_count = sum(
+                1
+                for item in body
+                if item and item[0] in {" ", "+"}
+            )
+            old_count = max(1, old_count)
+            new_count = max(1, new_count)
+            sanitized_lines.append(f"@@ -{old_start},{old_count} +{new_start},{new_count} @@")
+            sanitized_lines.extend(body)
+            continue
+
+        sanitized_lines.append(line)
+        i += 1
 
     return "\n".join(sanitized_lines).strip() + "\n"
 
@@ -223,14 +341,178 @@ def _extract_diff(text: str) -> str | None:
     candidates = blocks + [text]
 
     for candidate in candidates:
-        valid, _ = _validate_patch_format(candidate)
-        if valid:
-            return f"{candidate}\n"
         repaired = _sanitize_diff_candidate(candidate)
         valid_repaired, _ = _validate_patch_format(repaired)
         if valid_repaired:
             return repaired
+        valid, _ = _validate_patch_format(candidate)
+        if valid:
+            return f"{candidate}\n"
     return None
+
+
+def _parse_unified_diff(diff_text: str) -> tuple[list[ParsedFilePatch], str | None]:
+    lines = diff_text.splitlines()
+    parsed: list[ParsedFilePatch] = []
+    current: ParsedFilePatch | None = None
+    index = 0
+
+    while index < len(lines):
+        line = lines[index]
+        if line.startswith("--- "):
+            if index + 1 >= len(lines) or not lines[index + 1].startswith("+++ "):
+                return [], "Heuristic apply parse error: missing `+++` file header."
+            normalized = _normalize_patch_path(lines[index + 1][4:])
+            if not normalized:
+                return [], "Heuristic apply parse error: patch references /dev/null file."
+            current = ParsedFilePatch(path=normalized, hunks=[])
+            parsed.append(current)
+            index += 2
+            continue
+
+        if line.startswith("@@"):
+            if current is None:
+                return [], "Heuristic apply parse error: hunk appeared before file header."
+            match = HUNK_START_RE.match(line)
+            if not match:
+                return [], f"Heuristic apply parse error: malformed hunk header `{line}`."
+            old_start = int(match.group(1))
+            body_lines: list[str] = []
+            index += 1
+            while index < len(lines) and not lines[index].startswith(("@@", "--- ")):
+                body_lines.append(lines[index])
+                index += 1
+            current.hunks.append(ParsedHunk(old_start=old_start, body_lines=body_lines))
+            continue
+
+        index += 1
+
+    if not parsed:
+        return [], "Heuristic apply parse error: no file patches found."
+    return parsed, None
+
+
+def _find_subsequence_window(
+    file_lines: list[str],
+    old_lines: list[str],
+    *,
+    start_at: int,
+) -> tuple[int, int] | None:
+    if not old_lines:
+        return (max(0, min(start_at, len(file_lines))), max(0, min(start_at, len(file_lines))))
+
+    anchors = [line for line in old_lines if line.strip()]
+    if len(anchors) < 2:
+        return None
+
+    matched: list[int] = []
+    cursor = max(0, start_at)
+    for needle in old_lines:
+        found_at: int | None = None
+        for idx in range(cursor, len(file_lines)):
+            if file_lines[idx] == needle:
+                found_at = idx
+                break
+        if found_at is None:
+            return None
+        matched.append(found_at)
+        cursor = found_at + 1
+
+    start = matched[0]
+    end_exclusive = matched[-1] + 1
+    max_window = len(old_lines) + 120
+    if end_exclusive - start > max_window:
+        return None
+
+    return (start, end_exclusive)
+
+
+def _apply_patch_heuristic(workdir: Path, diff_text: str) -> tuple[bool, str]:
+    parsed, parse_error = _parse_unified_diff(diff_text)
+    if parse_error:
+        return False, parse_error
+
+    logs: list[str] = []
+    for file_patch in parsed:
+        target_path = workdir / file_patch.path
+        if not target_path.exists():
+            return False, f"Heuristic apply failed: target file `{file_patch.path}` does not exist."
+
+        original_text = target_path.read_text(encoding="utf-8")
+        had_trailing_newline = original_text.endswith("\n")
+        file_lines = original_text.splitlines()
+        cursor = 0
+
+        for hunk_index, hunk in enumerate(file_patch.hunks, start=1):
+            old_lines: list[str] = []
+            new_lines: list[str] = []
+            for line in hunk.body_lines:
+                if line.startswith("\\ No newline"):
+                    continue
+                if not line:
+                    marker = " "
+                    payload = ""
+                else:
+                    marker = line[0]
+                    payload = line[1:]
+                if marker in {" ", "-"}:
+                    old_lines.append(payload)
+                if marker in {" ", "+"}:
+                    new_lines.append(payload)
+
+            hint_index = max(0, hunk.old_start - 1)
+            replace_start: int | None = None
+            replace_end_exclusive: int | None = None
+
+            if old_lines:
+                if hint_index + len(old_lines) <= len(file_lines):
+                    if file_lines[hint_index : hint_index + len(old_lines)] == old_lines:
+                        replace_start = hint_index
+                        replace_end_exclusive = hint_index + len(old_lines)
+
+                if replace_start is None:
+                    for idx in range(0, len(file_lines) - len(old_lines) + 1):
+                        if file_lines[idx : idx + len(old_lines)] == old_lines:
+                            replace_start = idx
+                            replace_end_exclusive = idx + len(old_lines)
+                            break
+            else:
+                bounded = max(0, min(hint_index, len(file_lines)))
+                replace_start = bounded
+                replace_end_exclusive = bounded
+
+            if replace_start is None or replace_end_exclusive is None:
+                subsequence = _find_subsequence_window(
+                    file_lines,
+                    old_lines,
+                    start_at=cursor,
+                )
+                if subsequence is None:
+                    return (
+                        False,
+                        (
+                            "Heuristic apply failed: unable to match hunk "
+                            f"{hunk_index} in `{file_patch.path}`."
+                        ),
+                    )
+                replace_start, replace_end_exclusive = subsequence
+                logs.append(
+                    f"Heuristic hunk {hunk_index} for `{file_patch.path}` applied via ordered-subsequence match."
+                )
+            else:
+                logs.append(
+                    f"Heuristic hunk {hunk_index} for `{file_patch.path}` applied via exact match."
+                )
+
+            file_lines[replace_start:replace_end_exclusive] = new_lines
+            cursor = replace_start + len(new_lines)
+
+        updated_text = "\n".join(file_lines)
+        if had_trailing_newline or updated_text:
+            updated_text += "\n"
+        target_path.write_text(updated_text, encoding="utf-8")
+
+    return True, "\n".join(logs)
 
 
 def _apply_patch(workdir: Path, diff_text: str) -> tuple[bool, str]:
@@ -238,28 +520,41 @@ def _apply_patch(workdir: Path, diff_text: str) -> tuple[bool, str]:
     if not valid:
         return False, reason
 
+    sanitized = _sanitize_diff_candidate(diff_text)
+    patch_variants: list[tuple[str, str]] = [("input", diff_text)]
+    if sanitized != diff_text:
+        repaired_valid, _ = _validate_patch_format(sanitized)
+        if repaired_valid:
+            patch_variants.append(("sanitized", sanitized))
+
     attempts = [
         ["patch", "-p0", "--batch", "--forward", "--reject-file=-"],
         ["patch", "-p1", "--batch", "--forward", "--reject-file=-"],
     ]
 
     logs: list[str] = []
-    for command in attempts:
-        try:
-            process = subprocess.run(
-                command,
-                cwd=workdir,
-                input=diff_text,
-                text=True,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.STDOUT,
-                timeout=12,
-            )
-            logs.append(f"$ {' '.join(command)}\n{process.stdout}")
-            if process.returncode == 0:
-                return True, "\n".join(logs)
-        except subprocess.TimeoutExpired:
-            logs.append(f"$ {' '.join(command)}\n[timeout] patch command timed out")
+    for variant_name, patch_text in patch_variants:
+        for command in attempts:
+            try:
+                process = subprocess.run(
+                    command,
+                    cwd=workdir,
+                    input=patch_text,
+                    text=True,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.STDOUT,
+                    timeout=12,
+                )
+                logs.append(f"[{variant_name}] $ {' '.join(command)}\n{process.stdout}")
+                if process.returncode == 0:
+                    return True, "\n".join(logs)
+            except subprocess.TimeoutExpired:
+                logs.append(f"[{variant_name}] $ {' '.join(command)}\n[timeout] patch command timed out")
+
+    heuristic_ok, heuristic_log = _apply_patch_heuristic(workdir, diff_text)
+    logs.append(f"[heuristic]\n{heuristic_log}")
+    if heuristic_ok:
+        return True, "\n".join(logs)
 
     return False, "\n".join(logs)
 

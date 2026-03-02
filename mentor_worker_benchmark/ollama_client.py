@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import signal
 import subprocess
 import time
 from dataclasses import dataclass
@@ -177,19 +178,42 @@ class OllamaClient:
             "options": options,
         }
 
+        hard_timeout_seconds = max(5, self.timeout_seconds + 2)
+        timeout_triggered = False
+
+        def _alarm_handler(signum: int, frame: Any) -> None:
+            del signum, frame
+            raise TimeoutError("Ollama request exceeded hard timeout.")
+
         try:
-            request_timeout: tuple[int, int] = (5, max(10, self.timeout_seconds * 3))
-            response = requests.post(
-                self._url("/api/chat"),
-                data=json.dumps(payload),
-                headers={"Content-Type": "application/json"},
-                timeout=request_timeout,
-            )
+            request_timeout: tuple[int, int] = (5, max(5, self.timeout_seconds))
+            previous_handler = signal.getsignal(signal.SIGALRM)
+            signal.signal(signal.SIGALRM, _alarm_handler)
+            signal.setitimer(signal.ITIMER_REAL, float(hard_timeout_seconds))
+            try:
+                response = requests.post(
+                    self._url("/api/chat"),
+                    data=json.dumps(payload),
+                    headers={"Content-Type": "application/json"},
+                    timeout=request_timeout,
+                )
+            except TimeoutError:
+                timeout_triggered = True
+                raise requests.Timeout(f"Ollama request exceeded {hard_timeout_seconds}s hard timeout.")
+            finally:
+                signal.setitimer(signal.ITIMER_REAL, 0.0)
+                signal.signal(signal.SIGALRM, previous_handler)
             response.raise_for_status()
         except requests.RequestException as exc:
+            timeout_hint = (
+                f" Request timed out after {hard_timeout_seconds}s."
+                if timeout_triggered or isinstance(exc, requests.Timeout)
+                else ""
+            )
             raise RuntimeError(
                 f"Ollama chat request failed for model `{model}`. "
                 "Confirm Ollama is running (`ollama serve`) and the model is pulled (`ollama list`)."
+                f"{timeout_hint}"
             ) from exc
 
         body = response.json()

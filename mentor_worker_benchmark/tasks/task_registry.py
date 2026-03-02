@@ -97,13 +97,46 @@ def _select_pack_v2(
 ) -> TaskSelection:
     tasks = load_task_pack_v2()
 
+    def _quick_suite_v2(all_tasks: list[TaskDefinition], *, quick_seed: int) -> list[TaskDefinition]:
+        curated_ids = [
+            "v1_ds_algo_003",
+            "v1_ds_algo_044",
+            "v1_string_regex_parsing_026",
+            "v1_file_io_serialization_029",
+            "v1_numerical_edge_cases_018",
+            "v1_concurrency_basics_022",
+        ]
+        target_total = len(curated_ids)
+        eligible = [
+            task
+            for task in all_tasks
+            if not task.category.startswith("mini_repo_") and task.difficulty in {"easy", "medium"}
+        ]
+        if not eligible:
+            raise ValueError("Quick suite selection found no eligible non-mini tasks.")
+
+        by_id = {task.task_id: task for task in eligible}
+        picks = [by_id[task_id] for task_id in curated_ids if task_id in by_id]
+
+        if len(picks) < target_total:
+            picked_ids = {task.task_id for task in picks}
+            remainder_pool = [
+                task for task in _stable_shuffle(sorted(eligible, key=lambda task: task.task_id), quick_seed + 991)
+                if task.task_id not in picked_ids
+            ]
+            picks.extend(remainder_pool[: target_total - len(picks)])
+
+        if len(picks) > target_total:
+            picks = picks[:target_total]
+        return picks
+
     if legacy_selector:
         if legacy_selector == "all":
             selected = tasks
             selector_source = "tasks"
             suite_label = "all"
         elif legacy_selector == "quick":
-            selected = [task for task in tasks if task.quick]
+            selected = _quick_suite_v2(tasks, quick_seed=seed)
             selector_source = "tasks"
             suite_label = "quick"
         else:
@@ -118,7 +151,7 @@ def _select_pack_v2(
         if suite_token == "all":
             selected = tasks
         elif suite_token == "quick":
-            selected = [task for task in tasks if task.quick]
+            selected = _quick_suite_v2(tasks, quick_seed=seed)
         else:
             split_tokens = {token.strip() for token in suite_token.split(",") if token.strip()}
             valid = {"train", "dev", "test"}
