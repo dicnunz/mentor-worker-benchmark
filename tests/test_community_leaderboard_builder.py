@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import importlib.util
 import json
+import re
 import subprocess
 from pathlib import Path
 from typing import Any
@@ -185,3 +186,58 @@ def test_official_role_classification_for_headline_and_sanity(
     assert headline_normalized["official_role"] == "headline"
     assert sanity_normalized["official_role"] == "sanity"
 
+
+def test_rendered_index_contains_tabs_single_table_headers_and_embedded_summary_json(tmp_path: Path) -> None:
+    builder = _load_builder_module()
+    output_path = tmp_path / "index.html"
+    summary = {
+        "generated_at": "2026-03-01T00:00:00+00:00",
+        "submission_count": 1,
+        "official_count": 1,
+        "community_count": 0,
+        "entries": [
+            {
+                "submission_id": "official_dev_v1_m3air_2026-03-01",
+                "task_pack": "task_pack_v2",
+                "suite": "dev50",
+                "official_submission": True,
+                "best_worker": {
+                    "worker_model": "qwen2.5-coder:7b",
+                    "baseline_pass_rate": 0.1,
+                    "mentored_pass_rate": 0.2,
+                    "lift": 0.1,
+                },
+                "total_model_call_errors": 3,
+                "total_model_call_timeouts": 1,
+                "git_commit_hash": "1234567890abcdef1234567890abcdef12345678",
+                "generated_at": "2026-03-01T00:00:00+00:00",
+            }
+        ],
+    }
+
+    builder._render_index_html(summary, output_path)
+    rendered = output_path.read_text(encoding="utf-8")
+
+    assert '<script id="summary-json" type="application/json">' in rendered
+    assert ">Headline<" in rendered
+    assert ">Sanity<" in rendered
+    assert ">Community<" in rendered
+    assert ">All<" in rendered
+    assert rendered.count("<table>") == 1
+
+    match = re.search(r"<thead>\s*<tr>(.*?)</tr>\s*</thead>", rendered, flags=re.S)
+    assert match is not None
+    headers = re.findall(r"<th[^>]*>(.*?)</th>", match.group(1))
+    assert headers == [
+        "Submission",
+        "Role",
+        "Pack",
+        "Suite",
+        "Top Worker",
+        "Baseline",
+        "Mentored",
+        "Lift",
+        "Errors",
+        "Timeouts",
+        "Commit",
+    ]
