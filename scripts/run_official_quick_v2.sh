@@ -2,7 +2,7 @@
 set -euo pipefail
 
 PYTHON_BIN="${PYTHON_BIN:-python3}"
-WORKER_MODELS="${WORKER_MODELS:-phi3:mini,qwen2.5-coder:7b}"
+WORKER_MODELS="${WORKER_MODELS:-qwen2.5-coder:7b,phi3:mini}"
 MENTOR_MODELS="${MENTOR_MODELS:-llama3.1:8b}"
 RUN_MODES="${RUN_MODES:-worker_only,mentor_worker}"
 MAX_TURNS="${MAX_TURNS:-2}"

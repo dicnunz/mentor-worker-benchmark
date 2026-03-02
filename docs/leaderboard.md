@@ -1,17 +1,18 @@
 # Community Leaderboard
 
-Generated: 2026-03-02T00:09:11.138397+00:00
+Generated: 2026-03-02T00:36:26.840926+00:00
 
 ## Latest Official Runs
 
 | Submission | Pack | Suite | Top Worker | Baseline | Mentored | Lift |
 | --- | --- | --- | --- | --- | --- | --- |
-| official_quick_v2_m3air_2026-03-01 | task_pack_v2 | quick | qwen2.5-coder:7b | 16.67% | 16.67% | 0.00% |
+| official_quick_v3_m3air_2026-03-01 | task_pack_v2 | quick | qwen2.5-coder:7b | 16.67% | 0.00% | -16.67% |
 
 ## All Verified Submissions
 
 | Submission | Label | Pack | Suite | Top Worker | Mentored | Commit |
 | --- | --- | --- | --- | --- | --- | --- |
+| official_quick_v3_m3air_2026-03-01 | official | task_pack_v2 | quick | qwen2.5-coder:7b | 0.00% | 900fb31f49058087bc3ce8b9fc58e9abe5e2b028 |
 | official_quick_v2_m3air_2026-03-01 | official | task_pack_v2 | quick | qwen2.5-coder:7b | 16.67% | ece1a7330b99bb3cd627d9934967894f59bb71ed |
 | community_quick_qwen25coder7b_llama318b_2026-03-01 | community (not official) | task_pack_v2 | quick | qwen2.5-coder:7b | 0.00% | f8ed363c3d660d775591768f2b5f62f9696c9ea8 |
 | community_quick_phi3mini_gemma29b_2026-03-01 | community (not official) | task_pack_v2 | quick | phi3:mini | 0.00% | f8ed363c3d660d775591768f2b5f62f9696c9ea8 |
