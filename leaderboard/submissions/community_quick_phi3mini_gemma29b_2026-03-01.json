@@ -4,6 +4,7 @@
   "submission_path": "submissions/community_quick_phi3mini_gemma29b_2026-03-01.zip",
   "official_submission": false,
   "submission_label": "community (not official)",
+  "official_role": "community",
   "task_pack": "task_pack_v2",
   "task_pack_version": "2.0.0",
   "suite": "quick",
@@ -25,13 +26,31 @@
   ],
   "total_runs": 60,
   "total_passes": 0,
-  "passes_by_mode": {},
+  "passes_by_mode": {
+    "worker_only": 0,
+    "mentor_worker": 0
+  },
   "benchmark_wall_time_seconds": 506.5779,
   "violation_count": 0,
-  "model_call_errors_by_mode": {},
-  "model_call_timeouts_by_mode": {},
-  "total_model_call_errors": 0,
+  "model_call_errors_by_mode": {
+    "worker_only": 30,
+    "mentor_worker": 30
+  },
+  "model_call_timeouts_by_mode": {
+    "worker_only": 0,
+    "mentor_worker": 0
+  },
+  "total_model_call_errors": 60,
   "total_model_call_timeouts": 0,
+  "metrics_source": {
+    "total_runs": "summary",
+    "passes_by_mode": "runs_backfill",
+    "total_passes": "runs_backfill",
+    "model_call_errors_by_mode": "runs_backfill",
+    "model_call_timeouts_by_mode": "runs_backfill",
+    "total_model_call_errors": "runs_backfill",
+    "total_model_call_timeouts": "runs_backfill"
+  },
   "benchmark_version": "0.1.0",
   "best_worker": {
     "worker_model": "phi3:mini",

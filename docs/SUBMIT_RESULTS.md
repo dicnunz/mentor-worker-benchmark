@@ -17,10 +17,14 @@ or:
 ```
 
 Both scripts:
-- run the benchmark with standardized config (`task_pack_v2`, fixed seed, repro mode),
+- run the benchmark with standardized config (`task_pack_v2`, fixed seed, fixed suite/profile script defaults),
 - export a submission zip,
 - verify that zip locally,
 - mark the submission as `official`.
+
+Official interpretation policy:
+- `dev`/`dev50`/`test` official runs are headline baseline runs.
+- `dev10`/`quick` official runs are sanity checks (harness health and error-rate visibility).
 
 Environment variables:
 - `PYTHON_BIN` (default: `python3`)

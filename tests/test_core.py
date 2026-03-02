@@ -84,10 +84,11 @@ def test_task_selection_default_eval_split() -> None:
 
 def test_task_selection_quick_v2() -> None:
     selection = resolve_tasks(task_pack="task_pack_v2", suite="quick", legacy_selector=None, seed=1337)
-    assert len(selection.tasks) == 6
-    assert all(task.category.startswith("mini_repo_") is False for task in selection.tasks)
-    assert all(task.difficulty in {"easy", "medium"} for task in selection.tasks)
-    assert any(task.task_id == "v1_ds_algo_003" for task in selection.tasks)
+    assert len(selection.tasks) == 30
+    assert all(task.quick for task in selection.tasks)
+
+    selection_again = resolve_tasks(task_pack="task_pack_v2", suite="quick", legacy_selector=None, seed=1337)
+    assert [task.task_id for task in selection.tasks] == [task.task_id for task in selection_again.tasks]
 
 
 def test_task_selection_default_eval_split_v2() -> None:

@@ -4,6 +4,7 @@
   "submission_path": "submissions/official_dev_sanity_2026-03-01.zip",
   "official_submission": true,
   "submission_label": "official",
+  "official_role": "sanity",
   "task_pack": "task_pack_v2",
   "task_pack_version": "2.0.0",
   "suite": "dev10",
@@ -41,6 +42,15 @@
   },
   "total_model_call_errors": 15,
   "total_model_call_timeouts": 15,
+  "metrics_source": {
+    "total_runs": "summary",
+    "passes_by_mode": "summary",
+    "total_passes": "summary",
+    "model_call_errors_by_mode": "summary",
+    "model_call_timeouts_by_mode": "summary",
+    "total_model_call_errors": "summary",
+    "total_model_call_timeouts": "summary"
+  },
   "benchmark_version": "0.1.0",
   "best_worker": {
     "worker_model": "qwen2.5-coder:7b",
