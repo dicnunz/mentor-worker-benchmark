@@ -5,6 +5,20 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.1] - 2026-03-02
+
+### Changed
+- Fixed README/doc inaccuracies: `task_pack_v2` quick split is `30` tasks, and CLI suite examples now include `dev10`.
+- Clarified official baseline policy:
+  - headline official numbers come from `dev`/`dev50`/`test`
+  - official `dev10`/`quick` runs are sanity checks only.
+- Improved community leaderboard normalization for legacy bundles missing newer summary fields.
+  - Backfills `total_passes`, per-mode pass counts, model-call errors/timeouts from raw `results.runs` when available.
+  - Emits explicit `metrics_source` metadata in normalized submission JSON.
+  - Adds official-role labeling (`headline` vs `sanity`) and updates docs rendering accordingly.
+- Added regression tests for leaderboard legacy backfill and official-role classification.
+- Bumped package version to `0.2.1`.
+
 ## [0.1.0] - 2026-03-01
 
 ### Added

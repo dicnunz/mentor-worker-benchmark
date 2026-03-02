@@ -57,7 +57,7 @@ Splits:
 - `train`: 340
 - `dev`: 80
 - `test`: 80
-- `quick`: 6 curated non-mini eval tasks (fast local smoke profile)
+- `quick`: 30 curated eval tasks (balanced fast profile)
 
 Default benchmark behavior runs `dev+test` unless overridden.
 `task_pack_v1` is still available via `--task-pack task_pack_v1`.
@@ -170,8 +170,10 @@ Standardized scripts (macOS/Linux):
 ./scripts/run_official_dev_v1.sh
 ```
 
-Each script runs a fixed-suite benchmark in repro mode, exports a submission bundle, and verifies it.
-Use `official_dev_v1` as the headline baseline for model comparisons; `quick` is a smoke profile.
+Each script runs a fixed-suite benchmark configuration, exports a submission bundle, and verifies it.
+Headline policy:
+- Headline official baseline numbers come from `dev`/`dev50`/`test` suites.
+- Official `dev10`/`quick` runs are sanity checks for harness health and error-rate visibility, not headline performance claims.
 
 ## Sanity Check (No Model Calls)
 
@@ -189,8 +191,8 @@ python -m mentor_worker_benchmark provenance --task-pack task_pack_v2
 
 ```bash
 python -m mentor_worker_benchmark setup [--models default|m1,m2] [--skip-pull]
-python -m mentor_worker_benchmark run [--task-pack task_pack_v2|task_pack_v1] [--suite quick|dev50|dev|test|all] [--repro] [--debug]
-python -m mentor_worker_benchmark sanity [--task-pack task_pack_v2|task_pack_v1] [--suite quick|dev50|dev|test|all]
+python -m mentor_worker_benchmark run [--task-pack task_pack_v2|task_pack_v1] [--suite quick|dev10|dev50|dev|test|all] [--repro] [--debug]
+python -m mentor_worker_benchmark sanity [--task-pack task_pack_v2|task_pack_v1] [--suite quick|dev10|dev50|dev|test|all]
 python -m mentor_worker_benchmark leaderboard --results results/results.json --output results/leaderboard.md
 python -m mentor_worker_benchmark compare --before before.json --after after.json
 python -m mentor_worker_benchmark export --results results/results.json --out submissions/<name>.zip [--official]
@@ -260,15 +262,16 @@ Automation:
 - For same-repo PRs, CI auto-commits refreshed artifacts back to the PR branch.
 
 `docs/index.html` now includes:
-- latest official runs,
+- headline official baselines plus official sanity runs,
 - pack filter (`task_pack_v1` / `task_pack_v2`),
-- suite filter (`quick` / `dev50` / `dev` / `test`),
+- suite filter (`quick` / `dev10` / `dev50` / `dev` / `test`),
 - explicit `community (not official)` labeling.
 
 ## Official Baselines
 
 Merged official baseline submissions:
 - [official_dev_v1_m3air_2026-03-01.zip](submissions/official_dev_v1_m3air_2026-03-01.zip) (dev50 headline baseline)
+- [official_dev_sanity_2026-03-01.zip](submissions/official_dev_sanity_2026-03-01.zip) (`dev10` sanity run; harness-health only, not headline)
 - [official_quick_m3air_2026-03-01.zip](submissions/official_quick_m3air_2026-03-01.zip) (from [PR #1](https://github.com/dicnunz/mentor-worker-benchmark/pull/1))
 - [official_quick_expanded_m3air_2026-03-01.zip](submissions/official_quick_expanded_m3air_2026-03-01.zip) (from [PR #2](https://github.com/dicnunz/mentor-worker-benchmark/pull/2))
 

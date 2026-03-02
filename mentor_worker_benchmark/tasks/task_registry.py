@@ -140,37 +140,12 @@ def _select_pack_v2(
     tasks = load_task_pack_v2()
 
     def _quick_suite_v2(all_tasks: list[TaskDefinition], *, quick_seed: int) -> list[TaskDefinition]:
-        curated_ids = [
-            "v1_ds_algo_003",
-            "v1_ds_algo_044",
-            "v1_string_regex_parsing_026",
-            "v1_file_io_serialization_029",
-            "v1_numerical_edge_cases_018",
-            "v1_concurrency_basics_022",
-        ]
-        target_total = len(curated_ids)
-        eligible = [
-            task
-            for task in all_tasks
-            if not task.category.startswith("mini_repo_") and task.difficulty in {"easy", "medium"}
-        ]
-        if not eligible:
-            raise ValueError("Quick suite selection found no eligible non-mini tasks.")
+        quick_flagged = [task for task in all_tasks if task.quick]
+        if quick_flagged:
+            ordered = sorted(quick_flagged, key=lambda task: task.task_id)
+            return _stable_shuffle(ordered, quick_seed)
 
-        by_id = {task.task_id: task for task in eligible}
-        picks = [by_id[task_id] for task_id in curated_ids if task_id in by_id]
-
-        if len(picks) < target_total:
-            picked_ids = {task.task_id for task in picks}
-            remainder_pool = [
-                task for task in _stable_shuffle(sorted(eligible, key=lambda task: task.task_id), quick_seed + 991)
-                if task.task_id not in picked_ids
-            ]
-            picks.extend(remainder_pool[: target_total - len(picks)])
-
-        if len(picks) > target_total:
-            picks = picks[:target_total]
-        return picks
+        raise ValueError("Quick suite selection found no tasks marked with `quick=true`.")
 
     if legacy_selector:
         if legacy_selector == "all":
