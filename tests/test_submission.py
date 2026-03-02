@@ -1,4 +1,5 @@
 import json
+import subprocess
 import zipfile
 from pathlib import Path
 from typing import Any
@@ -149,3 +150,40 @@ def test_verify_rejects_manifest_with_missing_commit(tmp_path: Path) -> None:
     joined = "\n".join(report["errors"])
     assert "git_commit_hash cannot be empty" in joined
     assert "cli_command cannot be empty" in joined
+
+
+def test_export_uses_git_rev_parse_head_for_manifest_and_environment(
+    tmp_path: Path,
+    monkeypatch: Any,
+) -> None:
+    results_path = tmp_path / "results.json"
+    out_path = tmp_path / "submission.zip"
+    results_path.write_text(json.dumps(_sample_results_payload(), indent=2), encoding="utf-8")
+
+    export_commit = "1234567890abcdef1234567890abcdef12345678"
+
+    def _fake_run(*args: Any, **kwargs: Any) -> subprocess.CompletedProcess[str]:
+        assert args and list(args[0]) == ["git", "rev-parse", "HEAD"]
+        return subprocess.CompletedProcess(
+            args=list(args[0]),
+            returncode=0,
+            stdout=f"{export_commit}\n",
+            stderr="",
+        )
+
+    monkeypatch.setattr("mentor_worker_benchmark.submission.subprocess.run", _fake_run)
+
+    manifest = export_submission_bundle(
+        results_path=results_path,
+        out_path=out_path,
+    )
+    assert manifest["git_commit_hash"] == export_commit
+
+    with zipfile.ZipFile(out_path, "r") as archive:
+        bundled_results = json.loads(archive.read("results.json").decode("utf-8"))
+        bundled_environment = json.loads(archive.read("environment.json").decode("utf-8"))
+        bundled_manifest = json.loads(archive.read("submission_manifest.json").decode("utf-8"))
+
+    assert bundled_manifest["git_commit_hash"] == export_commit
+    assert bundled_environment["git"]["commit"] == export_commit
+    assert bundled_results["environment"]["git"]["commit"] == export_commit

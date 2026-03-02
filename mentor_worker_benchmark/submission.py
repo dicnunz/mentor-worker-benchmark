@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import re
+import subprocess
 import zipfile
 from datetime import UTC, datetime
 from pathlib import Path
@@ -160,6 +161,28 @@ def _infer_cli_command(results_payload: dict[str, Any]) -> str:
     return " ".join(command)
 
 
+def _resolve_export_commit_hash() -> str:
+    repo_root = Path(__file__).resolve().parents[1]
+    try:
+        process = subprocess.run(
+            ["git", "rev-parse", "HEAD"],
+            cwd=repo_root,
+            check=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+        )
+    except (OSError, subprocess.CalledProcessError) as exc:
+        raise RuntimeError(
+            "Unable to resolve git commit hash at export time via `git rev-parse HEAD`."
+        ) from exc
+
+    commit_hash = process.stdout.strip()
+    if not GIT_HASH_RE.fullmatch(commit_hash):
+        raise RuntimeError(f"Resolved git commit hash has invalid format: {commit_hash}")
+    return commit_hash
+
+
 def export_submission_bundle(
     *,
     results_path: Path,
@@ -177,13 +200,19 @@ def export_submission_bundle(
         raise RuntimeError(f"results.json failed validation:\n{joined}")
 
     config = payload["config"]
-    environment = payload["environment"]
-    git = environment.get("git", {}) if isinstance(environment, dict) else {}
-    commit_hash = str(git.get("commit", "")).strip()
-    if not commit_hash:
-        raise RuntimeError("results.json is missing environment.git.commit; cannot export submission bundle.")
-    if not GIT_HASH_RE.fullmatch(commit_hash):
-        raise RuntimeError(f"results.json has invalid git commit hash format: {commit_hash}")
+    commit_hash = _resolve_export_commit_hash()
+
+    # Capture export-time commit hash in both results payload and environment artifact.
+    payload_for_bundle = json.loads(json.dumps(payload))
+    environment = payload_for_bundle.get("environment", {})
+    if not isinstance(environment, dict):
+        environment = {}
+    git = environment.get("git", {})
+    if not isinstance(git, dict):
+        git = {}
+    git["commit"] = commit_hash
+    environment["git"] = git
+    payload_for_bundle["environment"] = environment
 
     task_pack = str(config["task_pack"])
     task_pack_version = resolve_task_pack_version(task_pack)
@@ -211,7 +240,7 @@ def export_submission_bundle(
 
     out_path.parent.mkdir(parents=True, exist_ok=True)
     with zipfile.ZipFile(out_path, "w", compression=zipfile.ZIP_DEFLATED) as archive:
-        archive.writestr("results.json", json.dumps(payload, indent=2))
+        archive.writestr("results.json", json.dumps(payload_for_bundle, indent=2))
         archive.writestr("environment.json", json.dumps(environment, indent=2))
         archive.writestr("submission_manifest.json", json.dumps(manifest, indent=2))
 

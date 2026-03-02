@@ -518,7 +518,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     run.add_argument("--max-turns", type=int, default=4)
     run.add_argument("--task-pack", default="task_pack_v2")
-    run.add_argument("--suite", choices=["quick", "dev50", "dev", "test", "all"], default=None)
+    run.add_argument("--suite", choices=["quick", "dev10", "dev50", "dev", "test", "all"], default=None)
     run.add_argument(
         "--tasks",
         default=None,
@@ -570,7 +570,7 @@ def build_parser() -> argparse.ArgumentParser:
         help="Run pytest sanity checks on task starters (no model interaction).",
     )
     sanity.add_argument("--task-pack", default="task_pack_v2")
-    sanity.add_argument("--suite", choices=["quick", "dev50", "dev", "test", "all"], default="all")
+    sanity.add_argument("--suite", choices=["quick", "dev10", "dev50", "dev", "test", "all"], default="all")
     sanity.add_argument(
         "--tasks",
         default=None,

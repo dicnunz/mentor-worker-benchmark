@@ -78,6 +78,7 @@ MALFORMED_HUNK_RE = re.compile(r"^@@\s*-(\d+)(?:,(\d+))?\s+\+\+\+\s+.*$")
 HUNK_HEADER_RE = re.compile(r"^@@\s*-\d+(?:,\d+)?\s+\+\d+(?:,\d+)?\s+@@")
 HUNK_START_RE = re.compile(r"^@@\s*-(\d+)(?:,(\d+))?\s+\+(\d+)(?:,(\d+))?\s+@@")
 MENTOR_CODE_BLOCK_MAX_LINES = 8
+TIMEOUT_TOKEN_RE = re.compile(r"(timed out|\btimeout\b)", re.IGNORECASE)
 
 
 @dataclass(slots=True)
@@ -1552,6 +1553,7 @@ def run_benchmark(
     for run in runs:
         mode_name = str(run.get("mode"))
         run_counts_by_mode[mode_name] = run_counts_by_mode.get(mode_name, 0) + 1
+    error_summary = _collect_run_error_summary(runs)
 
     results = {
         "generated_at": datetime.now(tz=UTC).isoformat(),
@@ -1586,6 +1588,12 @@ def run_benchmark(
             "runs_by_mode": run_counts_by_mode,
             "benchmark_wall_time_seconds": round(elapsed, 4),
             "violation_count": len(all_violations),
+            "total_passes": int(error_summary["total_passes"]),
+            "passes_by_mode": error_summary["passes_by_mode"],
+            "model_call_errors_by_mode": error_summary["model_call_errors_by_mode"],
+            "model_call_timeouts_by_mode": error_summary["model_call_timeouts_by_mode"],
+            "total_model_call_errors": int(error_summary["total_model_call_errors"]),
+            "total_model_call_timeouts": int(error_summary["total_model_call_timeouts"]),
         },
         "runs": runs,
         "violations": all_violations,
@@ -1602,6 +1610,54 @@ def _safe_float(value: Any) -> float:
     if isinstance(value, (int, float)):
         return float(value)
     return 0.0
+
+
+def _collect_run_error_summary(runs: list[dict[str, Any]]) -> dict[str, Any]:
+    passes_by_mode: dict[str, int] = {}
+    model_call_errors_by_mode: dict[str, int] = {}
+    model_call_timeouts_by_mode: dict[str, int] = {}
+    total_passes = 0
+
+    def _record_error(mode: str, message: Any) -> None:
+        if not isinstance(message, str) or not message.strip():
+            return
+        model_call_errors_by_mode[mode] = model_call_errors_by_mode.get(mode, 0) + 1
+        if TIMEOUT_TOKEN_RE.search(message):
+            model_call_timeouts_by_mode[mode] = model_call_timeouts_by_mode.get(mode, 0) + 1
+
+    for run in runs:
+        mode = str(run.get("mode", "unknown"))
+        if run.get("pass"):
+            total_passes += 1
+            passes_by_mode[mode] = passes_by_mode.get(mode, 0) + 1
+        else:
+            passes_by_mode.setdefault(mode, 0)
+
+        log = run.get("log", {})
+        if not isinstance(log, dict):
+            continue
+
+        if mode == "worker_only":
+            _record_error(mode, log.get("worker_error"))
+            continue
+
+        turns = log.get("turns", [])
+        if not isinstance(turns, list):
+            continue
+        for turn in turns:
+            if not isinstance(turn, dict):
+                continue
+            _record_error(mode, turn.get("worker_error"))
+            _record_error(mode, turn.get("mentor_error"))
+
+    return {
+        "total_passes": total_passes,
+        "passes_by_mode": passes_by_mode,
+        "model_call_errors_by_mode": model_call_errors_by_mode,
+        "model_call_timeouts_by_mode": model_call_timeouts_by_mode,
+        "total_model_call_errors": sum(model_call_errors_by_mode.values()),
+        "total_model_call_timeouts": sum(model_call_timeouts_by_mode.values()),
+    }
 
 
 def compare_results(before: dict[str, Any], after: dict[str, Any]) -> dict[str, Any]:

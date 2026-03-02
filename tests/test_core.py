@@ -104,3 +104,12 @@ def test_task_selection_dev50_v2() -> None:
 
     selection_again = resolve_tasks(task_pack="task_pack_v2", suite="dev50", legacy_selector=None, seed=1337)
     assert [task.task_id for task in selection.tasks] == [task.task_id for task in selection_again.tasks]
+
+
+def test_task_selection_dev10_v2() -> None:
+    selection = resolve_tasks(task_pack="task_pack_v2", suite="dev10", legacy_selector=None, seed=1337)
+    assert len(selection.tasks) == 10
+    assert {task.split for task in selection.tasks} == {"dev"}
+
+    selection_again = resolve_tasks(task_pack="task_pack_v2", suite="dev10", legacy_selector=None, seed=1337)
+    assert [task.task_id for task in selection.tasks] == [task.task_id for task in selection_again.tasks]

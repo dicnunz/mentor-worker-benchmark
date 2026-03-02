@@ -33,6 +33,22 @@ def _best_mentor(aggregates: dict[str, Any]) -> dict[str, Any] | None:
     return first if isinstance(first, dict) else None
 
 
+def _int_dict(value: Any) -> dict[str, int]:
+    if not isinstance(value, dict):
+        return {}
+    output: dict[str, int] = {}
+    for key, item in value.items():
+        if not isinstance(key, str):
+            continue
+        if isinstance(item, bool):
+            output[key] = int(item)
+        elif isinstance(item, int):
+            output[key] = item
+        elif isinstance(item, float):
+            output[key] = int(item)
+    return output
+
+
 def _is_official(submission_stem: str, manifest: dict[str, Any]) -> bool:
     if isinstance(manifest.get("official_submission"), bool):
         return bool(manifest["official_submission"])
@@ -55,6 +71,9 @@ def _normalize_submission(submission_path: Path) -> dict[str, Any]:
 
     best_worker = _best_worker(aggregates if isinstance(aggregates, dict) else {})
     best_mentor = _best_mentor(aggregates if isinstance(aggregates, dict) else {})
+    passes_by_mode = _int_dict(summary.get("passes_by_mode", {}))
+    model_call_errors_by_mode = _int_dict(summary.get("model_call_errors_by_mode", {}))
+    model_call_timeouts_by_mode = _int_dict(summary.get("model_call_timeouts_by_mode", {}))
 
     return {
         "submission_id": stem,
@@ -76,8 +95,18 @@ def _normalize_submission(submission_path: Path) -> dict[str, Any]:
         ),
         "run_modes": list(config.get("run_modes", [])) if isinstance(config.get("run_modes"), list) else [],
         "total_runs": int(summary.get("total_runs", 0)),
+        "total_passes": int(summary.get("total_passes", 0)),
+        "passes_by_mode": passes_by_mode,
         "benchmark_wall_time_seconds": round(_safe_float(summary.get("benchmark_wall_time_seconds", 0.0)), 4),
         "violation_count": int(summary.get("violation_count", 0)),
+        "model_call_errors_by_mode": model_call_errors_by_mode,
+        "model_call_timeouts_by_mode": model_call_timeouts_by_mode,
+        "total_model_call_errors": int(
+            summary.get("total_model_call_errors", sum(model_call_errors_by_mode.values()))
+        ),
+        "total_model_call_timeouts": int(
+            summary.get("total_model_call_timeouts", sum(model_call_timeouts_by_mode.values()))
+        ),
         "benchmark_version": str(environment.get("benchmark_version", "")),
         "best_worker": {
             "worker_model": str(best_worker.get("worker_model", "")) if isinstance(best_worker, dict) else "",
@@ -125,7 +154,7 @@ def _sort_key(entry: dict[str, Any]) -> tuple[str, str]:
 
 def _normalize_suite(value: Any) -> str:
     raw = str(value or "").strip()
-    if raw in {"quick", "dev", "dev50", "test"}:
+    if raw in {"quick", "dev", "dev10", "dev50", "test"}:
         return raw
     if not raw:
         return "unknown"
@@ -136,10 +165,11 @@ def _suite_priority(suite: str) -> int:
     priorities = {
         "dev": 0,
         "dev50": 1,
-        "test": 2,
-        "quick": 3,
-        "mixed": 4,
-        "unknown": 5,
+        "dev10": 2,
+        "test": 3,
+        "quick": 4,
+        "mixed": 5,
+        "unknown": 6,
     }
     return priorities.get(suite, 6)
 
@@ -352,6 +382,7 @@ def _render_index_html(summary: dict[str, Any], output_path: Path) -> None:
         <select id="suiteFilter">
           <option value="all">all</option>
           <option value="quick">quick</option>
+          <option value="dev10">dev10</option>
           <option value="dev">dev</option>
           <option value="dev50">dev50</option>
           <option value="test">test</option>
@@ -415,7 +446,7 @@ def _render_index_html(summary: dict[str, Any], output_path: Path) -> None:
 
     function normalizeSuite(value) {{
       const raw = String(value || "").trim();
-      if (raw === "quick" || raw === "dev" || raw === "dev50" || raw === "test") return raw;
+      if (raw === "quick" || raw === "dev" || raw === "dev10" || raw === "dev50" || raw === "test") return raw;
       if (!raw) return "unknown";
       return "mixed";
     }}
@@ -424,10 +455,11 @@ def _render_index_html(summary: dict[str, Any], output_path: Path) -> None:
       const token = normalizeSuite(value);
       if (token === "dev") return 0;
       if (token === "dev50") return 1;
-      if (token === "test") return 2;
-      if (token === "quick") return 3;
-      if (token === "mixed") return 4;
-      return 5;
+      if (token === "dev10") return 2;
+      if (token === "test") return 3;
+      if (token === "quick") return 4;
+      if (token === "mixed") return 5;
+      return 6;
     }}
 
     function rowMatches(entry) {{

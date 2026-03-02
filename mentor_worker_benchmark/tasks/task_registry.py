@@ -194,6 +194,8 @@ def _select_pack_v2(
             selected = tasks
         elif suite_token == "quick":
             selected = _quick_suite_v2(tasks, quick_seed=seed)
+        elif suite_token == "dev10":
+            selected = _balanced_split_sample(tasks, split="dev", target_count=10, seed=seed)
         elif suite_token == "dev50":
             selected = _balanced_split_sample(tasks, split="dev", target_count=50, seed=seed)
         else:
@@ -203,7 +205,7 @@ def _select_pack_v2(
                 raise ValueError("Suite selector resolved to no splits.")
             if not split_tokens.issubset(valid):
                 bad = ", ".join(sorted(split_tokens - valid))
-                raise ValueError(f"Unsupported suite token(s): {bad}. Use quick, dev50, dev, test, all.")
+                raise ValueError(f"Unsupported suite token(s): {bad}. Use quick, dev10, dev50, dev, test, all.")
             selected = [task for task in tasks if task.split in split_tokens]
 
     if not selected:
