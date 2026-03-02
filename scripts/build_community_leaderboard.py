@@ -861,10 +861,10 @@ def _render_index_html(summary: dict[str, Any], output_path: Path) -> None:
       <h2>Leaderboard</h2>
       <div class="toolbar">
         <div class="tabs" role="tablist" aria-label="Role filter tabs">
-          <button class="tab active" data-role="headline" type="button">Headline</button>
+          <button class="tab" data-role="headline" type="button">Headline</button>
           <button class="tab" data-role="sanity" type="button">Sanity</button>
           <button class="tab" data-role="community" type="button">Community</button>
-          <button class="tab" data-role="all" type="button">All</button>
+          <button class="tab active" data-role="all" type="button">All</button>
         </div>
         <div class="controls">
           <label for="packFilter">Pack
@@ -952,7 +952,7 @@ def _render_index_html(summary: dict[str, Any], output_path: Path) -> None:
     const highlights = document.getElementById("highlights");
     const leaderRows = document.getElementById("leaderRows");
     const state = {{
-      role: "headline",
+      role: "all",
       pack: "all",
       suite: "all",
       search: "",
@@ -1087,6 +1087,26 @@ def _render_index_html(summary: dict[str, Any], output_path: Path) -> None:
         return;
       }}
 
+      if (rows.length < 2) {{
+        const cards = [
+          "Best baseline",
+          "Best lift",
+          "Most reliable",
+        ];
+        for (const label of cards) {{
+          const tile = document.createElement("article");
+          tile.className = "hl-card";
+          tile.innerHTML = `
+            <div class="hl-label">${{label}}</div>
+            <div class="hl-worker">n/a</div>
+            <div class="hl-value">n/a</div>
+            <div class="hl-sub">Need 2+ filtered rows</div>
+          `;
+          highlights.appendChild(tile);
+        }}
+        return;
+      }}
+
       const bestBaseline = pickBest(
         rows,
         (row) => Number((row.best_worker || {{}}).baseline_pass_rate || 0),
@@ -1113,7 +1133,7 @@ def _render_index_html(summary: dict[str, Any], output_path: Path) -> None:
         {{
           label: "Most reliable",
           row: bestReliability,
-          value: `${{reliability(bestReliability)}} issues`,
+          value: `${{reliability(bestReliability)}} model-call issues (errors+timeouts)`,
         }},
       ];
 
@@ -1185,7 +1205,7 @@ def _render_index_html(summary: dict[str, Any], output_path: Path) -> None:
     function setDefaults() {{
       const packHasV2 = entries.some((entry) => entry.task_pack === "task_pack_v2");
       state.pack = packHasV2 ? "task_pack_v2" : "all";
-      state.suite = defaultSuiteToken();
+      state.suite = "all";
 
       packFilter.value = state.pack;
       suiteFilter.value = state.suite;
