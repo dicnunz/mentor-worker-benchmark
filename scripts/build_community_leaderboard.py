@@ -505,108 +505,332 @@ def _render_index_html(summary: dict[str, Any], output_path: Path) -> None:
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Mentor Worker Benchmark Community Leaderboard</title>
+  <title>Mentor Worker Benchmark Leaderboard</title>
   <style>
     :root {{
-      --bg: #f6f8fb;
+      --bg: #f3f6fb;
       --card: #ffffff;
       --text: #1d2433;
       --muted: #5b6782;
       --line: #dbe2ef;
-      --accent: #0f5cc0;
+      --accent: #0c5ab9;
       --warn: #b45309;
       --ok: #0f766e;
+      --chip: #eef3fb;
+      --stripe: #fbfcff;
     }}
     body {{
       margin: 0;
       font-family: "SF Pro Text", "Segoe UI", -apple-system, BlinkMacSystemFont, sans-serif;
-      background: radial-gradient(circle at 0% 0%, #e7eefb 0, var(--bg) 46%);
+      background: radial-gradient(circle at 0% 0%, #e9f0fd 0, var(--bg) 52%);
       color: var(--text);
     }}
     main {{
-      max-width: 1200px;
+      max-width: 1240px;
       margin: 0 auto;
-      padding: 1.6rem 1rem 2.4rem;
+      padding: 1.25rem 1rem 2rem;
     }}
-    h1 {{ margin: 0; font-size: 2rem; }}
+    h1 {{
+      margin: 0;
+      font-size: 1.8rem;
+      line-height: 1.2;
+    }}
+    h2 {{
+      margin: 0 0 0.55rem;
+      font-size: 1.08rem;
+    }}
+    p {{
+      margin: 0.35rem 0;
+      line-height: 1.4;
+    }}
     .meta {{
       color: var(--muted);
-      margin-top: 0.45rem;
-      margin-bottom: 1.2rem;
+      margin-top: 0.4rem;
+      margin-bottom: 0.9rem;
+      font-size: 0.9rem;
     }}
     .card {{
       background: var(--card);
       border: 1px solid var(--line);
       border-radius: 12px;
-      padding: 1rem;
-      margin-bottom: 1rem;
-      box-shadow: 0 3px 12px rgba(15, 34, 68, 0.06);
-      overflow-x: auto;
+      padding: 0.9rem;
+      margin-bottom: 0.9rem;
+      box-shadow: 0 2px 10px rgba(15, 34, 68, 0.06);
+      overflow: hidden;
+    }}
+    .intro p {{
+      max-width: 90ch;
+      font-size: 0.92rem;
+    }}
+    .glossary {{
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.38rem;
+      margin-top: 0.55rem;
+    }}
+    .term {{
+      position: relative;
+      border: 1px solid var(--line);
+      background: var(--chip);
+      border-radius: 999px;
+      padding: 0.14rem 0.55rem;
+      font-size: 0.78rem;
+      color: var(--muted);
+      cursor: help;
+      white-space: nowrap;
+    }}
+    .term::after {{
+      content: attr(data-tip);
+      position: absolute;
+      left: 50%;
+      bottom: calc(100% + 7px);
+      transform: translateX(-50%);
+      max-width: 240px;
+      width: max-content;
+      white-space: normal;
+      text-align: left;
+      background: #172033;
+      color: #fff;
+      border-radius: 6px;
+      padding: 0.35rem 0.45rem;
+      font-size: 0.72rem;
+      line-height: 1.3;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 120ms ease;
+      z-index: 4;
+      box-shadow: 0 3px 12px rgba(0, 0, 0, 0.25);
+    }}
+    .term:hover::after,
+    .term:focus-visible::after {{
+      opacity: 1;
+    }}
+    .toolbar {{
+      display: grid;
+      gap: 0.65rem;
+      margin-bottom: 0.65rem;
+    }}
+    .tabs {{
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.45rem;
+    }}
+    .tab {{
+      border: 1px solid var(--line);
+      background: #fff;
+      border-radius: 999px;
+      padding: 0.25rem 0.6rem;
+      font-size: 0.82rem;
+      color: var(--muted);
+      cursor: pointer;
+      line-height: 1.2;
+    }}
+    .tab.active {{
+      border-color: #98b9ec;
+      background: #edf4ff;
+      color: #1f3a68;
+      font-weight: 600;
     }}
     .controls {{
-      display: flex;
-      gap: 0.8rem;
-      flex-wrap: wrap;
-      align-items: center;
+      display: grid;
+      grid-template-columns: repeat(4, minmax(160px, 1fr));
+      gap: 0.45rem 0.6rem;
+      align-items: end;
     }}
     label {{
       color: var(--muted);
-      font-size: 0.9rem;
+      font-size: 0.76rem;
+      display: grid;
+      gap: 0.2rem;
+      min-width: 0;
     }}
-    select {{
-      padding: 0.35rem 0.55rem;
+    select, input[type="search"] {{
+      padding: 0.32rem 0.5rem;
       border-radius: 8px;
       border: 1px solid var(--line);
       background: #fff;
+      color: var(--text);
+      font-size: 0.84rem;
+      min-width: 0;
+    }}
+    .highlights {{
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 0.52rem;
+      margin-bottom: 0.6rem;
+    }}
+    .hl-card {{
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: linear-gradient(180deg, #ffffff 0%, #f9fbff 100%);
+      padding: 0.55rem 0.62rem;
+      min-width: 0;
+    }}
+    .hl-label {{
+      color: var(--muted);
+      font-size: 0.74rem;
+      text-transform: uppercase;
+      letter-spacing: 0.02em;
+      margin-bottom: 0.18rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }}
+    .hl-worker {{
+      font-size: 0.86rem;
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }}
+    .hl-value {{
+      font-size: 1rem;
+      font-weight: 700;
+      margin-top: 0.18rem;
+      font-variant-numeric: tabular-nums;
+    }}
+    .hl-sub {{
+      margin-top: 0.22rem;
+      font-size: 0.72rem;
+      color: var(--muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }}
+    .table-wrap {{
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      overflow: hidden;
     }}
     table {{
       border-collapse: collapse;
       width: 100%;
-      min-width: 760px;
+      table-layout: fixed;
+      font-size: 0.8rem;
     }}
     th, td {{
       text-align: left;
       border-bottom: 1px solid var(--line);
-      padding: 0.5rem;
-      font-size: 0.92rem;
-      vertical-align: top;
+      padding: 0.34rem 0.42rem;
+      vertical-align: middle;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      line-height: 1.25;
     }}
     th {{
       color: var(--muted);
       font-weight: 600;
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      background: #f7f9fd;
+      font-size: 0.73rem;
+      text-transform: uppercase;
+      letter-spacing: 0.01em;
+    }}
+    tbody tr:nth-child(even) {{
+      background: var(--stripe);
+    }}
+    .num {{
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+      font-feature-settings: "tnum";
+    }}
+    .text-clip {{
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }}
     .badge {{
       display: inline-block;
-      padding: 0.18rem 0.5rem;
+      padding: 0.15rem 0.42rem;
       border-radius: 999px;
-      font-size: 0.78rem;
+      font-size: 0.7rem;
       font-weight: 600;
       border: 1px solid transparent;
+      line-height: 1.2;
     }}
-    .badge-official {{
+    .badge-headline {{
       color: var(--ok);
-      border-color: #99f6e4;
-      background: #f0fdfa;
+      border-color: #9ce9dd;
+      background: #ecfdf8;
+    }}
+    .badge-sanity {{
+      color: #8a4b0f;
+      border-color: #f4d6a2;
+      background: #fff7ed;
     }}
     .badge-community {{
-      color: var(--warn);
-      border-color: #fde68a;
-      background: #fffbeb;
+      color: #334155;
+      border-color: #cbd5e1;
+      background: #f8fafc;
+    }}
+    .badge-other {{
+      color: var(--ok);
+      border-color: #cce4ff;
+      background: #eef6ff;
+    }}
+    .commit-wrap {{
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      max-width: 100%;
+    }}
+    .copy-btn {{
+      border: 1px solid var(--line);
+      background: #fff;
+      border-radius: 6px;
+      font-size: 0.68rem;
+      color: var(--muted);
+      padding: 0.05rem 0.32rem;
+      cursor: pointer;
+      line-height: 1.2;
+      flex: 0 0 auto;
+    }}
+    .copy-btn:hover {{
+      border-color: #a5b5cf;
+      color: #24324f;
+    }}
+    .subtle {{
+      color: var(--muted);
+      font-size: 0.76rem;
     }}
     .small {{
       color: var(--muted);
-      font-size: 0.85rem;
+      font-size: 0.8rem;
+      margin-top: 0.48rem;
     }}
     a {{
       color: var(--accent);
       text-decoration: none;
     }}
     a:hover {{ text-decoration: underline; }}
+    @media (max-width: 1080px) {{
+      .controls {{
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }}
+      .highlights {{
+        grid-template-columns: 1fr;
+      }}
+      th, td {{
+        padding: 0.3rem 0.34rem;
+        font-size: 0.76rem;
+      }}
+    }}
+    @media (max-width: 680px) {{
+      .controls {{
+        grid-template-columns: 1fr;
+      }}
+      h1 {{
+        font-size: 1.48rem;
+      }}
+    }}
   </style>
 </head>
 <body>
   <main>
-    <h1>Mentor Worker Benchmark Community Leaderboard</h1>
+    <h1>Mentor Worker Benchmark Leaderboard</h1>
     <p class="meta">
       Generated: {generated_at} |
       Submissions: {total_count} |
@@ -614,104 +838,132 @@ def _render_index_html(summary: dict[str, Any], output_path: Path) -> None:
       Community: {community_count}
     </p>
 
-    <section class="card">
-      <h2>Filters</h2>
-      <div class="controls">
-        <label for="packFilter">Task Pack</label>
-        <select id="packFilter">
-          <option value="all">all</option>
-          <option value="task_pack_v1">task_pack_v1</option>
-          <option value="task_pack_v2">task_pack_v2</option>
-        </select>
-        <label for="suiteFilter">Suite</label>
-        <select id="suiteFilter">
-          <option value="all">all</option>
-          <option value="quick">quick</option>
-          <option value="dev10">dev10</option>
-          <option value="dev">dev</option>
-          <option value="dev50">dev50</option>
-          <option value="test">test</option>
-          <option value="mixed">mixed</option>
-        </select>
+    <section class="card intro">
+      <h2>What This Measures</h2>
+      <p>This benchmark measures whether mentor guidance helps a worker model solve objective coding tasks with unit tests.</p>
+      <p><strong>Baseline</strong> is worker-only pass rate. <strong>Mentored</strong> is worker pass rate when paired with a mentor. <strong>Lift</strong> is mentored minus baseline.</p>
+      <p>Headline runs are used for performance comparisons. Sanity runs are harness-health checks and can show high errors/timeouts by design.</p>
+      <p class="subtle">Hover glossary chips for plain-English definitions.</p>
+      <div class="glossary">
+        <span class="term" tabindex="0" data-tip="Worker-only pass rate for a run.">Baseline</span>
+        <span class="term" tabindex="0" data-tip="Pass rate with mentor guidance enabled.">Mentored</span>
+        <span class="term" tabindex="0" data-tip="Difference between mentored and baseline pass rate.">Lift</span>
+        <span class="term" tabindex="0" data-tip="Model call failures (bad responses, request failures, etc.).">Model errors</span>
+        <span class="term" tabindex="0" data-tip="Model calls that exceeded the configured timeout.">Timeouts</span>
+        <span class="term" tabindex="0" data-tip="Task pack version used for the run (for example task_pack_v2).">Pack</span>
+        <span class="term" tabindex="0" data-tip="Task subset used for evaluation (for example dev50 or quick).">Suite</span>
       </div>
-      <p class="small">Headline policy: official `dev`/`dev50`/`test` runs are baseline headline numbers. Official `dev10`/`quick` runs are sanity-only harness checks.</p>
     </section>
 
     <section class="card">
-      <h2>Headline Official Baselines</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>Submission</th>
-            <th>Pack</th>
-            <th>Suite</th>
-            <th>Top Worker</th>
-            <th>Baseline</th>
-            <th>Mentored</th>
-            <th>Lift</th>
-            <th>Commit</th>
-          </tr>
-        </thead>
-        <tbody id="officialRows"></tbody>
-      </table>
-    </section>
+      <h2>Leaderboard</h2>
+      <div class="toolbar">
+        <div class="tabs" role="tablist" aria-label="Role filter tabs">
+          <button class="tab active" data-role="headline" type="button">Headline</button>
+          <button class="tab" data-role="sanity" type="button">Sanity</button>
+          <button class="tab" data-role="community" type="button">Community</button>
+          <button class="tab" data-role="all" type="button">All</button>
+        </div>
+        <div class="controls">
+          <label for="packFilter">Pack
+            <select id="packFilter">
+              <option value="all">all</option>
+              <option value="task_pack_v1">task_pack_v1</option>
+              <option value="task_pack_v2">task_pack_v2</option>
+            </select>
+          </label>
+          <label for="suiteFilter">Suite
+            <select id="suiteFilter">
+              <option value="all">all</option>
+              <option value="dev50">dev50</option>
+              <option value="dev">dev</option>
+              <option value="test">test</option>
+              <option value="dev10">dev10</option>
+              <option value="quick">quick</option>
+              <option value="mixed">mixed</option>
+              <option value="unknown">unknown</option>
+            </select>
+          </label>
+          <label for="searchFilter">Search
+            <input id="searchFilter" type="search" placeholder="submission, model, commit..." />
+          </label>
+          <label for="sortControl">Sort
+            <select id="sortControl">
+              <option value="lift_desc">Lift (high to low)</option>
+              <option value="baseline_desc">Baseline (high to low)</option>
+              <option value="mentored_desc">Mentored (high to low)</option>
+              <option value="reliability_asc">Reliability (fewest errors/timeouts)</option>
+            </select>
+          </label>
+        </div>
+      </div>
 
-    <section class="card">
-      <h2>Official Sanity Runs</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>Submission</th>
-            <th>Pack</th>
-            <th>Suite</th>
-            <th>Top Worker</th>
-            <th>Baseline</th>
-            <th>Mentored</th>
-            <th>Model Errors</th>
-            <th>Timeouts</th>
-            <th>Commit</th>
-          </tr>
-        </thead>
-        <tbody id="sanityRows"></tbody>
-      </table>
-    </section>
+      <div id="highlights" class="highlights"></div>
 
-    <section class="card">
-      <h2>All Verified Submissions</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>Submission</th>
-            <th>Label</th>
-            <th>Role</th>
-            <th>Pack</th>
-            <th>Suite</th>
-            <th>Top Worker</th>
-            <th>Baseline</th>
-            <th>Mentored</th>
-            <th>Lift</th>
-            <th>Model Errors</th>
-            <th>Timeouts</th>
-            <th>Commit</th>
-          </tr>
-        </thead>
-        <tbody id="submissionRows"></tbody>
-      </table>
+      <div class="table-wrap">
+        <table>
+          <colgroup>
+            <col style="width: 16%" />
+            <col style="width: 8%" />
+            <col style="width: 9%" />
+            <col style="width: 7%" />
+            <col style="width: 14%" />
+            <col style="width: 7%" />
+            <col style="width: 7%" />
+            <col style="width: 7%" />
+            <col style="width: 8%" />
+            <col style="width: 8%" />
+            <col style="width: 9%" />
+          </colgroup>
+          <thead>
+            <tr>
+              <th>Submission</th>
+              <th>Role</th>
+              <th>Pack</th>
+              <th>Suite</th>
+              <th>Top Worker</th>
+              <th class="num">Baseline</th>
+              <th class="num">Mentored</th>
+              <th class="num">Lift</th>
+              <th class="num">Errors</th>
+              <th class="num">Timeouts</th>
+              <th>Commit</th>
+            </tr>
+          </thead>
+          <tbody id="leaderRows"></tbody>
+        </table>
+      </div>
+      <p class="small">Headline rows are baseline performance numbers. Sanity rows are harness-health checks.</p>
     </section>
 
     <p class="meta">Raw normalized summaries: <a href="../leaderboard/summary.json">leaderboard/summary.json</a> | Markdown: <a href="./leaderboard.md">docs/leaderboard.md</a></p>
   </main>
   <script>
     const entries = {entries_json};
+    const tabs = Array.from(document.querySelectorAll(".tab"));
     const packFilter = document.getElementById("packFilter");
     const suiteFilter = document.getElementById("suiteFilter");
-    const officialRows = document.getElementById("officialRows");
-    const sanityRows = document.getElementById("sanityRows");
-    const submissionRows = document.getElementById("submissionRows");
+    const searchFilter = document.getElementById("searchFilter");
+    const sortControl = document.getElementById("sortControl");
+    const highlights = document.getElementById("highlights");
+    const leaderRows = document.getElementById("leaderRows");
+    const state = {{
+      role: "headline",
+      pack: "all",
+      suite: "all",
+      search: "",
+      sort: "lift_desc",
+    }};
 
     function pct(value) {{
       if (typeof value !== "number") return "";
       return (value * 100).toFixed(2) + "%";
+    }}
+
+    function pctSigned(value) {{
+      if (typeof value !== "number") return "";
+      const sign = value >= 0 ? "+" : "-";
+      return sign + (Math.abs(value) * 100).toFixed(2) + "%";
     }}
 
     function normalizeSuite(value) {{
@@ -719,17 +971,6 @@ def _render_index_html(summary: dict[str, Any], output_path: Path) -> None:
       if (raw === "quick" || raw === "dev" || raw === "dev10" || raw === "dev50" || raw === "test") return raw;
       if (!raw) return "unknown";
       return "mixed";
-    }}
-
-    function suitePriority(value) {{
-      const token = normalizeSuite(value);
-      if (token === "dev") return 0;
-      if (token === "dev50") return 1;
-      if (token === "test") return 2;
-      if (token === "dev10") return 3;
-      if (token === "quick") return 4;
-      if (token === "mixed") return 5;
-      return 6;
     }}
 
     function officialRole(entry) {{
@@ -740,128 +981,270 @@ def _render_index_html(summary: dict[str, Any], output_path: Path) -> None:
       return "other";
     }}
 
+    function roleBadge(role) {{
+      if (role === "headline") return "<span class='badge badge-headline'>headline</span>";
+      if (role === "sanity") return "<span class='badge badge-sanity'>sanity</span>";
+      if (role === "community") return "<span class='badge badge-community'>community</span>";
+      return "<span class='badge badge-other'>other</span>";
+    }}
+
+    function reliability(entry) {{
+      return Number(entry.total_model_call_errors || 0) + Number(entry.total_model_call_timeouts || 0);
+    }}
+
+    function shortId(value, limit) {{
+      const text = String(value || "");
+      if (text.length <= limit) return text;
+      return text.slice(0, Math.max(1, limit - 1)) + "…";
+    }}
+
+    function shortCommit(value) {{
+      const text = String(value || "");
+      return text ? text.slice(0, 8) : "-";
+    }}
+
+    function compareNumbersDesc(left, right, picker) {{
+      const a = Number(picker(left) || 0);
+      const b = Number(picker(right) || 0);
+      if (b !== a) return b - a;
+      return String(right.generated_at || "").localeCompare(String(left.generated_at || ""));
+    }}
+
+    function compareReliabilityAsc(left, right) {{
+      const a = reliability(left);
+      const b = reliability(right);
+      if (a !== b) return a - b;
+      const mentoredA = Number((left.best_worker || {{}}).mentored_pass_rate || 0);
+      const mentoredB = Number((right.best_worker || {{}}).mentored_pass_rate || 0);
+      if (mentoredB !== mentoredA) return mentoredB - mentoredA;
+      return String(right.generated_at || "").localeCompare(String(left.generated_at || ""));
+    }}
+
+    function sortRows(rows) {{
+      const sorted = rows.slice();
+      if (state.sort === "baseline_desc") {{
+        sorted.sort((a, b) => compareNumbersDesc(a, b, (row) => (row.best_worker || {{}}).baseline_pass_rate));
+        return sorted;
+      }}
+      if (state.sort === "mentored_desc") {{
+        sorted.sort((a, b) => compareNumbersDesc(a, b, (row) => (row.best_worker || {{}}).mentored_pass_rate));
+        return sorted;
+      }}
+      if (state.sort === "reliability_asc") {{
+        sorted.sort(compareReliabilityAsc);
+        return sorted;
+      }}
+      sorted.sort((a, b) => compareNumbersDesc(a, b, (row) => (row.best_worker || {{}}).lift));
+      return sorted;
+    }}
+
+    function matchesSearch(entry) {{
+      if (!state.search) return true;
+      const worker = entry.best_worker || {{}};
+      const haystack = [
+        entry.submission_id,
+        entry.task_pack,
+        entry.suite,
+        entry.git_commit_hash,
+        worker.worker_model,
+        entry.submission_label,
+      ]
+        .join(" ")
+        .toLowerCase();
+      return haystack.includes(state.search);
+    }}
+
     function rowMatches(entry) {{
-      const packOk = packFilter.value === "all" || entry.task_pack === packFilter.value;
+      const role = officialRole(entry);
+      const roleOk = state.role === "all" || role === state.role;
+      const packOk = state.pack === "all" || entry.task_pack === state.pack;
       const suiteToken = normalizeSuite(entry.suite);
-      const suiteOk = suiteFilter.value === "all" || suiteToken === suiteFilter.value;
-      return packOk && suiteOk;
+      const suiteOk = state.suite === "all" || suiteToken === state.suite;
+      return roleOk && packOk && suiteOk && matchesSearch(entry);
     }}
 
-    function headlineOfficial(filtered) {{
-      const byPack = new Map();
-      for (const entry of filtered) {{
-        if (officialRole(entry) !== "headline") continue;
-        const key = String(entry.task_pack || "unknown");
-        if (!byPack.has(key)) {{
-          byPack.set(key, []);
-        }}
-        byPack.get(key).push(entry);
-      }}
-
-      const selected = [];
-      for (const rows of byPack.values()) {{
-        rows.sort((a, b) => String(b.generated_at).localeCompare(String(a.generated_at)));
-        let best = rows[0];
-        for (const row of rows) {{
-          if (suitePriority(row.suite) < suitePriority(best.suite)) {{
-            best = row;
-          }}
-        }}
-        selected.push(best);
-      }}
-
-      selected.sort((a, b) => String(b.generated_at).localeCompare(String(a.generated_at)));
-      selected.sort((a, b) => suitePriority(a.suite) - suitePriority(b.suite));
-      return selected;
+    function pickBest(rows, scorer, tiebreaker) {{
+      if (rows.length === 0) return null;
+      return rows.slice().sort((a, b) => {{
+        const sa = scorer(a);
+        const sb = scorer(b);
+        if (sa !== sb) return sb - sa;
+        return tiebreaker(a, b);
+      }})[0];
     }}
 
-    function sanityOfficial(filtered) {{
-      const rows = filtered.filter((entry) => officialRole(entry) === "sanity");
-      rows.sort((a, b) => String(b.generated_at).localeCompare(String(a.generated_at)));
-      rows.sort((a, b) => suitePriority(a.suite) - suitePriority(b.suite));
-      return rows;
+    function renderHighlights(rows) {{
+      highlights.innerHTML = "";
+      if (rows.length === 0) {{
+        const empty = document.createElement("div");
+        empty.className = "hl-card";
+        empty.innerHTML = "<div class='hl-label'>No rows</div><div class='hl-worker'>No matching submissions for current filters.</div>";
+        highlights.appendChild(empty);
+        return;
+      }}
+
+      const bestBaseline = pickBest(
+        rows,
+        (row) => Number((row.best_worker || {{}}).baseline_pass_rate || 0),
+        (a, b) => String(b.generated_at || "").localeCompare(String(a.generated_at || "")),
+      );
+      const bestLift = pickBest(
+        rows,
+        (row) => Number((row.best_worker || {{}}).lift || 0),
+        (a, b) => String(b.generated_at || "").localeCompare(String(a.generated_at || "")),
+      );
+      const bestReliability = rows.slice().sort(compareReliabilityAsc)[0];
+
+      const cards = [
+        {{
+          label: "Best baseline",
+          row: bestBaseline,
+          value: pct(Number((bestBaseline.best_worker || {{}}).baseline_pass_rate || 0)),
+        }},
+        {{
+          label: "Best lift",
+          row: bestLift,
+          value: pctSigned(Number((bestLift.best_worker || {{}}).lift || 0)),
+        }},
+        {{
+          label: "Most reliable",
+          row: bestReliability,
+          value: `${{reliability(bestReliability)}} issues`,
+        }},
+      ];
+
+      for (const card of cards) {{
+        const row = card.row;
+        const worker = row.best_worker || {{}};
+        const tile = document.createElement("article");
+        tile.className = "hl-card";
+        tile.innerHTML = `
+          <div class="hl-label">${{card.label}}</div>
+          <div class="hl-worker" title="${{worker.worker_model || ""}}">${{worker.worker_model || "-"}}</div>
+          <div class="hl-value">${{card.value}}</div>
+          <div class="hl-sub" title="${{row.submission_id || ""}}">${{shortId(row.submission_id || "-", 24)}}</div>
+        `;
+        highlights.appendChild(tile);
+      }}
     }}
 
     function render() {{
-      const filtered = entries.filter(rowMatches).sort((a, b) => String(b.generated_at).localeCompare(String(a.generated_at)));
-      const official = headlineOfficial(filtered);
-      const sanity = sanityOfficial(filtered);
+      const filtered = entries.filter(rowMatches);
+      const sorted = sortRows(filtered);
 
-      officialRows.innerHTML = "";
-      if (official.length === 0) {{
-        officialRows.innerHTML = "<tr><td colspan='8'>No headline official runs for current filters.</td></tr>";
-      }} else {{
-        for (const entry of official) {{
-          const worker = entry.best_worker || {{}};
-          const tr = document.createElement("tr");
-          tr.innerHTML = `
-            <td>${{entry.submission_id}}</td>
-            <td>${{entry.task_pack}}</td>
-            <td>${{normalizeSuite(entry.suite)}}</td>
-            <td>${{worker.worker_model || ""}}</td>
-            <td>${{pct(worker.baseline_pass_rate)}}</td>
-            <td>${{pct(worker.mentored_pass_rate)}}</td>
-            <td>${{pct(worker.lift)}}</td>
-            <td>${{entry.git_commit_hash}}</td>
-          `;
-          officialRows.appendChild(tr);
-        }}
+      renderHighlights(sorted);
+
+      leaderRows.innerHTML = "";
+      if (sorted.length === 0) {{
+        leaderRows.innerHTML = "<tr><td colspan='11'>No submissions match current filters.</td></tr>";
+        return;
       }}
 
-      sanityRows.innerHTML = "";
-      if (sanity.length === 0) {{
-        sanityRows.innerHTML = "<tr><td colspan='9'>No official sanity runs for current filters.</td></tr>";
-      }} else {{
-        for (const entry of sanity) {{
-          const worker = entry.best_worker || {{}};
-          const tr = document.createElement("tr");
-          tr.innerHTML = `
-            <td>${{entry.submission_id}}</td>
-            <td>${{entry.task_pack}}</td>
-            <td>${{normalizeSuite(entry.suite)}}</td>
-            <td>${{worker.worker_model || ""}}</td>
-            <td>${{pct(worker.baseline_pass_rate)}}</td>
-            <td>${{pct(worker.mentored_pass_rate)}}</td>
-            <td>${{entry.total_model_call_errors ?? 0}}</td>
-            <td>${{entry.total_model_call_timeouts ?? 0}}</td>
-            <td>${{entry.git_commit_hash}}</td>
-          `;
-          sanityRows.appendChild(tr);
-        }}
-      }}
-
-      submissionRows.innerHTML = "";
-      if (filtered.length === 0) {{
-        submissionRows.innerHTML = "<tr><td colspan='12'>No submissions for current filters.</td></tr>";
-      }} else {{
-        for (const entry of filtered) {{
-          const worker = entry.best_worker || {{}};
-          const role = officialRole(entry);
-          const badge = role === "community"
-            ? "<span class='badge badge-community'>community (not official)</span>"
-            : "<span class='badge badge-official'>official</span>";
-          const tr = document.createElement("tr");
-          tr.innerHTML = `
-            <td>${{entry.submission_id}}</td>
-            <td>${{badge}}</td>
-            <td>${{role}}</td>
-            <td>${{entry.task_pack}}</td>
-            <td>${{normalizeSuite(entry.suite)}}</td>
-            <td>${{worker.worker_model || ""}}</td>
-            <td>${{pct(worker.baseline_pass_rate)}}</td>
-            <td>${{pct(worker.mentored_pass_rate)}}</td>
-            <td>${{pct(worker.lift)}}</td>
-            <td>${{entry.total_model_call_errors ?? 0}}</td>
-            <td>${{entry.total_model_call_timeouts ?? 0}}</td>
-            <td>${{entry.git_commit_hash}}</td>
-          `;
-          submissionRows.appendChild(tr);
-        }}
+      for (const entry of sorted) {{
+        const worker = entry.best_worker || {{}};
+        const role = officialRole(entry);
+        const commit = String(entry.git_commit_hash || "");
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td><span class="text-clip" title="${{entry.submission_id || ""}}">${{entry.submission_id || "-"}}</span></td>
+          <td>${{roleBadge(role)}}</td>
+          <td><span class="text-clip" title="${{entry.task_pack || ""}}">${{entry.task_pack || "-"}}</span></td>
+          <td><span class="text-clip" title="${{normalizeSuite(entry.suite)}}">${{normalizeSuite(entry.suite)}}</span></td>
+          <td><span class="text-clip" title="${{worker.worker_model || ""}}">${{worker.worker_model || "-"}}</span></td>
+          <td class="num">${{pct(Number(worker.baseline_pass_rate || 0))}}</td>
+          <td class="num">${{pct(Number(worker.mentored_pass_rate || 0))}}</td>
+          <td class="num">${{pctSigned(Number(worker.lift || 0))}}</td>
+          <td class="num">${{Number(entry.total_model_call_errors || 0)}}</td>
+          <td class="num">${{Number(entry.total_model_call_timeouts || 0)}}</td>
+          <td>
+            <span class="commit-wrap">
+              <span class="text-clip" title="${{commit || "-"}}">${{shortCommit(commit)}}</span>
+              <button class="copy-btn" type="button" data-commit="${{commit}}">Copy</button>
+            </span>
+          </td>
+        `;
+        leaderRows.appendChild(tr);
       }}
     }}
 
-    packFilter.addEventListener("change", render);
-    suiteFilter.addEventListener("change", render);
+    function setDefaults() {{
+      const packHasV2 = entries.some((entry) => entry.task_pack === "task_pack_v2");
+      state.pack = packHasV2 ? "task_pack_v2" : "all";
+      const suites = new Set(entries.map((entry) => normalizeSuite(entry.suite)));
+      if (suites.has("dev50")) {{
+        state.suite = "dev50";
+      }} else if (suites.has("quick")) {{
+        state.suite = "quick";
+      }} else {{
+        state.suite = "all";
+      }}
+
+      packFilter.value = state.pack;
+      suiteFilter.value = state.suite;
+      sortControl.value = state.sort;
+      searchFilter.value = "";
+    }}
+
+    function bindEvents() {{
+      tabs.forEach((tab) => {{
+        tab.addEventListener("click", () => {{
+          const role = String(tab.dataset.role || "all");
+          state.role = role;
+          tabs.forEach((item) => item.classList.toggle("active", item === tab));
+          render();
+        }});
+      }});
+
+      packFilter.addEventListener("change", () => {{
+        state.pack = packFilter.value;
+        render();
+      }});
+
+      suiteFilter.addEventListener("change", () => {{
+        state.suite = suiteFilter.value;
+        render();
+      }});
+
+      sortControl.addEventListener("change", () => {{
+        state.sort = sortControl.value;
+        render();
+      }});
+
+      searchFilter.addEventListener("input", () => {{
+        state.search = String(searchFilter.value || "").trim().toLowerCase();
+        render();
+      }});
+
+      leaderRows.addEventListener("click", async (event) => {{
+        const target = event.target;
+        if (!(target instanceof HTMLElement)) return;
+        if (!target.classList.contains("copy-btn")) return;
+        const commit = String(target.dataset.commit || "");
+        if (!commit || commit === "-") return;
+        const original = target.textContent || "Copy";
+        try {{
+          if (navigator.clipboard && navigator.clipboard.writeText) {{
+            await navigator.clipboard.writeText(commit);
+          }} else {{
+            const temp = document.createElement("textarea");
+            temp.value = commit;
+            document.body.appendChild(temp);
+            temp.select();
+            document.execCommand("copy");
+            document.body.removeChild(temp);
+          }}
+          target.textContent = "Copied";
+        }} catch (error) {{
+          target.textContent = "Failed";
+        }}
+        window.setTimeout(() => {{
+          target.textContent = original;
+        }}, 1000);
+      }});
+    }}
+
+    setDefaults();
+    bindEvents();
     render();
   </script>
 </body>
