@@ -494,7 +494,7 @@ def _write_markdown(entries: list[dict[str, Any]], output_path: Path, generated_
 
 
 def _render_index_html(summary: dict[str, Any], output_path: Path) -> None:
-    entries_json = json.dumps(summary.get("entries", []))
+    summary_json = json.dumps(summary, separators=(",", ":"), ensure_ascii=False).replace("</", "<\\/")
     generated_at = html.escape(str(summary.get("generated_at", "")))
     official_count = int(summary.get("official_count", 0))
     community_count = int(summary.get("community_count", 0))
@@ -840,9 +840,11 @@ def _render_index_html(summary: dict[str, Any], output_path: Path) -> None:
 
     <section class="card intro">
       <h2>What This Measures</h2>
-      <p>This benchmark measures whether mentor guidance helps a worker model solve objective coding tasks with unit tests.</p>
-      <p><strong>Baseline</strong> is worker-only pass rate. <strong>Mentored</strong> is worker pass rate when paired with a mentor. <strong>Lift</strong> is mentored minus baseline.</p>
-      <p>Headline runs are used for performance comparisons. Sanity runs are harness-health checks and can show high errors/timeouts by design.</p>
+      <p>This benchmark asks one question: does mentor guidance help a worker model solve objective coding tasks scored by tests?</p>
+      <p><strong>Baseline</strong> is the worker-only pass rate on the selected task set.</p>
+      <p><strong>Mentored</strong> is the worker pass rate when a mentor provides natural-language guidance.</p>
+      <p><strong>Lift</strong> is simply mentored minus baseline (positive means the mentor helped).</p>
+      <p><strong>Errors</strong> and <strong>Timeouts</strong> count model-call failures; sanity runs focus on harness health and are not headline performance claims.</p>
       <p class="subtle">Hover glossary chips for plain-English definitions.</p>
       <div class="glossary">
         <span class="term" tabindex="0" data-tip="Worker-only pass rate for a run.">Baseline</span>
@@ -938,8 +940,10 @@ def _render_index_html(summary: dict[str, Any], output_path: Path) -> None:
 
     <p class="meta">Raw normalized summaries: <a href="../leaderboard/summary.json">leaderboard/summary.json</a> | Markdown: <a href="./leaderboard.md">docs/leaderboard.md</a></p>
   </main>
+  <script id="summary-json" type="application/json">{summary_json}</script>
   <script>
-    const entries = {entries_json};
+    const summaryPayload = JSON.parse(document.getElementById("summary-json").textContent || "{{}}");
+    const entries = Array.isArray(summaryPayload.entries) ? summaryPayload.entries : [];
     const tabs = Array.from(document.querySelectorAll(".tab"));
     const packFilter = document.getElementById("packFilter");
     const suiteFilter = document.getElementById("suiteFilter");
@@ -1167,17 +1171,21 @@ def _render_index_html(summary: dict[str, Any], output_path: Path) -> None:
       }}
     }}
 
+    function defaultSuiteToken() {{
+      const suites = new Set(entries.map((entry) => normalizeSuite(entry.suite)));
+      if (suites.has("dev50")) {{
+        return "dev50";
+      }}
+      if (suites.has("quick")) {{
+        return "quick";
+      }}
+      return "all";
+    }}
+
     function setDefaults() {{
       const packHasV2 = entries.some((entry) => entry.task_pack === "task_pack_v2");
       state.pack = packHasV2 ? "task_pack_v2" : "all";
-      const suites = new Set(entries.map((entry) => normalizeSuite(entry.suite)));
-      if (suites.has("dev50")) {{
-        state.suite = "dev50";
-      }} else if (suites.has("quick")) {{
-        state.suite = "quick";
-      }} else {{
-        state.suite = "all";
-      }}
+      state.suite = defaultSuiteToken();
 
       packFilter.value = state.pack;
       suiteFilter.value = state.suite;
@@ -1190,6 +1198,13 @@ def _render_index_html(summary: dict[str, Any], output_path: Path) -> None:
         tab.addEventListener("click", () => {{
           const role = String(tab.dataset.role || "all");
           state.role = role;
+          if (role === "all") {{
+            state.suite = "all";
+            suiteFilter.value = "all";
+          }} else if (state.suite === "all") {{
+            state.suite = defaultSuiteToken();
+            suiteFilter.value = state.suite;
+          }}
           tabs.forEach((item) => item.classList.toggle("active", item === tab));
           render();
         }});
