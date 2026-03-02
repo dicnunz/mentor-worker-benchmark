@@ -1,6 +1,6 @@
 # Community Leaderboard
 
-Generated: 2026-03-02T19:13:23.422911+00:00
+Generated: 2026-03-02T23:30:11.100806+00:00
 
 ## Headline Official Baselines
 
@@ -24,6 +24,10 @@ Policy: headline official baselines come from `dev`/`dev50`/`test` suites. `dev1
 
 | Submission | Label | Role | Pack | Suite | Top Worker | Baseline | Mentored | Model Errors | Timeouts | Metrics Source | Commit |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| community_quick_phi3mini_gemma29b_2026-03-02 | community (not official) | community | task_pack_v2 | explicit | phi3:mini | 0.00% | 0.00% | 0 | 0 | summary,summary | e43f76a0b1be55ba0a9bc5a50e93b2a96bf93d8d |
+| community_quick_phi3mini_llama318b_2026-03-02 | community (not official) | community | task_pack_v2 | explicit | phi3:mini | 0.00% | 0.00% | 0 | 0 | summary,summary | e43f76a0b1be55ba0a9bc5a50e93b2a96bf93d8d |
+| community_quick_qwen25coder7b_mistral7b_2026-03-02 | community (not official) | community | task_pack_v2 | explicit | qwen2.5-coder:7b | 0.00% | 0.00% | 0 | 0 | summary,summary | e43f76a0b1be55ba0a9bc5a50e93b2a96bf93d8d |
+| community_quick_qwen25coder7b_llama318b_2026-03-02 | community (not official) | community | task_pack_v2 | explicit | qwen2.5-coder:7b | 0.00% | 0.00% | 0 | 0 | summary,summary | e43f76a0b1be55ba0a9bc5a50e93b2a96bf93d8d |
 | official_dev_sanity_2026-03-01 | official | sanity | task_pack_v2 | dev10 | qwen2.5-coder:7b | 10.00% | 10.00% | 15 | 15 | summary,summary | 42b9d586e81f00dd02607665d701b49c7871c2aa |
 | official_dev_v1_m3air_2026-03-01 | official | headline | task_pack_v2 | dev50 | qwen2.5-coder:7b | 0.00% | 0.00% | 149 | 149 | runs_backfill,runs_backfill | 801c41836629c4274aa08c43b8050b661e761bea |
 | official_quick_v3_m3air_2026-03-01 | official | sanity | task_pack_v2 | quick | qwen2.5-coder:7b | 16.67% | 0.00% | 32 | 32 | runs_backfill,runs_backfill | 900fb31f49058087bc3ce8b9fc58e9abe5e2b028 |
