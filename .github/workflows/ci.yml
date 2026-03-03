@@ -33,3 +33,14 @@ jobs:
 
       - name: Sanity check v2 quick subset (no Ollama)
         run: python -m mentor_worker_benchmark sanity --task-pack task_pack_v2 --suite quick --seed 1337
+
+  docker-sanity:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build and run Docker sanity image
+        run: DOCKER_IMAGE_TAG=mentor-worker-benchmark:ci ./scripts/docker_sanity.sh

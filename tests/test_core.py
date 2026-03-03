@@ -1,4 +1,12 @@
-from mentor_worker_benchmark.runner import _extract_diff, _sanitize_mentor_guidance, _validate_patch_format
+import re
+from typing import Any
+
+from mentor_worker_benchmark.runner import (
+    _capture_runtime_context,
+    _extract_diff,
+    _sanitize_mentor_guidance,
+    _validate_patch_format,
+)
 from mentor_worker_benchmark.tasks.task_registry import resolve_tasks
 
 
@@ -114,3 +122,37 @@ def test_task_selection_dev10_v2() -> None:
 
     selection_again = resolve_tasks(task_pack="task_pack_v2", suite="dev10", legacy_selector=None, seed=1337)
     assert [task.task_id for task in selection.tasks] == [task.task_id for task in selection_again.tasks]
+
+
+def test_capture_runtime_context_records_pip_hash_and_task_pack(monkeypatch: Any) -> None:
+    class _DummyClient:
+        def runtime_metadata(self, model_names: list[str]) -> dict[str, Any]:
+            return {"models": model_names}
+
+    monkeypatch.setattr(
+        "mentor_worker_benchmark.runner._capture_pip_freeze_hash",
+        lambda: ("a" * 64, 12),
+    )
+    monkeypatch.setattr("mentor_worker_benchmark.runner._git_commit_hash", lambda: "de5a929")
+    monkeypatch.setattr("mentor_worker_benchmark.runner._git_is_dirty", lambda: False)
+
+    context = _capture_runtime_context(
+        mentor_client=_DummyClient(),
+        worker_client=_DummyClient(),
+        mentor_models=["m1"],
+        worker_models=["w1"],
+        mentor_provider="ollama",
+        worker_provider="ollama",
+        task_pack_id="task_pack_v2",
+        task_pack_version="2.0.0",
+        task_pack_source="registry",
+        task_pack_hash="b" * 64,
+        task_pack_manifest_path="mentor_worker_benchmark/tasks/task_pack_v2/metadata.json",
+    )
+
+    assert context["python"]["pip_freeze_sha256"] == "a" * 64
+    assert context["python"]["pip_freeze_line_count"] == 12
+    assert re.fullmatch(r"[0-9a-f]{64}", context["python"]["pip_freeze_sha256"]) is not None
+    assert context["task_pack"]["id"] == "task_pack_v2"
+    assert context["task_pack"]["source"] == "registry"
+    assert context["task_pack"]["hash"] == "b" * 64

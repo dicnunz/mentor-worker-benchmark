@@ -38,7 +38,13 @@ def _sample_results_payload() -> dict[str, object]:
         },
         "environment": {
             "benchmark_version": "0.1.0",
-            "python": {"version": "3.11.0", "implementation": "CPython", "executable": "python"},
+            "python": {
+                "version": "3.11.0",
+                "implementation": "CPython",
+                "executable": "python",
+                "pip_freeze_sha256": "a" * 64,
+                "pip_freeze_line_count": 123,
+            },
             "platform": {
                 "platform": "macOS",
                 "system": "Darwin",
@@ -47,6 +53,13 @@ def _sample_results_payload() -> dict[str, object]:
             },
             "ollama": {"base_url": "http://localhost:11434", "cli_version": "0.0.0", "model_tags": []},
             "git": {"commit": "de5a929", "dirty": False},
+            "task_pack": {
+                "id": "task_pack_v2",
+                "version": "2.0.0",
+                "source": "registry",
+                "hash": "b" * 64,
+                "manifest_path": "mentor_worker_benchmark/tasks/task_pack_v2/metadata.json",
+            },
         },
         "summary": {
             "total_runs": 1,
@@ -104,11 +117,13 @@ def test_export_and_verify_submission_round_trip(tmp_path: Path) -> None:
     assert out_path.exists()
     assert manifest["task_pack"] == "task_pack_v2"
     assert manifest["official_submission"] is False
+    assert manifest["pip_freeze_sha256"] == "a" * 64
     with zipfile.ZipFile(out_path, "r") as archive:
         assert "analysis.json" in archive.namelist()
 
     report = verify_submission_bundle(out_path)
     assert report["ok"], report["errors"]
+    assert report["details"]["pip_freeze_sha256"] == "a" * 64
 
 
 def test_export_supports_official_submission_flag(tmp_path: Path) -> None:

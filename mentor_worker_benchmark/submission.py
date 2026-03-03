@@ -98,13 +98,51 @@ def validate_results_payload(payload: dict[str, Any]) -> list[str]:
 
     if isinstance(environment, dict):
         git = _expect_type(environment, "git", dict, "results.environment", errors)
-        _expect_type(environment, "python", dict, "results.environment", errors)
+        python_env = _expect_type(environment, "python", dict, "results.environment", errors)
         _expect_type(environment, "platform", dict, "results.environment", errors)
         _expect_type(environment, "ollama", dict, "results.environment", errors)
         if isinstance(git, dict):
             commit = _expect_type(git, "commit", str, "results.environment.git", errors)
             if isinstance(commit, str) and not commit.strip():
                 errors.append("results.environment.git.commit cannot be empty")
+        if isinstance(python_env, dict):
+            pip_freeze_hash = python_env.get("pip_freeze_sha256")
+            if pip_freeze_hash is not None:
+                if not isinstance(pip_freeze_hash, str):
+                    errors.append(
+                        "results.environment.python.pip_freeze_sha256 must be a string when present"
+                    )
+                elif pip_freeze_hash != "unavailable" and not SHA256_RE.fullmatch(pip_freeze_hash):
+                    errors.append(
+                        "results.environment.python.pip_freeze_sha256 must be a SHA256 hex digest "
+                        "or `unavailable`"
+                    )
+            pip_freeze_count = python_env.get("pip_freeze_line_count")
+            if pip_freeze_count is not None and (
+                isinstance(pip_freeze_count, bool) or not isinstance(pip_freeze_count, int)
+            ):
+                errors.append(
+                    "results.environment.python.pip_freeze_line_count must be an integer when present"
+                )
+        task_pack_env = environment.get("task_pack")
+        if task_pack_env is not None:
+            if not isinstance(task_pack_env, dict):
+                errors.append("results.environment.task_pack must be an object when present")
+            else:
+                pack_id = task_pack_env.get("id")
+                if pack_id is not None and not isinstance(pack_id, str):
+                    errors.append("results.environment.task_pack.id must be a string when present")
+                pack_source = task_pack_env.get("source")
+                if pack_source is not None and not isinstance(pack_source, str):
+                    errors.append("results.environment.task_pack.source must be a string when present")
+                pack_hash = task_pack_env.get("hash")
+                if pack_hash is not None:
+                    if not isinstance(pack_hash, str):
+                        errors.append("results.environment.task_pack.hash must be a string when present")
+                    elif pack_hash and not SHA256_RE.fullmatch(pack_hash):
+                        errors.append(
+                            "results.environment.task_pack.hash must be a SHA256 hex digest when non-empty"
+                        )
 
     if isinstance(summary, dict):
         total_runs = _expect_type(summary, "total_runs", int, "results.summary", errors)
@@ -482,6 +520,17 @@ def export_submission_bundle(
         "source_results_path": str(results_path),
         "compute_budget": compute_budget_manifest,
     }
+    python_env = environment.get("python", {}) if isinstance(environment, dict) else {}
+    pip_freeze_sha256 = (
+        str(python_env.get("pip_freeze_sha256", "")).strip()
+        if isinstance(python_env, dict)
+        else ""
+    )
+    if pip_freeze_sha256 and pip_freeze_sha256 != "unavailable" and not SHA256_RE.fullmatch(
+        pip_freeze_sha256
+    ):
+        pip_freeze_sha256 = "unavailable"
+    manifest["pip_freeze_sha256"] = pip_freeze_sha256 or "unavailable"
     if official_submission:
         manifest["protocol_version"] = OFFICIAL_PROTOCOL_VERSION
         manifest["protocol_seeds"] = [int(seed) for seed in protocol_seeds]
@@ -715,6 +764,12 @@ def verify_submission_bundle(submission_path: Path) -> dict[str, Any]:
         analysis_filename = manifest.get("analysis_filename")
         if analysis_filename is not None and analysis_filename != "analysis.json":
             errors.append("Manifest analysis_filename must be `analysis.json` when present")
+        pip_freeze_sha256 = manifest.get("pip_freeze_sha256")
+        if pip_freeze_sha256 is not None:
+            if not isinstance(pip_freeze_sha256, str):
+                errors.append("Manifest pip_freeze_sha256 must be a string when present")
+            elif pip_freeze_sha256 != "unavailable" and not SHA256_RE.fullmatch(pip_freeze_sha256):
+                errors.append("Manifest pip_freeze_sha256 must be a SHA256 digest or `unavailable`")
 
         if task_pack:
             if task_pack_source == "external":
@@ -769,6 +824,9 @@ def verify_submission_bundle(submission_path: Path) -> dict[str, Any]:
         details["task_pack_hash"] = task_pack_hash or None
         details["git_commit_hash"] = commit_hash
         details["cli_command"] = cli_command
+        details["pip_freeze_sha256"] = (
+            pip_freeze_sha256 if isinstance(pip_freeze_sha256, str) and pip_freeze_sha256 else None
+        )
         details["official_submission"] = bool(official_submission)
         details["analysis_required"] = needs_analysis
         _validate_official_protocol_requirements(
@@ -795,6 +853,8 @@ def render_verification_report(report: dict[str, Any]) -> str:
             f"- Command: {details.get('cli_command')}",
             f"- Analysis: {details.get('analysis_source', 'absent')}",
         ]
+        if details.get("pip_freeze_sha256"):
+            lines.append(f"- Pip freeze hash: {details.get('pip_freeze_sha256')}")
         if details.get("task_pack_hash"):
             lines.append(f"- Pack hash: {details.get('task_pack_hash')}")
         if details.get("official_submission"):
