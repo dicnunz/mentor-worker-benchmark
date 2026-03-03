@@ -195,6 +195,7 @@ python -m mentor_worker_benchmark run [--task-pack task_pack_v2|task_pack_v1] [-
 python -m mentor_worker_benchmark sanity [--task-pack task_pack_v2|task_pack_v1] [--suite quick|dev10|dev50|dev|test|all]
 python -m mentor_worker_benchmark leaderboard --results results/results.json --output results/leaderboard.md
 python -m mentor_worker_benchmark compare --before before.json --after after.json
+python -m mentor_worker_benchmark analyze --results results/results.json --out results/analysis.json
 python -m mentor_worker_benchmark export --results results/results.json --out submissions/<name>.zip [--official]
 python -m mentor_worker_benchmark verify --submission submissions/<name>.zip
 python -m mentor_worker_benchmark curate --task-pack task_pack_v1 --seed 1337
@@ -224,6 +225,7 @@ make quick
 
 Generated files:
 - `results/results.json`
+- `results/analysis.json` (from `analyze`, or bundled automatically during `export`)
 - `results/leaderboard.md`
 - `docs/index.html` (optional GitHub Pages view)
 

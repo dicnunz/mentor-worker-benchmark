@@ -1,0 +1,284 @@
+{
+  "generated_at": "2026-03-02T00:00:00+00:00",
+  "config": {
+    "models": [
+      "qwen2.5-coder:7b",
+      "llama3.1:8b"
+    ],
+    "mentor_models": [
+      "llama3.1:8b"
+    ],
+    "worker_models": [
+      "qwen2.5-coder:7b"
+    ],
+    "provider": "ollama",
+    "mentor_provider": "ollama",
+    "worker_provider": "ollama",
+    "run_modes": [
+      "worker_only",
+      "mentor_worker"
+    ],
+    "repro_mode": true,
+    "max_turns": 2,
+    "timeout_seconds": 20,
+    "generation": {
+      "temperature": 0.0,
+      "top_p": 1.0,
+      "worker_num_predict": 220,
+      "mentor_num_predict": 120,
+      "seed": 1337
+    },
+    "task_pack": "task_pack_v2",
+    "suite": "quick",
+    "selector_source": "suite",
+    "task_selector": null,
+    "task_count": 2,
+    "stronger_worker_included": null,
+    "stronger_worker_status": null
+  },
+  "environment": {
+    "benchmark_version": "0.3.0",
+    "python": {
+      "version": "3.11.0",
+      "implementation": "CPython",
+      "executable": "python"
+    },
+    "platform": {
+      "platform": "macOS",
+      "system": "Darwin",
+      "release": "23.0",
+      "machine": "arm64"
+    },
+    "ollama": {
+      "base_url": "http://localhost:11434",
+      "cli_version": "0.0.0",
+      "model_tags": []
+    },
+    "git": {
+      "commit": "de5a929",
+      "dirty": false
+    }
+  },
+  "summary": {
+    "total_runs": 4,
+    "runs_by_mode": {
+      "worker_only": 2,
+      "mentor_worker": 2
+    },
+    "benchmark_wall_time_seconds": 2.4,
+    "violation_count": 0
+  },
+  "runs": [
+    {
+      "mode": "worker_only",
+      "task_id": "v2_task_a",
+      "worker_model": "qwen2.5-coder:7b",
+      "mentor_model": null,
+      "pass": false,
+      "turns_used": 1,
+      "wall_time_seconds": 0.4,
+      "total_tokens_estimate": 110,
+      "mentor_turn_count": 0,
+      "mentor_violation_count": 0,
+      "log": {}
+    },
+    {
+      "mode": "worker_only",
+      "task_id": "v2_task_b",
+      "worker_model": "qwen2.5-coder:7b",
+      "mentor_model": null,
+      "pass": true,
+      "turns_used": 1,
+      "wall_time_seconds": 0.4,
+      "total_tokens_estimate": 115,
+      "mentor_turn_count": 0,
+      "mentor_violation_count": 0,
+      "log": {}
+    },
+    {
+      "mode": "mentor_worker",
+      "task_id": "v2_task_a",
+      "worker_model": "qwen2.5-coder:7b",
+      "mentor_model": "llama3.1:8b",
+      "pass": true,
+      "turns_used": 2,
+      "wall_time_seconds": 0.7,
+      "total_tokens_estimate": 230,
+      "mentor_turn_count": 1,
+      "mentor_violation_count": 0,
+      "log": {
+        "turns": []
+      }
+    },
+    {
+      "mode": "mentor_worker",
+      "task_id": "v2_task_b",
+      "worker_model": "qwen2.5-coder:7b",
+      "mentor_model": "llama3.1:8b",
+      "pass": true,
+      "turns_used": 2,
+      "wall_time_seconds": 0.9,
+      "total_tokens_estimate": 245,
+      "mentor_turn_count": 1,
+      "mentor_violation_count": 0,
+      "log": {
+        "turns": []
+      }
+    }
+  ],
+  "violations": [],
+  "aggregates": {
+    "task_count": 2,
+    "tasks": [
+      "v2_task_a",
+      "v2_task_b"
+    ],
+    "baseline_by_worker": {
+      "qwen2.5-coder:7b": 0.5
+    },
+    "control_by_worker": {
+      "qwen2.5-coder:7b": 0.0
+    },
+    "mentor_worker_pairs": [
+      {
+        "mentor_model": "llama3.1:8b",
+        "worker_model": "qwen2.5-coder:7b",
+        "baseline_pass_rate": 0.5,
+        "mentored_pass_rate": 1.0,
+        "control_pass_rate": 0.0,
+        "mentorship_lift": 0.5,
+        "mentor_violation_rate": 0.0
+      }
+    ],
+    "best_mentors": [
+      {
+        "mentor_model": "llama3.1:8b",
+        "avg_lift_across_workers": 0.5,
+        "overall_mentored_pass_rate": 1.0,
+        "mentor_violation_rate": 0.0
+      }
+    ],
+    "best_workers": [
+      {
+        "worker_model": "qwen2.5-coder:7b",
+        "baseline_pass_rate": 0.5,
+        "mentored_pass_rate": 1.0,
+        "control_pass_rate": 0.0,
+        "delta": 0.5
+      }
+    ],
+    "category_breakdown": []
+  },
+  "replicates": [
+    {
+      "replicate_id": "seed_1337",
+      "seed": 1337,
+      "generated_at": "2026-03-02T00:00:00+00:00",
+      "config": {
+        "task_pack": "task_pack_v2",
+        "suite": "quick",
+        "run_modes": [
+          "worker_only",
+          "mentor_worker"
+        ],
+        "worker_models": [
+          "qwen2.5-coder:7b"
+        ],
+        "mentor_models": [
+          "llama3.1:8b"
+        ],
+        "max_turns": 2,
+        "timeout_seconds": 20,
+        "repro_mode": true,
+        "generation": {
+          "seed": 1337
+        }
+      },
+      "runs": [
+        {
+          "mode": "worker_only",
+          "task_id": "v2_task_a",
+          "worker_model": "qwen2.5-coder:7b",
+          "mentor_model": null,
+          "pass": false
+        },
+        {
+          "mode": "worker_only",
+          "task_id": "v2_task_b",
+          "worker_model": "qwen2.5-coder:7b",
+          "mentor_model": null,
+          "pass": true
+        },
+        {
+          "mode": "mentor_worker",
+          "task_id": "v2_task_a",
+          "worker_model": "qwen2.5-coder:7b",
+          "mentor_model": "llama3.1:8b",
+          "pass": true
+        },
+        {
+          "mode": "mentor_worker",
+          "task_id": "v2_task_b",
+          "worker_model": "qwen2.5-coder:7b",
+          "mentor_model": "llama3.1:8b",
+          "pass": true
+        }
+      ]
+    },
+    {
+      "replicate_id": "seed_2026",
+      "seed": 2026,
+      "generated_at": "2026-03-02T01:00:00+00:00",
+      "config": {
+        "task_pack": "task_pack_v2",
+        "suite": "quick",
+        "run_modes": [
+          "worker_only",
+          "mentor_worker"
+        ],
+        "worker_models": [
+          "qwen2.5-coder:7b"
+        ],
+        "mentor_models": [
+          "llama3.1:8b"
+        ],
+        "max_turns": 2,
+        "timeout_seconds": 20,
+        "repro_mode": true,
+        "generation": {
+          "seed": 2026
+        }
+      },
+      "runs": [
+        {
+          "mode": "worker_only",
+          "task_id": "v2_task_a",
+          "worker_model": "qwen2.5-coder:7b",
+          "mentor_model": null,
+          "pass": false
+        },
+        {
+          "mode": "worker_only",
+          "task_id": "v2_task_b",
+          "worker_model": "qwen2.5-coder:7b",
+          "mentor_model": null,
+          "pass": false
+        },
+        {
+          "mode": "mentor_worker",
+          "task_id": "v2_task_a",
+          "worker_model": "qwen2.5-coder:7b",
+          "mentor_model": "llama3.1:8b",
+          "pass": true
+        },
+        {
+          "mode": "mentor_worker",
+          "task_id": "v2_task_b",
+          "worker_model": "qwen2.5-coder:7b",
+          "mentor_model": "llama3.1:8b",
+          "pass": false
+        }
+      ]
+    }
+  ]
+}

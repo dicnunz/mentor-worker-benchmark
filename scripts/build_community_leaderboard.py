@@ -9,6 +9,11 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
+from mentor_worker_benchmark.analysis import (
+    generate_analysis_payload,
+    select_primary_group,
+    validate_analysis_payload,
+)
 from mentor_worker_benchmark.submission import read_submission_bundle, verify_submission_bundle
 
 HEADLINE_SUITES = {"dev", "dev50", "test"}
@@ -247,6 +252,7 @@ def _normalize_submission(submission_path: Path) -> dict[str, Any]:
     results = bundle["results"]
     manifest = bundle["manifest"]
     environment = bundle["environment"]
+    analysis_payload = bundle.get("analysis")
 
     config = results.get("config", {}) if isinstance(results, dict) else {}
     summary = results.get("summary", {}) if isinstance(results, dict) else {}
@@ -274,6 +280,53 @@ def _normalize_submission(submission_path: Path) -> dict[str, Any]:
         config=config if isinstance(config, dict) else {},
         runs=runs,
     )
+
+    if isinstance(analysis_payload, dict):
+        analysis_errors = validate_analysis_payload(analysis_payload)
+        if analysis_errors:
+            analysis_payload = generate_analysis_payload(results if isinstance(results, dict) else {})
+    else:
+        analysis_payload = generate_analysis_payload(results if isinstance(results, dict) else {})
+
+    primary_group = select_primary_group(
+        results_payload=results if isinstance(results, dict) else {},
+        analysis_payload=analysis_payload,
+    )
+    if not isinstance(primary_group, dict):
+        primary_group = {}
+
+    def _metric_or_default(value: Any, default: float) -> float:
+        metric = _safe_float(value)
+        return metric if metric is not None else default
+
+    baseline_mean = round(
+        _metric_or_default(
+            primary_group.get("baseline_mean"),
+            _safe_float(best_worker.get("baseline_pass_rate", 0.0)) if isinstance(best_worker, dict) else 0.0,
+        ),
+        4,
+    )
+    mentored_mean = round(
+        _metric_or_default(
+            primary_group.get("mentored_mean"),
+            _safe_float(best_worker.get("mentored_pass_rate", 0.0)) if isinstance(best_worker, dict) else 0.0,
+        ),
+        4,
+    )
+    lift_mean = round(
+        _metric_or_default(
+            primary_group.get("lift_mean"),
+            _safe_float(best_worker.get("delta", 0.0)) if isinstance(best_worker, dict) else 0.0,
+        ),
+        4,
+    )
+    baseline_ci_low = round(_metric_or_default(primary_group.get("baseline_ci_low"), baseline_mean), 4)
+    baseline_ci_high = round(_metric_or_default(primary_group.get("baseline_ci_high"), baseline_mean), 4)
+    mentored_ci_low = round(_metric_or_default(primary_group.get("mentored_ci_low"), mentored_mean), 4)
+    mentored_ci_high = round(_metric_or_default(primary_group.get("mentored_ci_high"), mentored_mean), 4)
+    lift_ci_low = round(_metric_or_default(primary_group.get("lift_ci_low"), lift_mean), 4)
+    lift_ci_high = round(_metric_or_default(primary_group.get("lift_ci_high"), lift_mean), 4)
+    lift_significant = bool(primary_group.get("lift_significant", False))
 
     return {
         "submission_id": stem,
@@ -306,21 +359,26 @@ def _normalize_submission(submission_path: Path) -> dict[str, Any]:
         "total_model_call_timeouts": int(derived_metrics["total_model_call_timeouts"]),
         "metrics_source": metrics_source,
         "benchmark_version": str(environment.get("benchmark_version", "")),
+        "baseline_mean": baseline_mean,
+        "baseline_ci_low": baseline_ci_low,
+        "baseline_ci_high": baseline_ci_high,
+        "mentored_mean": mentored_mean,
+        "mentored_ci_low": mentored_ci_low,
+        "mentored_ci_high": mentored_ci_high,
+        "lift_mean": lift_mean,
+        "lift_ci_low": lift_ci_low,
+        "lift_ci_high": lift_ci_high,
+        "lift_significant": lift_significant,
         "best_worker": {
             "worker_model": str(best_worker.get("worker_model", "")) if isinstance(best_worker, dict) else "",
-            "baseline_pass_rate": round(
-                _safe_float(best_worker.get("baseline_pass_rate", 0.0)) if isinstance(best_worker, dict) else 0.0,
-                4,
-            ),
-            "mentored_pass_rate": round(
-                _safe_float(best_worker.get("mentored_pass_rate", 0.0)) if isinstance(best_worker, dict) else 0.0,
-                4,
-            ),
+            # Keep legacy fields but map to analysis means for backward-compatible UI consumers.
+            "baseline_pass_rate": baseline_mean,
+            "mentored_pass_rate": mentored_mean,
             "control_pass_rate": round(
                 _safe_float(best_worker.get("control_pass_rate", 0.0)) if isinstance(best_worker, dict) else 0.0,
                 4,
             ),
-            "lift": round(_safe_float(best_worker.get("delta", 0.0)) if isinstance(best_worker, dict) else 0.0, 4),
+            "lift": lift_mean,
         },
         "best_mentor": {
             "mentor_model": str(best_mentor.get("mentor_model", "")) if isinstance(best_mentor, dict) else "",
@@ -801,6 +859,26 @@ def _render_index_html(summary: dict[str, Any], output_path: Path) -> None:
       font-size: 0.8rem;
       margin-top: 0.48rem;
     }}
+    .metric {{
+      display: inline-flex;
+      align-items: center;
+      gap: 0.2rem;
+      max-width: 100%;
+    }}
+    .sig-marker {{
+      display: inline-block;
+      padding: 0.02rem 0.2rem;
+      border-radius: 4px;
+      border: 1px solid #86a7d9;
+      color: #1f3a68;
+      font-size: 0.64rem;
+      line-height: 1.1;
+      font-weight: 700;
+      background: #eef4ff;
+      margin-left: 0.2rem;
+      vertical-align: middle;
+      cursor: help;
+    }}
     a {{
       color: var(--accent);
       text-decoration: none;
@@ -841,15 +919,14 @@ def _render_index_html(summary: dict[str, Any], output_path: Path) -> None:
     <section class="card intro">
       <h2>What This Measures</h2>
       <p>This benchmark asks one question: does mentor guidance help a worker model solve objective coding tasks scored by tests?</p>
-      <p><strong>Baseline</strong> is the worker-only pass rate on the selected task set.</p>
-      <p><strong>Mentored</strong> is the worker pass rate when a mentor provides natural-language guidance.</p>
-      <p><strong>Lift</strong> is simply mentored minus baseline (positive means the mentor helped).</p>
+      <p><strong>Baseline</strong> and <strong>Mentored</strong> are means across replicates with task-level bootstrap confidence intervals.</p>
+      <p><strong>Lift</strong> is mentored minus baseline, with a paired bootstrap CI and a <code>sig</code> marker when CI excludes 0.</p>
       <p><strong>Errors</strong> and <strong>Timeouts</strong> count model-call failures; sanity runs focus on harness health and are not headline performance claims.</p>
       <p class="subtle">Hover glossary chips for plain-English definitions.</p>
       <div class="glossary">
-        <span class="term" tabindex="0" data-tip="Worker-only pass rate for a run.">Baseline</span>
-        <span class="term" tabindex="0" data-tip="Pass rate with mentor guidance enabled.">Mentored</span>
-        <span class="term" tabindex="0" data-tip="Difference between mentored and baseline pass rate.">Lift</span>
+        <span class="term" tabindex="0" data-tip="Mean worker-only pass rate across replicates with 95% CI.">Baseline</span>
+        <span class="term" tabindex="0" data-tip="Mean pass rate with mentor guidance across replicates with 95% CI.">Mentored</span>
+        <span class="term" tabindex="0" data-tip="Mentored minus baseline mean; 'sig' means 95% CI excludes 0.">Lift</span>
         <span class="term" tabindex="0" data-tip="Model call failures (bad responses, request failures, etc.).">Model errors</span>
         <span class="term" tabindex="0" data-tip="Model calls that exceeded the configured timeout.">Timeouts</span>
         <span class="term" tabindex="0" data-tip="Task pack version used for the run (for example task_pack_v2).">Pack</span>
@@ -968,6 +1045,17 @@ def _render_index_html(summary: dict[str, Any], output_path: Path) -> None:
       if (typeof value !== "number") return "";
       const sign = value >= 0 ? "+" : "-";
       return sign + (Math.abs(value) * 100).toFixed(2) + "%";
+    }}
+
+    function ciTip(label, meanValue, lowValue, highValue) {{
+      const meanNum = Number(meanValue);
+      const lowNum = Number(lowValue);
+      const highNum = Number(highValue);
+      if (!Number.isFinite(meanNum) || !Number.isFinite(lowNum) || !Number.isFinite(highNum)) {{
+        return `${{label}} mean`;
+      }}
+      const half = Math.abs(highNum - lowNum) / 2;
+      return `${{label}} mean ${{pct(meanNum)}}; ±${{(half * 100).toFixed(2)}}pp; 95% CI [${{pct(lowNum)}}, ${{pct(highNum)}}]`;
     }}
 
     function normalizeSuite(value) {{
@@ -1168,6 +1256,12 @@ def _render_index_html(summary: dict[str, Any], output_path: Path) -> None:
         const worker = entry.best_worker || {{}};
         const role = officialRole(entry);
         const commit = String(entry.git_commit_hash || "");
+        const baselineTip = ciTip("Baseline", entry.baseline_mean, entry.baseline_ci_low, entry.baseline_ci_high);
+        const mentoredTip = ciTip("Mentored", entry.mentored_mean, entry.mentored_ci_low, entry.mentored_ci_high);
+        const liftTip = ciTip("Lift", entry.lift_mean, entry.lift_ci_low, entry.lift_ci_high);
+        const sigMarker = entry.lift_significant
+          ? "<span class='sig-marker' title='Lift CI excludes 0 (significant)'>sig</span>"
+          : "";
         const tr = document.createElement("tr");
         tr.innerHTML = `
           <td><span class="text-clip" title="${{entry.submission_id || ""}}">${{entry.submission_id || "-"}}</span></td>
@@ -1175,9 +1269,9 @@ def _render_index_html(summary: dict[str, Any], output_path: Path) -> None:
           <td><span class="text-clip" title="${{entry.task_pack || ""}}">${{entry.task_pack || "-"}}</span></td>
           <td><span class="text-clip" title="${{normalizeSuite(entry.suite)}}">${{normalizeSuite(entry.suite)}}</span></td>
           <td><span class="text-clip" title="${{worker.worker_model || ""}}">${{worker.worker_model || "-"}}</span></td>
-          <td class="num">${{pct(Number(worker.baseline_pass_rate || 0))}}</td>
-          <td class="num">${{pct(Number(worker.mentored_pass_rate || 0))}}</td>
-          <td class="num">${{pctSigned(Number(worker.lift || 0))}}</td>
+          <td class="num"><span class="metric" title="${{baselineTip}}">${{pct(Number(worker.baseline_pass_rate || 0))}}</span></td>
+          <td class="num"><span class="metric" title="${{mentoredTip}}">${{pct(Number(worker.mentored_pass_rate || 0))}}</span></td>
+          <td class="num"><span class="metric" title="${{liftTip}}">${{pctSigned(Number(worker.lift || 0))}}</span>${{sigMarker}}</td>
           <td class="num">${{Number(entry.total_model_call_errors || 0)}}</td>
           <td class="num">${{Number(entry.total_model_call_timeouts || 0)}}</td>
           <td>

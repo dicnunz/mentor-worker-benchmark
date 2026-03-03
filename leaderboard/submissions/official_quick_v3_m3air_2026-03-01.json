@@ -54,6 +54,16 @@
     "total_model_call_timeouts": "runs_backfill"
   },
   "benchmark_version": "0.1.0",
+  "baseline_mean": 0.1667,
+  "baseline_ci_low": 0.0,
+  "baseline_ci_high": 0.5,
+  "mentored_mean": 0.0,
+  "mentored_ci_low": 0.0,
+  "mentored_ci_high": 0.0,
+  "lift_mean": -0.1667,
+  "lift_ci_low": -0.5,
+  "lift_ci_high": 0.0,
+  "lift_significant": false,
   "best_worker": {
     "worker_model": "qwen2.5-coder:7b",
     "baseline_pass_rate": 0.1667,

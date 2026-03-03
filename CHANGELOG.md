@@ -5,6 +5,29 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.0] - 2026-03-03
+
+### Added
+- Added deterministic `analyze` CLI subcommand:
+  - `python -m mentor_worker_benchmark analyze --results <path> --out <json>`
+  - Computes multi-replicate means, 95% bootstrap CIs, lift CI, and paired bootstrap significance.
+  - Emits explicit provenance (`analysis_version`, `ci_method`, `bootstrap_samples`, `bootstrap_seed`).
+- Added support for optional `results.replicates` payloads to represent seeded reruns for the same benchmark config.
+
+### Changed
+- Submission export now always bundles `analysis.json` alongside `results.json`, `environment.json`, and `submission_manifest.json`.
+- Submission verification now:
+  - Requires valid `analysis.json` when `results.replicates` contains multiple replicates.
+  - Deterministically backfills analysis during verify when a single-replicate archive omits `analysis.json`.
+- Community leaderboard normalization now surfaces CI/significance fields per submission:
+  - `baseline_mean`, `baseline_ci_low`, `baseline_ci_high`
+  - `mentored_mean`, `mentored_ci_low`, `mentored_ci_high`
+  - `lift_mean`, `lift_ci_low`, `lift_ci_high`, `lift_significant`
+- Legacy `best_worker` Baseline/Mentored/Lift fields are preserved and now mapped to analysis means for backward compatibility.
+- Docs leaderboard UI now shows CI tooltips on Baseline/Mentored/Lift and a `sig` marker when lift CI excludes zero.
+- Added deterministic analysis and submission verification tests, including a two-replicate fixture.
+- Bumped package version to `0.3.0`.
+
 ## [0.2.2] - 2026-03-02
 
 ### Changed
