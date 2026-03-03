@@ -24,6 +24,7 @@ from mentor_worker_benchmark.protocol import (
 
 REQUIRED_SUBMISSION_FILES = ("results.json", "environment.json", "submission_manifest.json")
 GIT_HASH_RE = re.compile(r"^[0-9a-f]{7,40}$")
+SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
 
 
 def _expect_type(
@@ -85,6 +86,15 @@ def validate_results_payload(payload: dict[str, Any]) -> list[str]:
         timeout_seconds = config.get("timeout_seconds")
         if timeout_seconds is not None and not isinstance(timeout_seconds, int):
             errors.append("results.config.timeout_seconds must be an integer when present")
+        task_pack_version = config.get("task_pack_version")
+        if task_pack_version is not None and not isinstance(task_pack_version, str):
+            errors.append("results.config.task_pack_version must be a string when present")
+        task_pack_source = config.get("task_pack_source")
+        if task_pack_source is not None and not isinstance(task_pack_source, str):
+            errors.append("results.config.task_pack_source must be a string when present")
+        task_pack_hash = config.get("task_pack_hash")
+        if task_pack_hash is not None and not isinstance(task_pack_hash, str):
+            errors.append("results.config.task_pack_hash must be a string when present")
 
     if isinstance(environment, dict):
         git = _expect_type(environment, "git", dict, "results.environment", errors)
@@ -199,6 +209,8 @@ def _infer_cli_command(results_payload: dict[str, Any]) -> str:
     max_turns = config.get("max_turns", 4)
     suite = config.get("suite", "dev,test")
     task_pack = config.get("task_pack", "task_pack_v2")
+    task_pack_source = str(config.get("task_pack_source", "builtin"))
+    task_pack_manifest_path = str(config.get("task_pack_manifest_path", ""))
     repro = bool(config.get("repro_mode", False))
     timeout_seconds = config.get("timeout_seconds", 180)
 
@@ -223,6 +235,9 @@ def _infer_cli_command(results_payload: dict[str, Any]) -> str:
         command.append(f"--mentor-models {','.join(str(item) for item in mentor_models)}")
     if isinstance(worker_models, list) and worker_models and worker_models != models:
         command.append(f"--worker-models {','.join(str(item) for item in worker_models)}")
+    if task_pack_source == "external" and task_pack_manifest_path:
+        manifest_parent = Path(task_pack_manifest_path).parent
+        command.append(f"--task-pack-path {manifest_parent}")
     if repro:
         command.append("--repro")
     return " ".join(command)
@@ -248,6 +263,28 @@ def _resolve_export_commit_hash() -> str:
     if not GIT_HASH_RE.fullmatch(commit_hash):
         raise RuntimeError(f"Resolved git commit hash has invalid format: {commit_hash}")
     return commit_hash
+
+
+def _resolve_task_pack_version_for_export(config: dict[str, Any]) -> tuple[str, str]:
+    task_pack = str(config.get("task_pack", ""))
+    config_version = str(config.get("task_pack_version", "")).strip()
+    pack_source = str(config.get("task_pack_source", "builtin")).strip().lower() or "builtin"
+
+    if pack_source == "external":
+        if not config_version:
+            raise RuntimeError(
+                "External task packs must include config.task_pack_version in results payload."
+            )
+        return config_version, pack_source
+
+    discovered = resolve_task_pack_version(task_pack)
+    if discovered:
+        return discovered, pack_source
+    if config_version:
+        return config_version, pack_source
+    raise RuntimeError(
+        f"Task pack `{task_pack}` not found locally and no task_pack_version was present in results config."
+    )
 
 
 def _safe_int(value: Any) -> int | None:
@@ -410,11 +447,14 @@ def export_submission_bundle(
     payload_for_bundle["analysis"] = analysis_payload
 
     task_pack = str(config["task_pack"])
-    task_pack_version = resolve_task_pack_version(task_pack)
-    if not task_pack_version:
-        raise RuntimeError(
-            f"Task pack `{task_pack}` not found locally (missing metadata.json in mentor_worker_benchmark/tasks)."
-        )
+    task_pack_version, task_pack_source = _resolve_task_pack_version_for_export(config)
+    task_pack_hash = str(config.get("task_pack_hash", "")).strip()
+    task_pack_license = str(config.get("task_pack_license", "")).strip() or None
+    if task_pack_source == "external":
+        if not task_pack_hash:
+            raise RuntimeError("External task pack results must include config.task_pack_hash.")
+        if not SHA256_RE.fullmatch(task_pack_hash):
+            raise RuntimeError(f"External task pack hash has invalid format: {task_pack_hash}")
 
     inferred_command = _infer_cli_command(payload)
     command_used = cli_command.strip() if isinstance(cli_command, str) and cli_command.strip() else inferred_command
@@ -433,6 +473,9 @@ def export_submission_bundle(
         "analysis_filename": "analysis.json",
         "task_pack": task_pack,
         "task_pack_version": task_pack_version,
+        "task_pack_source": task_pack_source,
+        "task_pack_hash": task_pack_hash or None,
+        "task_pack_license": task_pack_license,
         "git_commit_hash": commit_hash,
         "cli_command": command_used,
         "official_submission": bool(official_submission),
@@ -651,6 +694,8 @@ def verify_submission_bundle(submission_path: Path) -> dict[str, Any]:
 
         task_pack = str(manifest.get("task_pack", "")).strip()
         task_pack_version = str(manifest.get("task_pack_version", "")).strip()
+        task_pack_source = str(manifest.get("task_pack_source", "builtin")).strip().lower() or "builtin"
+        task_pack_hash = str(manifest.get("task_pack_hash", "")).strip()
         commit_hash = str(manifest.get("git_commit_hash", "")).strip()
         cli_command = str(manifest.get("cli_command", "")).strip()
 
@@ -672,19 +717,43 @@ def verify_submission_bundle(submission_path: Path) -> dict[str, Any]:
             errors.append("Manifest analysis_filename must be `analysis.json` when present")
 
         if task_pack:
-            discovered_version = resolve_task_pack_version(task_pack)
-            if not discovered_version:
-                errors.append(f"Task pack `{task_pack}` does not exist locally.")
-            elif task_pack_version and task_pack_version != discovered_version:
-                errors.append(
-                    f"Manifest task_pack_version mismatch: bundle={task_pack_version}, local={discovered_version}"
-                )
+            if task_pack_source == "external":
+                if not task_pack_hash:
+                    errors.append("External task pack manifests must include task_pack_hash.")
+                elif not SHA256_RE.fullmatch(task_pack_hash):
+                    errors.append(f"Manifest task_pack_hash has invalid format: {task_pack_hash}")
+            else:
+                discovered_version = resolve_task_pack_version(task_pack)
+                if not discovered_version:
+                    errors.append(f"Task pack `{task_pack}` does not exist locally.")
+                elif task_pack_version and task_pack_version != discovered_version:
+                    errors.append(
+                        f"Manifest task_pack_version mismatch: bundle={task_pack_version}, local={discovered_version}"
+                    )
 
-        results_task_pack = str(results_payload.get("config", {}).get("task_pack", "")).strip()
+        results_config = results_payload.get("config", {})
+        if not isinstance(results_config, dict):
+            results_config = {}
+        results_task_pack = str(results_config.get("task_pack", "")).strip()
         if task_pack and results_task_pack and task_pack != results_task_pack:
             errors.append(
                 f"Task pack mismatch between manifest (`{task_pack}`) and results (`{results_task_pack}`)."
             )
+        results_pack_source = str(results_config.get("task_pack_source", task_pack_source)).strip().lower()
+        if task_pack_source and results_pack_source and task_pack_source != results_pack_source:
+            errors.append(
+                "Task pack source mismatch between manifest "
+                f"(`{task_pack_source}`) and results (`{results_pack_source}`)."
+            )
+        results_pack_hash = str(results_config.get("task_pack_hash", "")).strip()
+        if task_pack_source == "external":
+            if results_pack_hash and task_pack_hash and results_pack_hash != task_pack_hash:
+                errors.append(
+                    "External task pack hash mismatch between manifest "
+                    f"(`{task_pack_hash}`) and results (`{results_pack_hash}`)."
+                )
+            if not results_pack_hash:
+                errors.append("results.config.task_pack_hash is required for external task packs.")
 
         results_commit = str(
             results_payload.get("environment", {}).get("git", {}).get("commit", "")
@@ -696,6 +765,8 @@ def verify_submission_bundle(submission_path: Path) -> dict[str, Any]:
 
         details["task_pack"] = task_pack
         details["task_pack_version"] = task_pack_version
+        details["task_pack_source"] = task_pack_source
+        details["task_pack_hash"] = task_pack_hash or None
         details["git_commit_hash"] = commit_hash
         details["cli_command"] = cli_command
         details["official_submission"] = bool(official_submission)
@@ -718,11 +789,14 @@ def render_verification_report(report: dict[str, Any]) -> str:
             "Submission verification passed.",
             f"- Submission: {details.get('submission_path')}",
             f"- Task pack: {details.get('task_pack')} ({details.get('task_pack_version')})",
+            f"- Pack source: {details.get('task_pack_source', 'builtin')}",
             f"- Commit: {details.get('git_commit_hash')}",
             f"- Label: {'official' if details.get('official_submission') else 'community (not official)'}",
             f"- Command: {details.get('cli_command')}",
             f"- Analysis: {details.get('analysis_source', 'absent')}",
         ]
+        if details.get("task_pack_hash"):
+            lines.append(f"- Pack hash: {details.get('task_pack_hash')}")
         if details.get("official_submission"):
             lines.append(f"- Protocol: {details.get('official_protocol', 'legacy')}")
             if details.get("protocol_seed_count") is not None:
