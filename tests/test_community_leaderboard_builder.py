@@ -164,6 +164,9 @@ def test_legacy_summary_metrics_are_backfilled_from_runs(
     assert normalized["metrics_source"]["total_passes"] == "runs_backfill"
     assert normalized["metrics_source"]["model_call_errors_by_mode"] == "runs_backfill"
     assert normalized["official_role"] == "sanity"
+    assert normalized["protocol_version"] == "v0.3.0"
+    assert normalized["seeds_count"] == 1
+    assert isinstance(normalized["time_total_s"], float)
 
 
 def test_official_role_classification_for_headline_and_sanity(
@@ -215,6 +218,9 @@ def test_normalize_submission_surfaces_analysis_means_cis_and_significance(
     assert normalized["best_worker"]["baseline_pass_rate"] == normalized["baseline_mean"]
     assert normalized["best_worker"]["mentored_pass_rate"] == normalized["mentored_mean"]
     assert normalized["best_worker"]["lift"] == normalized["lift_mean"]
+    assert normalized["protocol_version"] == "v0.3.0"
+    assert normalized["seeds_count"] == 2
+    assert normalized["protocol_seeds"] == [1337, 2026]
 
 
 def test_rendered_index_contains_tabs_single_table_headers_and_embedded_summary_json(tmp_path: Path) -> None:

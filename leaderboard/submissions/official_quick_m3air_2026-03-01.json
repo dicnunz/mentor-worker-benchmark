@@ -22,6 +22,12 @@
   "run_modes": [
     "worker_only"
   ],
+  "protocol_version": "legacy",
+  "seeds_count": 1,
+  "protocol_seeds": [
+    1337
+  ],
+  "time_total_s": 253.402,
   "total_runs": 30,
   "total_passes": 0,
   "passes_by_mode": {

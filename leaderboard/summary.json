@@ -45,6 +45,12 @@
         "worker_only",
         "mentor_worker"
       ],
+      "protocol_version": "legacy",
+      "seeds_count": 1,
+      "protocol_seeds": [
+        1337
+      ],
+      "time_total_s": 501.5102,
       "total_runs": 16,
       "total_passes": 0,
       "passes_by_mode": {
@@ -117,6 +123,12 @@
         "worker_only",
         "mentor_worker"
       ],
+      "protocol_version": "legacy",
+      "seeds_count": 1,
+      "protocol_seeds": [
+        1337
+      ],
+      "time_total_s": 496.1014,
       "total_runs": 16,
       "total_passes": 0,
       "passes_by_mode": {
@@ -189,6 +201,12 @@
         "worker_only",
         "mentor_worker"
       ],
+      "protocol_version": "legacy",
+      "seeds_count": 1,
+      "protocol_seeds": [
+        1337
+      ],
+      "time_total_s": 643.3594,
       "total_runs": 16,
       "total_passes": 0,
       "passes_by_mode": {
@@ -261,6 +279,12 @@
         "worker_only",
         "mentor_worker"
       ],
+      "protocol_version": "legacy",
+      "seeds_count": 1,
+      "protocol_seeds": [
+        1337
+      ],
+      "time_total_s": 633.6726,
       "total_runs": 16,
       "total_passes": 0,
       "passes_by_mode": {
@@ -333,6 +357,12 @@
         "worker_only",
         "mentor_worker"
       ],
+      "protocol_version": "legacy",
+      "seeds_count": 1,
+      "protocol_seeds": [
+        1337
+      ],
+      "time_total_s": 394.2805,
       "total_runs": 20,
       "total_passes": 2,
       "passes_by_mode": {
@@ -413,6 +443,12 @@
         "mentor_worker",
         "mentor_only_suggestion_noise"
       ],
+      "protocol_version": "legacy",
+      "seeds_count": 1,
+      "protocol_seeds": [
+        1337
+      ],
+      "time_total_s": 4022.6453,
       "total_runs": 200,
       "total_passes": 0,
       "passes_by_mode": {
@@ -496,6 +532,12 @@
         "worker_only",
         "mentor_worker"
       ],
+      "protocol_version": "legacy",
+      "seeds_count": 1,
+      "protocol_seeds": [
+        1337
+      ],
+      "time_total_s": 934.4144,
       "total_runs": 24,
       "total_passes": 1,
       "passes_by_mode": {
@@ -574,6 +616,12 @@
         "worker_only",
         "mentor_worker"
       ],
+      "protocol_version": "legacy",
+      "seeds_count": 1,
+      "protocol_seeds": [
+        1337
+      ],
+      "time_total_s": 611.2486,
       "total_runs": 12,
       "total_passes": 2,
       "passes_by_mode": {
@@ -652,6 +700,12 @@
         "worker_only",
         "mentor_worker"
       ],
+      "protocol_version": "legacy",
+      "seeds_count": 1,
+      "protocol_seeds": [
+        1337
+      ],
+      "time_total_s": 507.1298,
       "total_runs": 60,
       "total_passes": 0,
       "passes_by_mode": {
@@ -730,6 +784,12 @@
         "worker_only",
         "mentor_worker"
       ],
+      "protocol_version": "legacy",
+      "seeds_count": 1,
+      "protocol_seeds": [
+        1337
+      ],
+      "time_total_s": 506.5779,
       "total_runs": 60,
       "total_passes": 0,
       "passes_by_mode": {
@@ -808,6 +868,12 @@
         "worker_only",
         "mentor_worker"
       ],
+      "protocol_version": "legacy",
+      "seeds_count": 1,
+      "protocol_seeds": [
+        1337
+      ],
+      "time_total_s": 507.7685,
       "total_runs": 60,
       "total_passes": 0,
       "passes_by_mode": {
@@ -886,6 +952,12 @@
         "worker_only",
         "mentor_worker"
       ],
+      "protocol_version": "legacy",
+      "seeds_count": 1,
+      "protocol_seeds": [
+        1337
+      ],
+      "time_total_s": 1015.4612,
       "total_runs": 120,
       "total_passes": 0,
       "passes_by_mode": {
@@ -962,6 +1034,12 @@
       "run_modes": [
         "worker_only"
       ],
+      "protocol_version": "legacy",
+      "seeds_count": 1,
+      "protocol_seeds": [
+        1337
+      ],
+      "time_total_s": 253.402,
       "total_runs": 30,
       "total_passes": 0,
       "passes_by_mode": {
@@ -1041,6 +1119,12 @@
         "mentor_worker",
         "mentor_only_suggestion_noise"
       ],
+      "protocol_version": "legacy",
+      "seeds_count": 1,
+      "protocol_seeds": [
+        1337
+      ],
+      "time_total_s": 4022.6453,
       "total_runs": 200,
       "total_passes": 0,
       "passes_by_mode": {
@@ -1124,6 +1208,12 @@
         "worker_only",
         "mentor_worker"
       ],
+      "protocol_version": "legacy",
+      "seeds_count": 1,
+      "protocol_seeds": [
+        1337
+      ],
+      "time_total_s": 394.2805,
       "total_runs": 20,
       "total_passes": 2,
       "passes_by_mode": {
@@ -1204,6 +1294,12 @@
         "worker_only",
         "mentor_worker"
       ],
+      "protocol_version": "legacy",
+      "seeds_count": 1,
+      "protocol_seeds": [
+        1337
+      ],
+      "time_total_s": 934.4144,
       "total_runs": 24,
       "total_passes": 1,
       "passes_by_mode": {
@@ -1282,6 +1378,12 @@
         "worker_only",
         "mentor_worker"
       ],
+      "protocol_version": "legacy",
+      "seeds_count": 1,
+      "protocol_seeds": [
+        1337
+      ],
+      "time_total_s": 611.2486,
       "total_runs": 12,
       "total_passes": 2,
       "passes_by_mode": {
@@ -1360,6 +1462,12 @@
         "worker_only",
         "mentor_worker"
       ],
+      "protocol_version": "legacy",
+      "seeds_count": 1,
+      "protocol_seeds": [
+        1337
+      ],
+      "time_total_s": 1015.4612,
       "total_runs": 120,
       "total_passes": 0,
       "passes_by_mode": {
@@ -1436,6 +1544,12 @@
       "run_modes": [
         "worker_only"
       ],
+      "protocol_version": "legacy",
+      "seeds_count": 1,
+      "protocol_seeds": [
+        1337
+      ],
+      "time_total_s": 253.402,
       "total_runs": 30,
       "total_passes": 0,
       "passes_by_mode": {
@@ -1515,6 +1629,12 @@
         "mentor_worker",
         "mentor_only_suggestion_noise"
       ],
+      "protocol_version": "legacy",
+      "seeds_count": 1,
+      "protocol_seeds": [
+        1337
+      ],
+      "time_total_s": 4022.6453,
       "total_runs": 200,
       "total_passes": 0,
       "passes_by_mode": {

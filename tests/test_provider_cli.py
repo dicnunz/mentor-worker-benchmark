@@ -146,3 +146,52 @@ def test_cmd_analyze_writes_deterministic_analysis(tmp_path: Path) -> None:
     analysis = json.loads(out_path.read_text(encoding="utf-8"))
     assert analysis["group_count"] >= 1
     assert analysis["bootstrap_samples"] == 512
+
+
+def test_cmd_run_uses_multi_seed_runner_when_seeds_provided(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    captured: dict[str, Any] = {}
+
+    def _fake_build_client(*, provider: str, timeout_seconds: int, reasoning_level: str) -> _DummyClient:
+        del timeout_seconds, reasoning_level
+        return _DummyClient(provider)
+
+    def _fake_run_multi_seed_benchmark(
+        config: Any,
+        *,
+        seeds: list[int],
+        client: Any = None,
+        mentor_client: Any = None,
+        worker_client: Any = None,
+    ) -> dict[str, Any]:
+        del client, mentor_client, worker_client
+        captured["config"] = config
+        captured["seeds"] = seeds
+        return {"summary": {"total_runs": 0, "runs_by_mode": {}}, "run_group_id": "group_test"}
+
+    monkeypatch.setattr(cli_module, "build_client", _fake_build_client)
+    monkeypatch.setattr(cli_module, "run_multi_seed_benchmark", _fake_run_multi_seed_benchmark)
+
+    parser = cli_module.build_parser()
+    args = parser.parse_args(
+        [
+            "run",
+            "--provider",
+            "openai",
+            "--mentor-model",
+            "gpt-5",
+            "--worker-model",
+            "gpt-5-mini",
+            "--suite",
+            "dev50",
+            "--seeds",
+            "1337,2026,9001",
+            "--results-path",
+            str(tmp_path / "results.json"),
+        ]
+    )
+    exit_code = cli_module.cmd_run(args)
+    assert exit_code == 0
+    assert captured["seeds"] == [1337, 2026, 9001]

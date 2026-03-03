@@ -7,7 +7,7 @@ import re
 import subprocess
 import sys
 import time
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from datetime import UTC, datetime
 from pathlib import Path
 from statistics import mean
@@ -16,6 +16,7 @@ from typing import Any, Literal
 from mentor_worker_benchmark import __version__
 from mentor_worker_benchmark.llm_client import LLMClient
 from mentor_worker_benchmark.ollama_client import OllamaClient
+from mentor_worker_benchmark.protocol import deterministic_run_group_id
 from mentor_worker_benchmark.tasks.task_codegen_py.harness import (
     materialize_task,
     project_snapshot,
@@ -1390,6 +1391,8 @@ def run_benchmark(
     *,
     mentor_client: LLMClient | None = None,
     worker_client: LLMClient | None = None,
+    write_outputs: bool = True,
+    run_group_id: str | None = None,
 ) -> dict[str, Any]:
     if mentor_client is None and worker_client is None and client is None:
         client = OllamaClient()
@@ -1555,9 +1558,16 @@ def run_benchmark(
         mode_name = str(run.get("mode"))
         run_counts_by_mode[mode_name] = run_counts_by_mode.get(mode_name, 0) + 1
     error_summary = _collect_run_error_summary(runs)
+    compute_budget = _compute_budget_manifest(
+        runs=runs,
+        max_turns=generation.max_turns,
+        timeout_seconds=config.timeout_seconds,
+        total_wall_time_seconds=elapsed,
+    )
 
     results = {
         "generated_at": datetime.now(tz=UTC).isoformat(),
+        "run_group_id": run_group_id,
         "config": {
             "models": sorted(set(mentor_models + worker_models)),
             "mentor_models": mentor_models,
@@ -1591,20 +1601,24 @@ def run_benchmark(
             "benchmark_wall_time_seconds": round(elapsed, 4),
             "violation_count": len(all_violations),
             "total_passes": int(error_summary["total_passes"]),
+            "total_failed_runs": int(error_summary["total_failed_runs"]),
             "passes_by_mode": error_summary["passes_by_mode"],
+            "failed_runs_by_mode": error_summary["failed_runs_by_mode"],
             "model_call_errors_by_mode": error_summary["model_call_errors_by_mode"],
             "model_call_timeouts_by_mode": error_summary["model_call_timeouts_by_mode"],
             "total_model_call_errors": int(error_summary["total_model_call_errors"]),
             "total_model_call_timeouts": int(error_summary["total_model_call_timeouts"]),
         },
+        "compute_budget": compute_budget,
         "runs": runs,
         "violations": all_violations,
         "aggregates": aggregates,
     }
 
-    config.results_path.parent.mkdir(parents=True, exist_ok=True)
-    config.results_path.write_text(json.dumps(results, indent=2), encoding="utf-8")
-    write_leaderboard(results, config.results_path.parent / "leaderboard.md")
+    if write_outputs:
+        config.results_path.parent.mkdir(parents=True, exist_ok=True)
+        config.results_path.write_text(json.dumps(results, indent=2), encoding="utf-8")
+        write_leaderboard(results, config.results_path.parent / "leaderboard.md")
     return results
 
 
@@ -1616,6 +1630,7 @@ def _safe_float(value: Any) -> float:
 
 def _collect_run_error_summary(runs: list[dict[str, Any]]) -> dict[str, Any]:
     passes_by_mode: dict[str, int] = {}
+    failed_runs_by_mode: dict[str, int] = {}
     model_call_errors_by_mode: dict[str, int] = {}
     model_call_timeouts_by_mode: dict[str, int] = {}
     total_passes = 0
@@ -1632,8 +1647,10 @@ def _collect_run_error_summary(runs: list[dict[str, Any]]) -> dict[str, Any]:
         if run.get("pass"):
             total_passes += 1
             passes_by_mode[mode] = passes_by_mode.get(mode, 0) + 1
+            failed_runs_by_mode.setdefault(mode, 0)
         else:
             passes_by_mode.setdefault(mode, 0)
+            failed_runs_by_mode[mode] = failed_runs_by_mode.get(mode, 0) + 1
 
         log = run.get("log", {})
         if not isinstance(log, dict):
@@ -1654,12 +1671,306 @@ def _collect_run_error_summary(runs: list[dict[str, Any]]) -> dict[str, Any]:
 
     return {
         "total_passes": total_passes,
+        "total_failed_runs": len(runs) - total_passes,
         "passes_by_mode": passes_by_mode,
+        "failed_runs_by_mode": failed_runs_by_mode,
         "model_call_errors_by_mode": model_call_errors_by_mode,
         "model_call_timeouts_by_mode": model_call_timeouts_by_mode,
         "total_model_call_errors": sum(model_call_errors_by_mode.values()),
         "total_model_call_timeouts": sum(model_call_timeouts_by_mode.values()),
     }
+
+
+def _count_model_calls_attempted_for_run(run: dict[str, Any]) -> int:
+    mode = str(run.get("mode", ""))
+    if mode == "worker_only":
+        return 1
+
+    log = run.get("log", {})
+    if not isinstance(log, dict):
+        return 0
+    turns = log.get("turns", [])
+    if not isinstance(turns, list):
+        return 0
+
+    calls = 0
+    for turn in turns:
+        if not isinstance(turn, dict):
+            continue
+        worker_attempted = any(
+            key in turn
+            for key in ("worker_prompt", "worker_response", "worker_error", "extracted_patch")
+        )
+        if worker_attempted:
+            calls += 1
+
+        mentor_attempted = mode == "mentor_worker" and any(
+            key in turn
+            for key in ("mentor_prompt", "mentor_response_raw", "mentor_error", "mentor_guidance")
+        )
+        if mentor_attempted:
+            calls += 1
+
+    return calls
+
+
+def _compute_budget_manifest(
+    *,
+    runs: list[dict[str, Any]],
+    max_turns: int,
+    timeout_seconds: int,
+    total_wall_time_seconds: float,
+) -> dict[str, Any]:
+    calls_by_mode: dict[str, int] = {}
+    total_calls = 0
+    total_tokens = 0
+    tokens_available = True
+
+    for run in runs:
+        mode = str(run.get("mode", "unknown"))
+        attempted = _count_model_calls_attempted_for_run(run)
+        calls_by_mode[mode] = calls_by_mode.get(mode, 0) + attempted
+        total_calls += attempted
+
+        token_value = run.get("total_tokens_estimate")
+        if isinstance(token_value, bool) or not isinstance(token_value, (int, float)):
+            tokens_available = False
+        else:
+            total_tokens += int(token_value)
+
+    return {
+        "max_turns": int(max_turns),
+        "timeout_seconds": int(timeout_seconds),
+        "total_model_calls_attempted": int(total_calls),
+        "model_calls_attempted_by_mode": calls_by_mode,
+        "total_tokens_estimate": int(total_tokens) if tokens_available else "unavailable",
+        "total_wall_time_seconds": round(float(total_wall_time_seconds), 4),
+    }
+
+
+def _merge_compute_budget(
+    *,
+    replicate_results: list[dict[str, Any]],
+    max_turns: int,
+    timeout_seconds: int,
+) -> dict[str, Any]:
+    total_calls = 0
+    total_tokens = 0
+    tokens_available = True
+    total_wall_time = 0.0
+    calls_by_mode: dict[str, int] = {}
+
+    for replicate in replicate_results:
+        budget = replicate.get("compute_budget", {})
+        if not isinstance(budget, dict):
+            budget = {}
+
+        call_value = budget.get("total_model_calls_attempted")
+        if isinstance(call_value, bool) or not isinstance(call_value, (int, float)):
+            call_value = _compute_budget_manifest(
+                runs=replicate.get("runs", []) if isinstance(replicate.get("runs"), list) else [],
+                max_turns=max_turns,
+                timeout_seconds=timeout_seconds,
+                total_wall_time_seconds=0.0,
+            )["total_model_calls_attempted"]
+        total_calls += int(call_value)
+
+        tokens_value = budget.get("total_tokens_estimate")
+        if isinstance(tokens_value, str) and tokens_value == "unavailable":
+            tokens_available = False
+        elif isinstance(tokens_value, bool) or not isinstance(tokens_value, (int, float)):
+            tokens_available = False
+        else:
+            total_tokens += int(tokens_value)
+
+        wall = budget.get("total_wall_time_seconds")
+        if isinstance(wall, bool) or not isinstance(wall, (int, float)):
+            wall = replicate.get("summary", {}).get("benchmark_wall_time_seconds", 0.0)
+        if isinstance(wall, (int, float)) and not isinstance(wall, bool):
+            total_wall_time += float(wall)
+
+        by_mode = budget.get("model_calls_attempted_by_mode")
+        if isinstance(by_mode, dict):
+            for mode, count in by_mode.items():
+                if not isinstance(mode, str):
+                    continue
+                if isinstance(count, bool) or not isinstance(count, (int, float)):
+                    continue
+                calls_by_mode[mode] = calls_by_mode.get(mode, 0) + int(count)
+
+    return {
+        "max_turns": int(max_turns),
+        "timeout_seconds": int(timeout_seconds),
+        "total_model_calls_attempted": int(total_calls),
+        "model_calls_attempted_by_mode": calls_by_mode,
+        "total_tokens_estimate": int(total_tokens) if tokens_available else "unavailable",
+        "total_wall_time_seconds": round(total_wall_time, 4),
+        "replicate_count": len(replicate_results),
+    }
+
+
+def _combine_replicate_results(
+    *,
+    config: BenchmarkConfig,
+    replicate_results: list[dict[str, Any]],
+    seeds: list[int],
+    run_group_id: str,
+) -> dict[str, Any]:
+    if not replicate_results:
+        raise RuntimeError("No replicate results to combine.")
+
+    first = replicate_results[0]
+    first_config = first.get("config", {}) if isinstance(first.get("config"), dict) else {}
+    run_modes = _normalize_run_modes(
+        list(first_config.get("run_modes", []))
+        if isinstance(first_config.get("run_modes"), list)
+        else list(config.run_modes)
+    )
+    merged_runs: list[dict[str, Any]] = []
+    merged_violations: list[dict[str, Any]] = []
+    replicate_payloads: list[dict[str, Any]] = []
+
+    for index, (seed, replicate) in enumerate(zip(seeds, replicate_results), start=1):
+        runs = replicate.get("runs", [])
+        if isinstance(runs, list):
+            merged_runs.extend(runs)
+
+        violations = replicate.get("violations", [])
+        if isinstance(violations, list):
+            merged_violations.extend(violations)
+
+        replicate_payloads.append(
+            {
+                "replicate_id": f"seed_{seed}",
+                "seed": int(seed),
+                "run_group_id": run_group_id,
+                "generated_at": str(replicate.get("generated_at", "")),
+                "config": replicate.get("config", {}),
+                "summary": replicate.get("summary", {}),
+                "compute_budget": replicate.get("compute_budget", {}),
+                "runs": runs if isinstance(runs, list) else [],
+            }
+        )
+
+    run_counts_by_mode: dict[str, int] = {}
+    for run in merged_runs:
+        mode_name = str(run.get("mode", "unknown"))
+        run_counts_by_mode[mode_name] = run_counts_by_mode.get(mode_name, 0) + 1
+
+    error_summary = _collect_run_error_summary(merged_runs)
+    max_turns_raw = first_config.get("max_turns", config.max_turns)
+    timeout_raw = first_config.get("timeout_seconds", config.timeout_seconds)
+    max_turns = int(max_turns_raw) if isinstance(max_turns_raw, (int, float)) else int(config.max_turns)
+    timeout_seconds = (
+        int(timeout_raw)
+        if isinstance(timeout_raw, (int, float))
+        else int(config.timeout_seconds)
+    )
+    compute_budget = _merge_compute_budget(
+        replicate_results=replicate_results,
+        max_turns=max_turns,
+        timeout_seconds=timeout_seconds,
+    )
+
+    merged = {
+        "generated_at": datetime.now(tz=UTC).isoformat(),
+        "run_group_id": run_group_id,
+        "config": {
+            **first_config,
+            "run_group_id": run_group_id,
+            "seed_list": [int(seed) for seed in seeds],
+            "seed_count": len(seeds),
+            "run_modes": run_modes,
+        },
+        "environment": first.get("environment", {}),
+        "summary": {
+            "total_runs": len(merged_runs),
+            "runs_by_mode": run_counts_by_mode,
+            "benchmark_wall_time_seconds": compute_budget["total_wall_time_seconds"],
+            "violation_count": len(merged_violations),
+            "total_passes": int(error_summary["total_passes"]),
+            "total_failed_runs": int(error_summary["total_failed_runs"]),
+            "passes_by_mode": error_summary["passes_by_mode"],
+            "failed_runs_by_mode": error_summary["failed_runs_by_mode"],
+            "model_call_errors_by_mode": error_summary["model_call_errors_by_mode"],
+            "model_call_timeouts_by_mode": error_summary["model_call_timeouts_by_mode"],
+            "total_model_call_errors": int(error_summary["total_model_call_errors"]),
+            "total_model_call_timeouts": int(error_summary["total_model_call_timeouts"]),
+            "replicate_count": len(seeds),
+        },
+        "compute_budget": compute_budget,
+        "runs": merged_runs,
+        "violations": merged_violations,
+        "aggregates": first.get("aggregates", {}),
+        "replicates": replicate_payloads,
+    }
+    return merged
+
+
+def run_multi_seed_benchmark(
+    config: BenchmarkConfig,
+    *,
+    seeds: list[int],
+    client: LLMClient | None = None,
+    mentor_client: LLMClient | None = None,
+    worker_client: LLMClient | None = None,
+) -> dict[str, Any]:
+    if not seeds:
+        raise ValueError("`seeds` must contain at least one seed.")
+    if len(set(seeds)) != len(seeds):
+        raise ValueError("`seeds` must not contain duplicates.")
+
+    if len(seeds) == 1:
+        return run_benchmark(
+            replace(config, seed=int(seeds[0])),
+            client=client,
+            mentor_client=mentor_client,
+            worker_client=worker_client,
+        )
+
+    effective_max_turns = REPRO_MAX_TURNS if config.repro_mode else config.max_turns
+    effective_worker_num_predict = config.worker_num_predict_override or REPRO_WORKER_MAX_TOKENS
+    effective_mentor_num_predict = config.mentor_num_predict_override or REPRO_MENTOR_MAX_TOKENS
+    run_group_id = deterministic_run_group_id(
+        task_pack=config.task_pack,
+        suite=config.suite or "explicit",
+        run_modes=_normalize_run_modes(list(config.run_modes)),
+        mentor_models=list(config.mentor_models_override or config.models),
+        worker_models=list(config.worker_models_override or config.models),
+        provider=config.provider,
+        mentor_provider=(config.mentor_provider or config.provider),
+        worker_provider=(config.worker_provider or config.provider),
+        max_turns=effective_max_turns,
+        timeout_seconds=config.timeout_seconds,
+        repro_mode=config.repro_mode,
+        worker_num_predict=effective_worker_num_predict,
+        mentor_num_predict=effective_mentor_num_predict,
+        seeds=[int(seed) for seed in seeds],
+    )
+
+    replicate_results: list[dict[str, Any]] = []
+    for seed in seeds:
+        replicate = run_benchmark(
+            replace(config, seed=int(seed)),
+            client=client,
+            mentor_client=mentor_client,
+            worker_client=worker_client,
+            write_outputs=False,
+            run_group_id=run_group_id,
+        )
+        replicate_results.append(replicate)
+
+    merged = _combine_replicate_results(
+        config=config,
+        replicate_results=replicate_results,
+        seeds=[int(seed) for seed in seeds],
+        run_group_id=run_group_id,
+    )
+
+    config.results_path.parent.mkdir(parents=True, exist_ok=True)
+    config.results_path.write_text(json.dumps(merged, indent=2), encoding="utf-8")
+    write_leaderboard(merged, config.results_path.parent / "leaderboard.md")
+    return merged
 
 
 def compare_results(before: dict[str, Any], after: dict[str, Any]) -> dict[str, Any]:

@@ -7,6 +7,7 @@ from pathlib import Path
 
 from mentor_worker_benchmark.analysis import DEFAULT_BOOTSTRAP_SAMPLES, generate_analysis_payload
 from mentor_worker_benchmark.ollama_client import OllamaClient
+from mentor_worker_benchmark.protocol import parse_seed_list
 from mentor_worker_benchmark.provider_factory import (
     SUPPORTED_PROVIDERS,
     build_client,
@@ -20,6 +21,7 @@ from mentor_worker_benchmark.runner import (
     compare_results,
     render_compare_report,
     run_benchmark,
+    run_multi_seed_benchmark,
     run_sanity_check,
     write_leaderboard,
 )
@@ -75,6 +77,16 @@ def _parse_run_modes(raw: str) -> tuple[str, ...]:
     if not entries:
         return tuple(DEFAULT_RUN_MODES)
     return tuple(entries)
+
+
+def _parse_seeds(raw: str | None, *, fallback_seed: int) -> list[int]:
+    if raw is None or not raw.strip():
+        return [fallback_seed]
+
+    seeds = parse_seed_list(raw)
+    if len(set(seeds)) != len(seeds):
+        raise ValueError("--seeds must not contain duplicates.")
+    return seeds
 
 
 def _head_lines(text: str, *, max_lines: int = 50) -> str:
@@ -208,6 +220,11 @@ def cmd_run(args: argparse.Namespace) -> int:
         return 1
 
     run_modes = _parse_run_modes(args.run_modes)
+    try:
+        seeds = _parse_seeds(args.seeds, fallback_seed=args.seed)
+    except ValueError as exc:
+        print(str(exc))
+        return 1
 
     if args.max_turns < 1:
         print("--max-turns must be >= 1")
@@ -281,7 +298,7 @@ def cmd_run(args: argparse.Namespace) -> int:
         task_pack=args.task_pack,
         suite=args.suite,
         task_selector=args.tasks,
-        seed=args.seed,
+        seed=seeds[0],
         results_path=Path(args.results_path),
         run_modes=run_modes,
         repro_mode=args.repro,
@@ -292,12 +309,25 @@ def cmd_run(args: argparse.Namespace) -> int:
     )
 
     try:
-        results = run_benchmark(config, mentor_client=mentor_client, worker_client=worker_client)
+        if len(seeds) > 1:
+            results = run_multi_seed_benchmark(
+                config,
+                seeds=seeds,
+                mentor_client=mentor_client,
+                worker_client=worker_client,
+            )
+        else:
+            results = run_benchmark(config, mentor_client=mentor_client, worker_client=worker_client)
     except (ValueError, RuntimeError) as exc:
         print(str(exc))
         return 1
 
     print(f"Completed {results['summary']['total_runs']} runs.")
+    if len(seeds) > 1:
+        print(
+            f"Replicates: {len(seeds)} "
+            f"(seeds={','.join(str(seed) for seed in seeds)}, run_group_id={results.get('run_group_id')})"
+        )
     print("Runs by mode:")
     for mode, count in sorted(results["summary"]["runs_by_mode"].items()):
         print(f"- {mode}: {count}")
@@ -419,6 +449,12 @@ def cmd_export(args: argparse.Namespace) -> int:
     print(f"Submission bundle written: {args.out}")
     print(f"Task pack: {manifest['task_pack']} ({manifest['task_pack_version']})")
     print(f"Commit: {manifest['git_commit_hash']}")
+    if manifest.get("official_submission"):
+        print(
+            "Official protocol: "
+            f"{manifest.get('protocol_version', 'legacy')} "
+            f"seeds={manifest.get('protocol_seeds', [])}"
+        )
     return 0
 
 
@@ -561,6 +597,14 @@ def build_parser() -> argparse.ArgumentParser:
         help="Legacy explicit selector: all, quick, or comma-separated task ids. Overrides --suite.",
     )
     run.add_argument("--seed", type=int, default=1337)
+    run.add_argument(
+        "--seeds",
+        default=None,
+        help=(
+            "Optional comma-separated seed list for multi-replicate runs. "
+            "When set, --seed is ignored."
+        ),
+    )
     run.add_argument("--repro", action="store_true", help="Enable deterministic reproducibility mode.")
     run.add_argument(
         "--run-modes",

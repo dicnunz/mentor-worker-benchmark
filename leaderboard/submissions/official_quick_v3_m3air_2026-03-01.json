@@ -26,6 +26,12 @@
     "worker_only",
     "mentor_worker"
   ],
+  "protocol_version": "legacy",
+  "seeds_count": 1,
+  "protocol_seeds": [
+    1337
+  ],
+  "time_total_s": 934.4144,
   "total_runs": 24,
   "total_passes": 1,
   "passes_by_mode": {
