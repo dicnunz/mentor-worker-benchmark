@@ -1,6 +1,6 @@
 # Community Leaderboard
 
-Generated: 2026-03-03T21:37:49.649156+00:00
+Generated: 2026-03-03T23:10:21.309825+00:00
 
 ## Headline Official Baselines
 
@@ -24,8 +24,11 @@ Policy: headline official baselines come from `dev`/`dev50`/`test` suites. `dev1
 
 | Submission | Label | Role | Pack | Suite | Top Worker | Baseline | Mentored | Model Errors | Timeouts | Metrics Source | Commit |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| community_quick_matrix_qwen25coder7b_deepseekcoder67b_2026-03-03 | community (not official) | community | task_pack_v2 | quick | qwen2.5-coder:7b | 16.67% | 13.33% | 9 | 9 | summary,summary | 8b1ade794dca6e3c033c587f5db571891a4c476e |
+| community_quick_matrix_qwen25coder7b_qwen25coder7b_2026-03-03 | community (not official) | community | task_pack_v2 | quick | qwen2.5-coder:7b | 16.67% | 16.67% | 0 | 0 | summary,summary | 8b1ade794dca6e3c033c587f5db571891a4c476e |
 | community_quick_multiseed_deepseekcoder67b_llama318b_2026-03-03 | community (not official) | community | task_pack_v2 | quick | deepseek-coder:6.7b | 0.00% | 0.00% | 0 | 0 | summary,summary | 14da90b5696226cee191f1b802b8c0fcdc6d7614 |
 | community_quick_multiseed_qwen25coder7b_mistral7b_2026-03-03 | community (not official) | community | task_pack_v2 | quick | qwen2.5-coder:7b | 16.67% | 13.33% | 6 | 6 | summary,summary | 14da90b5696226cee191f1b802b8c0fcdc6d7614 |
+| community_quick_matrix_qwen25coder7b_mistral7b_2026-03-03 | community (not official) | community | task_pack_v2 | quick | qwen2.5-coder:7b | 16.67% | 13.33% | 6 | 6 | summary,summary | 8b1ade794dca6e3c033c587f5db571891a4c476e |
 | community_quick_phi3mini_gemma29b_2026-03-02 | community (not official) | community | task_pack_v2 | explicit | phi3:mini | 0.00% | 0.00% | 0 | 0 | summary,summary | e43f76a0b1be55ba0a9bc5a50e93b2a96bf93d8d |
 | community_quick_phi3mini_llama318b_2026-03-02 | community (not official) | community | task_pack_v2 | explicit | phi3:mini | 0.00% | 0.00% | 0 | 0 | summary,summary | e43f76a0b1be55ba0a9bc5a50e93b2a96bf93d8d |
 | community_quick_qwen25coder7b_mistral7b_2026-03-02 | community (not official) | community | task_pack_v2 | explicit | qwen2.5-coder:7b | 0.00% | 0.00% | 0 | 0 | summary,summary | e43f76a0b1be55ba0a9bc5a50e93b2a96bf93d8d |
@@ -37,6 +40,7 @@ Policy: headline official baselines come from `dev`/`dev50`/`test` suites. `dev1
 | community_quick_multiseed_mistral7b_llama318b_2026-03-03 | community (not official) | community | task_pack_v2 | quick | mistral:7b | 0.00% | 0.00% | 5 | 5 | runs_backfill,runs_backfill | 14da90b5696226cee191f1b802b8c0fcdc6d7614 |
 | community_quick_qwen25coder7b_llama318b_2026-03-01 | community (not official) | community | task_pack_v2 | quick | qwen2.5-coder:7b | 0.00% | 0.00% | 60 | 0 | runs_backfill,runs_backfill | f8ed363c3d660d775591768f2b5f62f9696c9ea8 |
 | community_quick_multiseed_qwen25coder7b_llama318b_2026-03-03 | community (not official) | community | task_pack_v2 | quick | qwen2.5-coder:7b | 0.00% | 0.00% | 60 | 0 | runs_backfill,runs_backfill | 14da90b5696226cee191f1b802b8c0fcdc6d7614 |
+| community_quick_matrix_qwen25coder7b_llama318b_2026-03-03 | community (not official) | community | task_pack_v2 | quick | qwen2.5-coder:7b | 0.00% | 0.00% | 60 | 0 | runs_backfill,runs_backfill | 8b1ade794dca6e3c033c587f5db571891a4c476e |
 | community_quick_phi3mini_gemma29b_2026-03-01 | community (not official) | community | task_pack_v2 | quick | phi3:mini | 0.00% | 0.00% | 60 | 0 | runs_backfill,runs_backfill | f8ed363c3d660d775591768f2b5f62f9696c9ea8 |
 | community_quick_multiseed_phi3mini_gemma29b_2026-03-03 | community (not official) | community | task_pack_v2 | quick | phi3:mini | 0.00% | 0.00% | 60 | 0 | runs_backfill,runs_backfill | 14da90b5696226cee191f1b802b8c0fcdc6d7614 |
 | community_quick_phi3mini_mistral7b_2026-03-01 | community (not official) | community | task_pack_v2 | quick | phi3:mini | 0.00% | 0.00% | 60 | 0 | runs_backfill,runs_backfill | f8ed363c3d660d775591768f2b5f62f9696c9ea8 |
