@@ -308,6 +308,30 @@ python scripts/build_community_leaderboard.py --strict
 - Tests run in isolated temp directories with per-task timeout and network disabled.
 - Run metadata logs environment and provenance (Python, platform, Ollama version/model tags, git commit hash).
 
+## Test Strength Gates
+
+Task-pack validation now includes deterministic test-strength gates to make results harder to game:
+
+- Static test strength heuristics per task:
+  - assertion count (AST-based),
+  - edge-case keyword coverage,
+  - negative-test presence (e.g., exception expectations),
+  - multi-file interaction signal from test/source imports.
+- Counterexample mutation harness:
+  - runs tests on the starter task workspace,
+  - applies a deterministic wrong patch to the likely target module/function,
+  - verifies tests fail on the wrong patch.
+- Strict mode (`--strict`) fails validation when:
+  - too many tasks are mutation-skipped,
+  - non-allowlisted tasks do not fail under the wrong patch,
+  - low-strength scores exceed conservative policy thresholds.
+
+Allowlists live in each pack (`strength_allowlist.json`) to explicitly grandfather legacy tasks while keeping strict checks transparent.
+
+What this does **not** guarantee:
+- It is not a full mutation-testing framework and does not prove complete behavioral coverage.
+- It reduces obvious weak-test/trivial-task failure modes but cannot eliminate every possible benchmark gaming path.
+
 ## Provenance & Limitations
 
 `task_pack_v2` includes generated provenance artifacts:
