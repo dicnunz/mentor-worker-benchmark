@@ -69,6 +69,34 @@ def _safe_int(value: Any) -> int | None:
     return None
 
 
+def _seed_list_from_results(results: dict[str, Any]) -> list[int]:
+    seeds: list[int] = []
+    replicates = results.get("replicates")
+    if isinstance(replicates, list) and replicates:
+        for replicate in replicates:
+            if not isinstance(replicate, dict):
+                continue
+            seed = _safe_int(replicate.get("seed"))
+            if seed is None:
+                config = replicate.get("config", {})
+                if isinstance(config, dict):
+                    generation = config.get("generation", {})
+                    if isinstance(generation, dict):
+                        seed = _safe_int(generation.get("seed"))
+            if seed is not None:
+                seeds.append(seed)
+        return seeds
+
+    config = results.get("config", {})
+    if isinstance(config, dict):
+        generation = config.get("generation", {})
+        if isinstance(generation, dict):
+            seed = _safe_int(generation.get("seed"))
+            if seed is not None:
+                return [seed]
+    return []
+
+
 def _config_run_modes(config: dict[str, Any], runs: list[dict[str, Any]]) -> list[str]:
     run_modes = config.get("run_modes", [])
     modes: list[str] = []
@@ -275,6 +303,20 @@ def _normalize_submission(submission_path: Path) -> dict[str, Any]:
 
     best_worker = _best_worker(aggregates if isinstance(aggregates, dict) else {})
     best_mentor = _best_mentor(aggregates if isinstance(aggregates, dict) else {})
+    protocol_version = str(manifest.get("protocol_version", "legacy"))
+    protocol_seeds = (
+        [int(item) for item in manifest.get("protocol_seeds", []) if isinstance(item, int)]
+        if isinstance(manifest.get("protocol_seeds"), list)
+        else []
+    )
+    if not protocol_seeds:
+        protocol_seeds = _seed_list_from_results(results if isinstance(results, dict) else {})
+    compute_budget = results.get("compute_budget", {}) if isinstance(results, dict) else {}
+    if not isinstance(compute_budget, dict):
+        compute_budget = {}
+    time_total_s = _safe_float(
+        compute_budget.get("total_wall_time_seconds", summary.get("benchmark_wall_time_seconds", 0.0))
+    )
     derived_metrics, metrics_source = _derive_metrics(
         summary=summary if isinstance(summary, dict) else {},
         config=config if isinstance(config, dict) else {},
@@ -348,6 +390,10 @@ def _normalize_submission(submission_path: Path) -> dict[str, Any]:
             list(config.get("worker_models", [])) if isinstance(config.get("worker_models"), list) else []
         ),
         "run_modes": list(config.get("run_modes", [])) if isinstance(config.get("run_modes"), list) else [],
+        "protocol_version": protocol_version,
+        "seeds_count": len(protocol_seeds),
+        "protocol_seeds": protocol_seeds,
+        "time_total_s": round(time_total_s, 4),
         "total_runs": int(derived_metrics["total_runs"]),
         "total_passes": int(derived_metrics["total_passes"]),
         "passes_by_mode": dict(derived_metrics["passes_by_mode"]),

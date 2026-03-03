@@ -4,6 +4,7 @@ import zipfile
 from pathlib import Path
 from typing import Any
 
+from mentor_worker_benchmark.analysis import generate_analysis_payload
 from mentor_worker_benchmark.submission import (
     export_submission_bundle,
     resolve_task_pack_version,
@@ -112,7 +113,7 @@ def test_export_and_verify_submission_round_trip(tmp_path: Path) -> None:
 
 def test_export_supports_official_submission_flag(tmp_path: Path) -> None:
     results_path = tmp_path / "results.json"
-    out_path = tmp_path / "official_submission.zip"
+    out_path = tmp_path / "official_quick_protocol-v0.3.0_seeds-1337.zip"
     results_path.write_text(json.dumps(_sample_results_payload(), indent=2), encoding="utf-8")
 
     manifest = export_submission_bundle(
@@ -121,6 +122,8 @@ def test_export_supports_official_submission_flag(tmp_path: Path) -> None:
         official_submission=True,
     )
     assert manifest["official_submission"] is True
+    assert manifest["protocol_version"] == "v0.3.0"
+    assert manifest["protocol_seeds"] == [1337]
 
     report = verify_submission_bundle(out_path)
     assert report["ok"], report["errors"]
@@ -248,3 +251,75 @@ def test_verify_backfills_analysis_for_single_replicate_when_missing(tmp_path: P
     report = verify_submission_bundle(out_path)
     assert report["ok"], report["errors"]
     assert report["details"]["analysis_source"] == "generated_single_replicate"
+
+
+def test_verify_rejects_new_official_headline_bundle_without_required_multiseed(
+    tmp_path: Path,
+) -> None:
+    payload = _sample_results_payload()
+    payload["config"]["suite"] = "dev50"
+    out_path = tmp_path / "official_dev50_protocol-v0.3.0_seeds-1337.zip"
+    task_pack_version = resolve_task_pack_version("task_pack_v2") or "2.0.0"
+
+    with zipfile.ZipFile(out_path, "w", compression=zipfile.ZIP_DEFLATED) as archive:
+        archive.writestr("results.json", json.dumps(payload, indent=2))
+        archive.writestr("environment.json", json.dumps(payload["environment"], indent=2))
+        archive.writestr("analysis.json", json.dumps(generate_analysis_payload(payload), indent=2))
+        archive.writestr(
+            "submission_manifest.json",
+            json.dumps(
+                {
+                    "bundle_version": "1",
+                    "task_pack": "task_pack_v2",
+                    "task_pack_version": task_pack_version,
+                    "git_commit_hash": "de5a929",
+                    "cli_command": "python -m mentor_worker_benchmark run --suite dev50 --seed 1337",
+                    "official_submission": True,
+                    "protocol_version": "v0.3.0",
+                    "protocol_seeds": [1337],
+                    "protocol_seed_count": 1,
+                    "suite": "dev50",
+                    "run_group_id": "group_test",
+                    "compute_budget": {
+                        "max_turns": 2,
+                        "timeout_seconds": 180,
+                        "total_model_calls_attempted": 1,
+                        "total_tokens_estimate": 42,
+                        "total_wall_time_seconds": 1.0,
+                    },
+                },
+                indent=2,
+            ),
+        )
+
+    report = verify_submission_bundle(out_path)
+    assert not report["ok"]
+    assert any("Headline official bundles must use protocol seeds" in item for item in report["errors"])
+
+
+def test_verify_allows_legacy_official_bundle_without_protocol_fields(tmp_path: Path) -> None:
+    payload = _sample_results_payload()
+    out_path = tmp_path / "official_legacy_bundle.zip"
+    task_pack_version = resolve_task_pack_version("task_pack_v2") or "2.0.0"
+    with zipfile.ZipFile(out_path, "w", compression=zipfile.ZIP_DEFLATED) as archive:
+        archive.writestr("results.json", json.dumps(payload, indent=2))
+        archive.writestr("environment.json", json.dumps(payload["environment"], indent=2))
+        archive.writestr("analysis.json", json.dumps(generate_analysis_payload(payload), indent=2))
+        archive.writestr(
+            "submission_manifest.json",
+            json.dumps(
+                {
+                    "bundle_version": "1",
+                    "task_pack": "task_pack_v2",
+                    "task_pack_version": task_pack_version,
+                    "git_commit_hash": "de5a929",
+                    "cli_command": "python -m mentor_worker_benchmark run --suite quick --seed 1337",
+                    "official_submission": True,
+                },
+                indent=2,
+            ),
+        )
+
+    report = verify_submission_bundle(out_path)
+    assert report["ok"], report["errors"]
+    assert report["details"]["official_protocol"] == "legacy"

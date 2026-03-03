@@ -170,10 +170,20 @@ Standardized scripts (macOS/Linux):
 ./scripts/run_official_dev_v1.sh
 ```
 
+`run_official_dev_v1.sh` accepts `TASK_SUITE=dev|dev50|test` (default `dev50`).
+
 Each script runs a fixed-suite benchmark configuration, exports a submission bundle, and verifies it.
 Headline policy:
 - Headline official baseline numbers come from `dev`/`dev50`/`test` suites.
 - Official `dev10`/`quick` runs are sanity checks for harness health and error-rate visibility, not headline performance claims.
+- Headline suites run three deterministic seeds by default: `1337`, `2026`, `9001`.
+
+## How To Interpret Headline Numbers
+
+- Headline `Baseline`, `Mentored`, and `Lift` are multi-seed means (not single-point pass rates).
+- Confidence intervals are 95% bootstrap CIs computed deterministically from task outcomes.
+- A `sig` lift marker means the 95% lift CI excludes `0`.
+- Sanity suites (`quick`/`dev10`) remain harness-health checks, not headline claims.
 
 ## Sanity Check (No Model Calls)
 
@@ -191,7 +201,7 @@ python -m mentor_worker_benchmark provenance --task-pack task_pack_v2
 
 ```bash
 python -m mentor_worker_benchmark setup [--models default|m1,m2] [--skip-pull]
-python -m mentor_worker_benchmark run [--task-pack task_pack_v2|task_pack_v1] [--suite quick|dev10|dev50|dev|test|all] [--repro] [--debug]
+python -m mentor_worker_benchmark run [--task-pack task_pack_v2|task_pack_v1] [--suite quick|dev10|dev50|dev|test|all] [--seed 1337|--seeds 1337,2026,9001] [--repro] [--debug]
 python -m mentor_worker_benchmark sanity [--task-pack task_pack_v2|task_pack_v1] [--suite quick|dev10|dev50|dev|test|all]
 python -m mentor_worker_benchmark leaderboard --results results/results.json --output results/leaderboard.md
 python -m mentor_worker_benchmark compare --before before.json --after after.json
@@ -307,6 +317,16 @@ python scripts/build_community_leaderboard.py --strict
 - Patch application forbids traversal outside the task workspace.
 - Tests run in isolated temp directories with per-task timeout and network disabled.
 - Run metadata logs environment and provenance (Python, platform, Ollama version/model tags, git commit hash).
+
+## Compute Budget
+
+Each run writes a `compute_budget` manifest in `results.json` and in exported `submission_manifest.json`:
+
+- `max_turns`
+- `timeout_seconds`
+- `total_model_calls_attempted`
+- `total_tokens_estimate` (or explicit `"unavailable"`)
+- `total_wall_time_seconds`
 
 ## Test Strength Gates
 

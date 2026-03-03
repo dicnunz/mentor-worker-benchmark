@@ -14,6 +14,13 @@ from mentor_worker_benchmark.analysis import (
     generate_analysis_payload,
     validate_analysis_payload,
 )
+from mentor_worker_benchmark.protocol import (
+    OFFICIAL_HEADLINE_SEEDS,
+    OFFICIAL_PROTOCOL_VERSION,
+    is_headline_suite,
+    protocol_token,
+    seed_token,
+)
 
 REQUIRED_SUBMISSION_FILES = ("results.json", "environment.json", "submission_manifest.json")
 GIT_HASH_RE = re.compile(r"^[0-9a-f]{7,40}$")
@@ -54,9 +61,19 @@ def validate_results_payload(payload: dict[str, Any]) -> list[str]:
     runs = _expect_type(payload, "runs", list, "results", errors)
     aggregates = _expect_type(payload, "aggregates", dict, "results", errors)
     _expect_type(payload, "generated_at", str, "results", errors)
+    run_group_id = payload.get("run_group_id")
+    if run_group_id is not None and not isinstance(run_group_id, str):
+        errors.append("results.run_group_id must be a string when present")
     replicates = payload.get("replicates")
     if replicates is not None and not isinstance(replicates, list):
         errors.append("results.replicates must be a list when present")
+    compute_budget = payload.get("compute_budget")
+    if compute_budget is not None:
+        _validate_compute_budget_manifest(
+            budget=compute_budget,
+            path="results.compute_budget",
+            errors=errors,
+        )
 
     if isinstance(config, dict):
         _expect_type(config, "task_pack", str, "results.config", errors)
@@ -84,6 +101,12 @@ def validate_results_payload(payload: dict[str, Any]) -> list[str]:
         _expect_type(summary, "runs_by_mode", dict, "results.summary", errors)
         _expect_type(summary, "benchmark_wall_time_seconds", (int, float), "results.summary", errors)
         _expect_type(summary, "violation_count", int, "results.summary", errors)
+        total_failed_runs = summary.get("total_failed_runs")
+        if total_failed_runs is not None and not isinstance(total_failed_runs, int):
+            errors.append("results.summary.total_failed_runs must be an integer when present")
+        failed_runs_by_mode = summary.get("failed_runs_by_mode")
+        if failed_runs_by_mode is not None and not isinstance(failed_runs_by_mode, dict):
+            errors.append("results.summary.failed_runs_by_mode must be an object when present")
         if isinstance(total_runs, int) and isinstance(runs, list) and total_runs != len(runs):
             errors.append(
                 f"results.summary.total_runs ({total_runs}) does not match len(results.runs) ({len(runs)})"
@@ -119,6 +142,13 @@ def validate_results_payload(payload: dict[str, Any]) -> list[str]:
             path = f"results.replicates[{index}]"
             replicate_config = _expect_type(replicate, "config", dict, path, errors)
             replicate_runs = _expect_type(replicate, "runs", list, path, errors)
+            replicate_budget = replicate.get("compute_budget")
+            if replicate_budget is not None:
+                _validate_compute_budget_manifest(
+                    budget=replicate_budget,
+                    path=f"{path}.compute_budget",
+                    errors=errors,
+                )
             if isinstance(replicate_config, dict):
                 _expect_type(replicate_config, "task_pack", str, f"{path}.config", errors)
                 _expect_type(replicate_config, "suite", str, f"{path}.config", errors)
@@ -220,6 +250,124 @@ def _resolve_export_commit_hash() -> str:
     return commit_hash
 
 
+def _safe_int(value: Any) -> int | None:
+    if isinstance(value, bool):
+        return int(value)
+    if isinstance(value, int):
+        return value
+    if isinstance(value, float):
+        return int(value)
+    return None
+
+
+def _extract_protocol_seeds(payload: dict[str, Any]) -> list[int]:
+    seeds: list[int] = []
+    replicates = payload.get("replicates")
+    if isinstance(replicates, list) and replicates:
+        for replicate in replicates:
+            if not isinstance(replicate, dict):
+                continue
+            seed = _safe_int(replicate.get("seed"))
+            if seed is None:
+                config = replicate.get("config", {})
+                if isinstance(config, dict):
+                    generation = config.get("generation", {})
+                    if isinstance(generation, dict):
+                        seed = _safe_int(generation.get("seed"))
+            if seed is not None:
+                seeds.append(seed)
+        return seeds
+
+    config = payload.get("config", {})
+    if isinstance(config, dict):
+        generation = config.get("generation", {})
+        if isinstance(generation, dict):
+            seed = _safe_int(generation.get("seed"))
+            if seed is not None:
+                return [seed]
+        seed = _safe_int(config.get("seed"))
+        if seed is not None:
+            return [seed]
+    return []
+
+
+def _extract_compute_budget(payload: dict[str, Any]) -> dict[str, Any]:
+    budget = payload.get("compute_budget")
+    if isinstance(budget, dict):
+        return budget
+    return {}
+
+
+def _normalize_compute_budget_for_manifest(payload: dict[str, Any]) -> dict[str, Any]:
+    budget = _extract_compute_budget(payload)
+    summary = payload.get("summary", {})
+    config = payload.get("config", {})
+
+    if not isinstance(summary, dict):
+        summary = {}
+    if not isinstance(config, dict):
+        config = {}
+
+    max_turns = _safe_int(budget.get("max_turns"))
+    if max_turns is None:
+        max_turns = _safe_int(config.get("max_turns"))
+    timeout_seconds = _safe_int(budget.get("timeout_seconds"))
+    if timeout_seconds is None:
+        timeout_seconds = _safe_int(config.get("timeout_seconds"))
+
+    total_calls = _safe_int(budget.get("total_model_calls_attempted"))
+    if total_calls is None:
+        total_calls = 0
+
+    total_tokens = budget.get("total_tokens_estimate", "unavailable")
+    if isinstance(total_tokens, bool) or not isinstance(total_tokens, (int, float, str)):
+        total_tokens = "unavailable"
+    if isinstance(total_tokens, str) and total_tokens != "unavailable":
+        total_tokens = "unavailable"
+    if isinstance(total_tokens, (int, float)) and not isinstance(total_tokens, bool):
+        total_tokens = int(total_tokens)
+
+    wall = budget.get("total_wall_time_seconds")
+    if isinstance(wall, bool) or not isinstance(wall, (int, float)):
+        wall = summary.get("benchmark_wall_time_seconds", 0.0)
+    wall_value = float(wall) if isinstance(wall, (int, float)) and not isinstance(wall, bool) else 0.0
+
+    return {
+        "max_turns": int(max_turns) if max_turns is not None else 0,
+        "timeout_seconds": int(timeout_seconds) if timeout_seconds is not None else 0,
+        "total_model_calls_attempted": int(total_calls),
+        "total_tokens_estimate": total_tokens,
+        "total_wall_time_seconds": round(wall_value, 4),
+    }
+
+
+def _validate_compute_budget_manifest(
+    *,
+    budget: Any,
+    path: str,
+    errors: list[str],
+) -> None:
+    if not isinstance(budget, dict):
+        errors.append(f"{path} must be an object")
+        return
+
+    for key in ("max_turns", "timeout_seconds", "total_model_calls_attempted"):
+        value = budget.get(key)
+        if isinstance(value, bool) or not isinstance(value, int):
+            errors.append(f"{path}.{key} must be an integer")
+
+    token_value = budget.get("total_tokens_estimate")
+    if isinstance(token_value, str):
+        if token_value != "unavailable":
+            errors.append(f"{path}.total_tokens_estimate string value must be `unavailable`")
+    elif isinstance(token_value, bool) or not isinstance(token_value, int):
+        errors.append(f"{path}.total_tokens_estimate must be an integer or `unavailable`")
+
+    wall_time = budget.get("total_wall_time_seconds")
+    if isinstance(wall_time, bool) or not isinstance(wall_time, (int, float)):
+        errors.append(f"{path}.total_wall_time_seconds must be a number")
+
+
 def export_submission_bundle(
     *,
     results_path: Path,
@@ -270,6 +418,11 @@ def export_submission_bundle(
 
     inferred_command = _infer_cli_command(payload)
     command_used = cli_command.strip() if isinstance(cli_command, str) and cli_command.strip() else inferred_command
+    suite = str(config.get("suite", ""))
+    protocol_seeds = _extract_protocol_seeds(payload_for_bundle)
+    compute_budget_manifest = _normalize_compute_budget_for_manifest(payload_for_bundle)
+    payload_for_bundle["compute_budget"] = compute_budget_manifest
+    run_group_id = payload_for_bundle.get("run_group_id")
 
     manifest = {
         "bundle_version": "1",
@@ -284,7 +437,15 @@ def export_submission_bundle(
         "cli_command": command_used,
         "official_submission": bool(official_submission),
         "source_results_path": str(results_path),
+        "compute_budget": compute_budget_manifest,
     }
+    if official_submission:
+        manifest["protocol_version"] = OFFICIAL_PROTOCOL_VERSION
+        manifest["protocol_seeds"] = [int(seed) for seed in protocol_seeds]
+        manifest["protocol_seed_count"] = len(protocol_seeds)
+        manifest["suite"] = suite
+        manifest["run_group_id"] = run_group_id if isinstance(run_group_id, str) else None
+        manifest["headline_suite"] = is_headline_suite(suite)
 
     out_path.parent.mkdir(parents=True, exist_ok=True)
     with zipfile.ZipFile(out_path, "w", compression=zipfile.ZIP_DEFLATED) as archive:
@@ -328,6 +489,113 @@ def read_submission_bundle(submission_path: Path) -> dict[str, Any]:
         "analysis": analysis_payload,
         "manifest": manifest_payload,
     }
+
+
+def _validate_official_protocol_requirements(
+    *,
+    submission_path: Path,
+    results_payload: dict[str, Any],
+    manifest: dict[str, Any],
+    errors: list[str],
+    details: dict[str, Any],
+) -> None:
+    official_submission = bool(manifest.get("official_submission"))
+    if not official_submission:
+        return
+
+    protocol_version = manifest.get("protocol_version")
+    if protocol_version is None:
+        details["official_protocol"] = "legacy"
+        return
+
+    if not isinstance(protocol_version, str) or not protocol_version.strip():
+        errors.append("Manifest protocol_version must be a non-empty string for official submissions.")
+        return
+    if protocol_version != OFFICIAL_PROTOCOL_VERSION:
+        errors.append(
+            f"Manifest protocol_version must be `{OFFICIAL_PROTOCOL_VERSION}` for new official bundles "
+            f"(got `{protocol_version}`)."
+        )
+
+    protocol_seeds_raw = manifest.get("protocol_seeds")
+    if not isinstance(protocol_seeds_raw, list) or not protocol_seeds_raw:
+        errors.append("Manifest protocol_seeds must be a non-empty list for official protocol bundles.")
+        protocol_seeds: list[int] = []
+    else:
+        protocol_seeds = []
+        for index, value in enumerate(protocol_seeds_raw):
+            if isinstance(value, bool) or not isinstance(value, int):
+                errors.append(f"Manifest protocol_seeds[{index}] must be an integer.")
+                continue
+            protocol_seeds.append(int(value))
+
+    seed_count = manifest.get("protocol_seed_count")
+    if seed_count is not None:
+        if isinstance(seed_count, bool) or not isinstance(seed_count, int):
+            errors.append("Manifest protocol_seed_count must be an integer when present.")
+        elif isinstance(protocol_seeds_raw, list) and seed_count != len(protocol_seeds_raw):
+            errors.append(
+                "Manifest protocol_seed_count does not match len(protocol_seeds)."
+            )
+
+    manifest_budget = manifest.get("compute_budget")
+    _validate_compute_budget_manifest(
+        budget=manifest_budget,
+        path="submission_manifest.compute_budget",
+        errors=errors,
+    )
+    _validate_compute_budget_manifest(
+        budget=results_payload.get("compute_budget"),
+        path="results.compute_budget",
+        errors=errors,
+    )
+
+    protocol_fragment = protocol_token(protocol_version)
+    seeds_fragment = f"seeds-{seed_token(protocol_seeds)}" if protocol_seeds else ""
+    submission_name = submission_path.name
+    if protocol_fragment not in submission_name:
+        errors.append(
+            f"Official protocol submission filename must include `{protocol_fragment}`."
+        )
+    if seeds_fragment and seeds_fragment not in submission_name:
+        errors.append(
+            f"Official protocol submission filename must include `{seeds_fragment}`."
+        )
+
+    suite = str(manifest.get("suite", "")).strip()
+    if not suite:
+        suite = str(results_payload.get("config", {}).get("suite", "")).strip()
+
+    if is_headline_suite(suite):
+        expected_seeds = list(OFFICIAL_HEADLINE_SEEDS)
+        if protocol_seeds != expected_seeds:
+            errors.append(
+                f"Headline official bundles must use protocol seeds {expected_seeds} in order."
+            )
+
+        replicates = results_payload.get("replicates")
+        if not isinstance(replicates, list) or len(replicates) != len(expected_seeds):
+            errors.append(
+                "Headline official bundles must include multi-seed replicates in results.replicates."
+            )
+        result_seeds = _extract_protocol_seeds(results_payload)
+        if result_seeds != expected_seeds:
+            errors.append(
+                f"results.replicates seeds must be {expected_seeds} for headline official bundles."
+            )
+
+        run_group_id = results_payload.get("run_group_id")
+        manifest_group_id = manifest.get("run_group_id")
+        if not isinstance(run_group_id, str) or not run_group_id.strip():
+            errors.append("results.run_group_id is required for headline official bundles.")
+        if not isinstance(manifest_group_id, str) or not manifest_group_id.strip():
+            errors.append("Manifest run_group_id is required for headline official bundles.")
+        elif isinstance(run_group_id, str) and run_group_id != manifest_group_id:
+            errors.append("Manifest run_group_id must match results.run_group_id.")
+
+    details["official_protocol"] = protocol_version
+    details["protocol_seeds"] = protocol_seeds
+    details["protocol_seed_count"] = len(protocol_seeds)
 
 
 def verify_submission_bundle(submission_path: Path) -> dict[str, Any]:
@@ -432,6 +700,13 @@ def verify_submission_bundle(submission_path: Path) -> dict[str, Any]:
         details["cli_command"] = cli_command
         details["official_submission"] = bool(official_submission)
         details["analysis_required"] = needs_analysis
+        _validate_official_protocol_requirements(
+            submission_path=submission_path,
+            results_payload=results_payload,
+            manifest=manifest,
+            errors=errors,
+            details=details,
+        )
 
     return {"ok": len(errors) == 0, "errors": errors, "details": details}
 
@@ -448,6 +723,10 @@ def render_verification_report(report: dict[str, Any]) -> str:
             f"- Command: {details.get('cli_command')}",
             f"- Analysis: {details.get('analysis_source', 'absent')}",
         ]
+        if details.get("official_submission"):
+            lines.append(f"- Protocol: {details.get('official_protocol', 'legacy')}")
+            if details.get("protocol_seed_count") is not None:
+                lines.append(f"- Seeds: {details.get('protocol_seeds', [])}")
         return "\n".join(lines)
 
     lines = ["Submission verification failed."]

@@ -17,10 +17,15 @@ or:
 ```
 
 Both scripts:
-- run the benchmark with standardized config (`task_pack_v2`, fixed seed, fixed suite/profile script defaults),
+- run the benchmark with standardized config (`task_pack_v2`, fixed suite/profile script defaults),
 - export a submission zip,
 - verify that zip locally,
 - mark the submission as `official`.
+
+Official protocol (`v0.3.0`):
+- Headline suites (`dev`/`dev50`/`test`) run 3 seeds: `1337,2026,9001`.
+- Official zip filenames include protocol + seeds (for example `protocol-v0.3.0_seeds-1337-2026-9001`).
+- Results include `run_group_id`, `replicates`, and a `compute_budget` manifest.
 
 Official interpretation policy:
 - `dev`/`dev50`/`test` official runs are headline baseline runs.
@@ -47,7 +52,7 @@ Submission zip contents:
 - `results.json`
 - `environment.json`
 - `analysis.json` (deterministic CI/significance analysis)
-- `submission_manifest.json` (commit, task-pack version, CLI command)
+- `submission_manifest.json` (commit, task-pack version, CLI command, protocol metadata, compute budget)
 
 By default, manual exports are labeled `community (not official)`.
 Only maintainers should use `--official` for standardized official runs.
