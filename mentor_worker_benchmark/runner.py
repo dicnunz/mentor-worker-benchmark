@@ -1107,6 +1107,23 @@ def _git_is_dirty() -> bool | None:
         return None
 
 
+def _capture_pip_freeze_hash() -> tuple[str, int]:
+    try:
+        process = subprocess.run(
+            [sys.executable, "-m", "pip", "freeze", "--all"],
+            check=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.DEVNULL,
+            text=True,
+        )
+    except (OSError, subprocess.CalledProcessError):
+        return "unavailable", 0
+
+    lines = sorted(line.strip() for line in process.stdout.splitlines() if line.strip())
+    digest = hashlib.sha256("\n".join(lines).encode("utf-8")).hexdigest()
+    return digest, len(lines)
+
+
 def _capture_runtime_context(
     *,
     mentor_client: LLMClient,
@@ -1115,6 +1132,11 @@ def _capture_runtime_context(
     worker_models: list[str],
     mentor_provider: str,
     worker_provider: str,
+    task_pack_id: str,
+    task_pack_version: str | None,
+    task_pack_source: str,
+    task_pack_hash: str | None,
+    task_pack_manifest_path: str | None,
 ) -> dict[str, Any]:
     provider_details: dict[str, dict[str, Any]] = {}
 
@@ -1134,12 +1156,16 @@ def _capture_runtime_context(
     else:
         provider_details["openai"] = {}
 
+    pip_freeze_sha256, pip_freeze_line_count = _capture_pip_freeze_hash()
+
     return {
         "benchmark_version": __version__,
         "python": {
             "version": platform.python_version(),
             "implementation": platform.python_implementation(),
             "executable": sys.executable,
+            "pip_freeze_sha256": pip_freeze_sha256,
+            "pip_freeze_line_count": pip_freeze_line_count,
         },
         "platform": {
             "platform": platform.platform(),
@@ -1156,6 +1182,13 @@ def _capture_runtime_context(
         "git": {
             "commit": _git_commit_hash(),
             "dirty": _git_is_dirty(),
+        },
+        "task_pack": {
+            "id": task_pack_id,
+            "version": task_pack_version,
+            "source": task_pack_source,
+            "hash": task_pack_hash,
+            "manifest_path": task_pack_manifest_path,
         },
     }
 
@@ -1558,6 +1591,11 @@ def run_benchmark(
         worker_models=worker_models,
         mentor_provider=mentor_provider,
         worker_provider=worker_provider,
+        task_pack_id=selection.task_pack,
+        task_pack_version=selection.pack_version,
+        task_pack_source=selection.pack_source,
+        task_pack_hash=selection.pack_hash,
+        task_pack_manifest_path=selection.pack_manifest_path,
     )
 
     run_counts_by_mode: dict[str, int] = {}

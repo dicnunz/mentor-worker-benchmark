@@ -1,4 +1,4 @@
-.PHONY: setup quick curate lock generate-pack sanity run-quick run-dev run-test run-all leaderboard community-leaderboard compare lint test
+.PHONY: setup quick curate lock generate-pack sanity docker-sanity run-quick run-dev run-test run-all leaderboard community-leaderboard compare lint test
 
 setup:
 	python -m mentor_worker_benchmark setup
@@ -17,6 +17,9 @@ generate-pack:
 
 sanity:
 	python -m mentor_worker_benchmark sanity --task-pack task_pack_v1 --suite all --seed 1337
+
+docker-sanity:
+	./scripts/docker_sanity.sh
 
 run-quick:
 	python -m mentor_worker_benchmark run --suite quick --max-turns 2 --repro
