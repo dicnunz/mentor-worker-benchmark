@@ -100,6 +100,7 @@ class BenchmarkConfig:
     stronger_worker_model: str | None = None
     worker_num_predict_override: int | None = None
     mentor_num_predict_override: int | None = None
+    timeout_seconds: int = 180
 
 
 @dataclass(slots=True)
@@ -1567,6 +1568,7 @@ def run_benchmark(
             "run_modes": run_modes,
             "repro_mode": config.repro_mode,
             "max_turns": generation.max_turns,
+            "timeout_seconds": config.timeout_seconds,
             "generation": {
                 "temperature": generation.temperature,
                 "top_p": generation.top_p,

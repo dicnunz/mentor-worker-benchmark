@@ -4,7 +4,11 @@ import zipfile
 from pathlib import Path
 from typing import Any
 
-from mentor_worker_benchmark.submission import export_submission_bundle, verify_submission_bundle
+from mentor_worker_benchmark.submission import (
+    export_submission_bundle,
+    resolve_task_pack_version,
+    verify_submission_bundle,
+)
 
 
 def _sample_results_payload() -> dict[str, object]:
@@ -99,6 +103,8 @@ def test_export_and_verify_submission_round_trip(tmp_path: Path) -> None:
     assert out_path.exists()
     assert manifest["task_pack"] == "task_pack_v2"
     assert manifest["official_submission"] is False
+    with zipfile.ZipFile(out_path, "r") as archive:
+        assert "analysis.json" in archive.namelist()
 
     report = verify_submission_bundle(out_path)
     assert report["ok"], report["errors"]
@@ -187,3 +193,58 @@ def test_export_uses_git_rev_parse_head_for_manifest_and_environment(
     assert bundled_manifest["git_commit_hash"] == export_commit
     assert bundled_environment["git"]["commit"] == export_commit
     assert bundled_results["environment"]["git"]["commit"] == export_commit
+
+
+def test_verify_requires_analysis_for_multi_replicate_results(tmp_path: Path) -> None:
+    fixture = Path(__file__).resolve().parent / "fixtures" / "results_two_replicates.json"
+    payload = json.loads(fixture.read_text(encoding="utf-8"))
+
+    out_path = tmp_path / "missing_analysis_multi.zip"
+    task_pack_version = resolve_task_pack_version("task_pack_v2") or "2.0.0"
+    with zipfile.ZipFile(out_path, "w", compression=zipfile.ZIP_DEFLATED) as archive:
+        archive.writestr("results.json", json.dumps(payload, indent=2))
+        archive.writestr("environment.json", json.dumps(payload["environment"], indent=2))
+        archive.writestr(
+            "submission_manifest.json",
+            json.dumps(
+                {
+                    "bundle_version": "1",
+                    "task_pack": "task_pack_v2",
+                    "task_pack_version": task_pack_version,
+                    "git_commit_hash": "de5a929",
+                    "cli_command": "python -m mentor_worker_benchmark run --suite quick",
+                },
+                indent=2,
+            ),
+        )
+
+    report = verify_submission_bundle(out_path)
+    assert not report["ok"]
+    assert any("analysis.json is required for multi-replicate" in item for item in report["errors"])
+
+
+def test_verify_backfills_analysis_for_single_replicate_when_missing(tmp_path: Path) -> None:
+    payload = _sample_results_payload()
+    out_path = tmp_path / "missing_analysis_single.zip"
+    task_pack_version = resolve_task_pack_version("task_pack_v2") or "2.0.0"
+
+    with zipfile.ZipFile(out_path, "w", compression=zipfile.ZIP_DEFLATED) as archive:
+        archive.writestr("results.json", json.dumps(payload, indent=2))
+        archive.writestr("environment.json", json.dumps(payload["environment"], indent=2))
+        archive.writestr(
+            "submission_manifest.json",
+            json.dumps(
+                {
+                    "bundle_version": "1",
+                    "task_pack": "task_pack_v2",
+                    "task_pack_version": task_pack_version,
+                    "git_commit_hash": "de5a929",
+                    "cli_command": "python -m mentor_worker_benchmark run --suite quick --repro",
+                },
+                indent=2,
+            ),
+        )
+
+    report = verify_submission_bundle(out_path)
+    assert report["ok"], report["errors"]
+    assert report["details"]["analysis_source"] == "generated_single_replicate"

@@ -9,6 +9,11 @@ from pathlib import Path
 from typing import Any
 
 from mentor_worker_benchmark import __version__
+from mentor_worker_benchmark.analysis import (
+    analysis_required_for_results,
+    generate_analysis_payload,
+    validate_analysis_payload,
+)
 
 REQUIRED_SUBMISSION_FILES = ("results.json", "environment.json", "submission_manifest.json")
 GIT_HASH_RE = re.compile(r"^[0-9a-f]{7,40}$")
@@ -49,6 +54,9 @@ def validate_results_payload(payload: dict[str, Any]) -> list[str]:
     runs = _expect_type(payload, "runs", list, "results", errors)
     aggregates = _expect_type(payload, "aggregates", dict, "results", errors)
     _expect_type(payload, "generated_at", str, "results", errors)
+    replicates = payload.get("replicates")
+    if replicates is not None and not isinstance(replicates, list):
+        errors.append("results.replicates must be a list when present")
 
     if isinstance(config, dict):
         _expect_type(config, "task_pack", str, "results.config", errors)
@@ -57,6 +65,9 @@ def validate_results_payload(payload: dict[str, Any]) -> list[str]:
         _expect_type(config, "models", list, "results.config", errors)
         _expect_type(config, "worker_models", list, "results.config", errors)
         _expect_type(config, "generation", dict, "results.config", errors)
+        timeout_seconds = config.get("timeout_seconds")
+        if timeout_seconds is not None and not isinstance(timeout_seconds, int):
+            errors.append("results.config.timeout_seconds must be an integer when present")
 
     if isinstance(environment, dict):
         git = _expect_type(environment, "git", dict, "results.environment", errors)
@@ -100,6 +111,30 @@ def validate_results_payload(payload: dict[str, Any]) -> list[str]:
         _expect_type(aggregates, "best_workers", list, "results.aggregates", errors)
         _expect_type(aggregates, "mentor_worker_pairs", list, "results.aggregates", errors)
 
+    if isinstance(replicates, list):
+        for index, replicate in enumerate(replicates):
+            if not isinstance(replicate, dict):
+                errors.append(f"results.replicates[{index}] must be an object")
+                continue
+            path = f"results.replicates[{index}]"
+            replicate_config = _expect_type(replicate, "config", dict, path, errors)
+            replicate_runs = _expect_type(replicate, "runs", list, path, errors)
+            if isinstance(replicate_config, dict):
+                _expect_type(replicate_config, "task_pack", str, f"{path}.config", errors)
+                _expect_type(replicate_config, "suite", str, f"{path}.config", errors)
+                _expect_type(replicate_config, "run_modes", list, f"{path}.config", errors)
+                _expect_type(replicate_config, "generation", dict, f"{path}.config", errors)
+            if isinstance(replicate_runs, list):
+                for run_index, row in enumerate(replicate_runs):
+                    if not isinstance(row, dict):
+                        errors.append(f"{path}.runs[{run_index}] must be an object")
+                        continue
+                    run_path = f"{path}.runs[{run_index}]"
+                    _expect_type(row, "mode", str, run_path, errors)
+                    _expect_type(row, "task_id", str, run_path, errors)
+                    _expect_type(row, "worker_model", str, run_path, errors)
+                    _expect_type(row, "pass", bool, run_path, errors)
+
     return errors
 
 
@@ -135,6 +170,7 @@ def _infer_cli_command(results_payload: dict[str, Any]) -> str:
     suite = config.get("suite", "dev,test")
     task_pack = config.get("task_pack", "task_pack_v2")
     repro = bool(config.get("repro_mode", False))
+    timeout_seconds = config.get("timeout_seconds", 180)
 
     command = [
         "python -m mentor_worker_benchmark run",
@@ -144,6 +180,7 @@ def _infer_cli_command(results_payload: dict[str, Any]) -> str:
         f"--run-modes {','.join(str(item) for item in run_modes) if run_modes else 'default'}",
         f"--seed {seed}",
         f"--max-turns {max_turns}",
+        f"--timeout {timeout_seconds}",
         "--results-path results/results.json",
     ]
     if provider:
@@ -199,6 +236,15 @@ def export_submission_bundle(
         joined = "\n".join(f"- {item}" for item in result_errors)
         raise RuntimeError(f"results.json failed validation:\n{joined}")
 
+    analysis_payload = payload.get("analysis", {})
+    if isinstance(analysis_payload, dict) and analysis_payload:
+        analysis_errors = validate_analysis_payload(analysis_payload)
+        if analysis_errors:
+            joined = "\n".join(f"- {item}" for item in analysis_errors)
+            raise RuntimeError(f"results.analysis failed validation:\n{joined}")
+    else:
+        analysis_payload = generate_analysis_payload(payload)
+
     config = payload["config"]
     commit_hash = _resolve_export_commit_hash()
 
@@ -213,6 +259,7 @@ def export_submission_bundle(
     git["commit"] = commit_hash
     environment["git"] = git
     payload_for_bundle["environment"] = environment
+    payload_for_bundle["analysis"] = analysis_payload
 
     task_pack = str(config["task_pack"])
     task_pack_version = resolve_task_pack_version(task_pack)
@@ -230,6 +277,7 @@ def export_submission_bundle(
         "tool_version": __version__,
         "results_filename": "results.json",
         "environment_filename": "environment.json",
+        "analysis_filename": "analysis.json",
         "task_pack": task_pack,
         "task_pack_version": task_pack_version,
         "git_commit_hash": commit_hash,
@@ -242,6 +290,7 @@ def export_submission_bundle(
     with zipfile.ZipFile(out_path, "w", compression=zipfile.ZIP_DEFLATED) as archive:
         archive.writestr("results.json", json.dumps(payload_for_bundle, indent=2))
         archive.writestr("environment.json", json.dumps(environment, indent=2))
+        archive.writestr("analysis.json", json.dumps(analysis_payload, indent=2))
         archive.writestr("submission_manifest.json", json.dumps(manifest, indent=2))
 
     return manifest
@@ -261,6 +310,11 @@ def read_submission_bundle(submission_path: Path) -> dict[str, Any]:
 
             results_payload = json.loads(archive.read("results.json").decode("utf-8"))
             environment_payload = json.loads(archive.read("environment.json").decode("utf-8"))
+            analysis_payload = (
+                json.loads(archive.read("analysis.json").decode("utf-8"))
+                if "analysis.json" in names
+                else None
+            )
             manifest_payload = json.loads(archive.read("submission_manifest.json").decode("utf-8"))
     except zipfile.BadZipFile:
         raise RuntimeError(f"Invalid zip archive: {submission_path}") from None
@@ -271,6 +325,7 @@ def read_submission_bundle(submission_path: Path) -> dict[str, Any]:
         "submission_path": str(submission_path),
         "results": results_payload,
         "environment": environment_payload,
+        "analysis": analysis_payload,
         "manifest": manifest_payload,
     }
 
@@ -286,6 +341,7 @@ def verify_submission_bundle(submission_path: Path) -> dict[str, Any]:
 
     results_payload = bundle["results"]
     environment_payload = bundle["environment"]
+    analysis_payload = bundle.get("analysis")
     manifest_payload = bundle["manifest"]
 
     result_errors = validate_results_payload(results_payload)
@@ -293,6 +349,23 @@ def verify_submission_bundle(submission_path: Path) -> dict[str, Any]:
 
     if results_payload.get("environment") != environment_payload:
         errors.append("environment.json does not match results.environment payload")
+
+    needs_analysis = analysis_required_for_results(results_payload)
+    if analysis_payload is None:
+        if needs_analysis:
+            errors.append(
+                "analysis.json is required for multi-replicate results payloads (results.replicates length > 1)"
+            )
+        else:
+            analysis_errors = validate_analysis_payload(generate_analysis_payload(results_payload))
+            errors.extend(f"Generated analysis invalid: {item}" for item in analysis_errors)
+            if not analysis_errors:
+                details["analysis_source"] = "generated_single_replicate"
+    else:
+        analysis_errors = validate_analysis_payload(analysis_payload)
+        errors.extend(f"analysis.json invalid: {item}" for item in analysis_errors)
+        if not analysis_errors:
+            details["analysis_source"] = "archive"
 
     if not isinstance(manifest_payload, dict):
         errors.append("submission_manifest.json must contain a JSON object")
@@ -326,6 +399,9 @@ def verify_submission_bundle(submission_path: Path) -> dict[str, Any]:
         official_submission = manifest.get("official_submission")
         if official_submission is not None and not isinstance(official_submission, bool):
             errors.append("Manifest official_submission must be a boolean when present")
+        analysis_filename = manifest.get("analysis_filename")
+        if analysis_filename is not None and analysis_filename != "analysis.json":
+            errors.append("Manifest analysis_filename must be `analysis.json` when present")
 
         if task_pack:
             discovered_version = resolve_task_pack_version(task_pack)
@@ -355,6 +431,7 @@ def verify_submission_bundle(submission_path: Path) -> dict[str, Any]:
         details["git_commit_hash"] = commit_hash
         details["cli_command"] = cli_command
         details["official_submission"] = bool(official_submission)
+        details["analysis_required"] = needs_analysis
 
     return {"ok": len(errors) == 0, "errors": errors, "details": details}
 
@@ -369,6 +446,7 @@ def render_verification_report(report: dict[str, Any]) -> str:
             f"- Commit: {details.get('git_commit_hash')}",
             f"- Label: {'official' if details.get('official_submission') else 'community (not official)'}",
             f"- Command: {details.get('cli_command')}",
+            f"- Analysis: {details.get('analysis_source', 'absent')}",
         ]
         return "\n".join(lines)
 

@@ -118,6 +118,11 @@ def _base_results_payload(*, suite: str) -> dict[str, Any]:
     }
 
 
+def _two_replicates_payload() -> dict[str, Any]:
+    fixture = Path(__file__).resolve().parent / "fixtures" / "results_two_replicates.json"
+    return json.loads(fixture.read_text(encoding="utf-8"))
+
+
 def _fake_git_head(monkeypatch: Any) -> str:
     export_commit = "1234567890abcdef1234567890abcdef12345678"
 
@@ -187,6 +192,31 @@ def test_official_role_classification_for_headline_and_sanity(
     assert sanity_normalized["official_role"] == "sanity"
 
 
+def test_normalize_submission_surfaces_analysis_means_cis_and_significance(
+    tmp_path: Path,
+    monkeypatch: Any,
+) -> None:
+    builder = _load_builder_module()
+    _fake_git_head(monkeypatch)
+
+    results_path = tmp_path / "multi_results.json"
+    out_path = tmp_path / "multi_submission.zip"
+    results_path.write_text(json.dumps(_two_replicates_payload(), indent=2), encoding="utf-8")
+    export_submission_bundle(results_path=results_path, out_path=out_path, official_submission=True)
+
+    normalized = builder._normalize_submission(out_path)
+    assert normalized["baseline_mean"] == 0.25
+    assert normalized["mentored_mean"] == 0.75
+    assert normalized["lift_mean"] == 0.5
+    assert normalized["baseline_ci_low"] <= normalized["baseline_ci_high"]
+    assert normalized["mentored_ci_low"] <= normalized["mentored_ci_high"]
+    assert normalized["lift_ci_low"] <= normalized["lift_ci_high"]
+    assert isinstance(normalized["lift_significant"], bool)
+    assert normalized["best_worker"]["baseline_pass_rate"] == normalized["baseline_mean"]
+    assert normalized["best_worker"]["mentored_pass_rate"] == normalized["mentored_mean"]
+    assert normalized["best_worker"]["lift"] == normalized["lift_mean"]
+
+
 def test_rendered_index_contains_tabs_single_table_headers_and_embedded_summary_json(tmp_path: Path) -> None:
     builder = _load_builder_module()
     output_path = tmp_path / "index.html"
@@ -241,3 +271,5 @@ def test_rendered_index_contains_tabs_single_table_headers_and_embedded_summary_
         "Timeouts",
         "Commit",
     ]
+    assert "sig-marker" in rendered
+    assert "95% CI" in rendered

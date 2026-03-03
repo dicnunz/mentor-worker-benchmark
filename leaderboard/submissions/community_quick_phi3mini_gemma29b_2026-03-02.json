@@ -46,6 +46,16 @@
     "total_model_call_timeouts": "summary"
   },
   "benchmark_version": "0.2.1",
+  "baseline_mean": 0.0,
+  "baseline_ci_low": 0.0,
+  "baseline_ci_high": 0.0,
+  "mentored_mean": 0.0,
+  "mentored_ci_low": 0.0,
+  "mentored_ci_high": 0.0,
+  "lift_mean": 0.0,
+  "lift_ci_low": 0.0,
+  "lift_ci_high": 0.0,
+  "lift_significant": false,
   "best_worker": {
     "worker_model": "phi3:mini",
     "baseline_pass_rate": 0.0,

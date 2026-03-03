@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 from pathlib import Path
 from typing import Any
 
@@ -119,3 +120,29 @@ def test_cmd_run_rejects_conflicting_single_and_plural_model_flags(tmp_path: Pat
         ]
     )
     assert cli_module.cmd_run(args) == 1
+
+
+def test_cmd_analyze_writes_deterministic_analysis(tmp_path: Path) -> None:
+    fixture = Path(__file__).resolve().parent / "fixtures" / "results_two_replicates.json"
+    payload = json.loads(fixture.read_text(encoding="utf-8"))
+    results_path = tmp_path / "results.json"
+    out_path = tmp_path / "analysis.json"
+    results_path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
+
+    parser = cli_module.build_parser()
+    args = parser.parse_args(
+        [
+            "analyze",
+            "--results",
+            str(results_path),
+            "--out",
+            str(out_path),
+            "--bootstrap-samples",
+            "512",
+        ]
+    )
+
+    assert cli_module.cmd_analyze(args) == 0
+    analysis = json.loads(out_path.read_text(encoding="utf-8"))
+    assert analysis["group_count"] >= 1
+    assert analysis["bootstrap_samples"] == 512

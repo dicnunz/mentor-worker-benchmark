@@ -5,6 +5,7 @@ import json
 import sys
 from pathlib import Path
 
+from mentor_worker_benchmark.analysis import DEFAULT_BOOTSTRAP_SAMPLES, generate_analysis_payload
 from mentor_worker_benchmark.ollama_client import OllamaClient
 from mentor_worker_benchmark.provider_factory import (
     SUPPORTED_PROVIDERS,
@@ -287,6 +288,7 @@ def cmd_run(args: argparse.Namespace) -> int:
         stronger_worker_model=args.stronger_worker_model,
         worker_num_predict_override=args.worker_num_predict,
         mentor_num_predict_override=args.mentor_num_predict,
+        timeout_seconds=args.timeout,
     )
 
     try:
@@ -365,6 +367,40 @@ def cmd_compare(args: argparse.Namespace) -> int:
     comparison = compare_results(before, after)
     report = render_compare_report(comparison)
     print(report)
+    return 0
+
+
+def cmd_analyze(args: argparse.Namespace) -> int:
+    results_path = Path(args.results)
+    if not results_path.exists():
+        print(f"Results file not found: {results_path}")
+        return 1
+
+    try:
+        payload = json.loads(results_path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as exc:
+        print(f"Invalid JSON at {results_path}: {exc}")
+        return 1
+
+    try:
+        analysis = generate_analysis_payload(
+            payload,
+            bootstrap_samples=args.bootstrap_samples,
+            bootstrap_seed=args.bootstrap_seed,
+        )
+    except ValueError as exc:
+        print(str(exc))
+        return 1
+
+    out_path = Path(args.out)
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    out_path.write_text(json.dumps(analysis, indent=2), encoding="utf-8")
+
+    print(f"Analysis written to: {out_path}")
+    print(f"Groups: {analysis.get('group_count', 0)}")
+    print(
+        f"Bootstrap: samples={analysis.get('bootstrap_samples')} seed={analysis.get('bootstrap_seed')}"
+    )
     return 0
 
 
@@ -588,6 +624,26 @@ def build_parser() -> argparse.ArgumentParser:
     compare.add_argument("--before", required=True)
     compare.add_argument("--after", required=True)
     compare.set_defaults(func=cmd_compare)
+
+    analyze = subparsers.add_parser(
+        "analyze",
+        help="Compute deterministic multi-replicate pass-rate CIs and lift significance from results JSON.",
+    )
+    analyze.add_argument("--results", required=True, help="Path to benchmark results JSON.")
+    analyze.add_argument("--out", required=True, help="Path to write analysis JSON.")
+    analyze.add_argument(
+        "--bootstrap-samples",
+        type=int,
+        default=DEFAULT_BOOTSTRAP_SAMPLES,
+        help=f"Number of bootstrap samples per group (default: {DEFAULT_BOOTSTRAP_SAMPLES}).",
+    )
+    analyze.add_argument(
+        "--bootstrap-seed",
+        type=int,
+        default=None,
+        help="Optional base bootstrap seed override (deterministic if omitted).",
+    )
+    analyze.set_defaults(func=cmd_analyze)
 
     export = subparsers.add_parser("export", help="Export a standardized submission zip from results.json.")
     export.add_argument("--results", default="results/results.json")
