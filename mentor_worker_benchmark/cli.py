@@ -296,6 +296,7 @@ def cmd_run(args: argparse.Namespace) -> int:
         worker_provider=worker_provider,
         max_turns=args.max_turns,
         task_pack=args.task_pack,
+        task_pack_path=Path(args.task_pack_path).resolve() if args.task_pack_path else None,
         suite=args.suite,
         task_selector=args.tasks,
         seed=seeds[0],
@@ -344,6 +345,7 @@ def cmd_sanity(args: argparse.Namespace) -> int:
     try:
         summary = run_sanity_check(
             task_pack=args.task_pack,
+            task_pack_path=Path(args.task_pack_path).resolve() if args.task_pack_path else None,
             suite=args.suite,
             task_selector=args.tasks,
             seed=args.seed,
@@ -590,6 +592,11 @@ def build_parser() -> argparse.ArgumentParser:
     )
     run.add_argument("--max-turns", type=int, default=4)
     run.add_argument("--task-pack", default="task_pack_v2")
+    run.add_argument(
+        "--task-pack-path",
+        default=None,
+        help="Optional path to an external task pack directory (metadata.json + tasks).",
+    )
     run.add_argument("--suite", choices=["quick", "dev10", "dev50", "dev", "test", "all"], default=None)
     run.add_argument(
         "--tasks",
@@ -650,6 +657,11 @@ def build_parser() -> argparse.ArgumentParser:
         help="Run pytest sanity checks on task starters (no model interaction).",
     )
     sanity.add_argument("--task-pack", default="task_pack_v2")
+    sanity.add_argument(
+        "--task-pack-path",
+        default=None,
+        help="Optional path to an external task pack directory (metadata.json + tasks).",
+    )
     sanity.add_argument("--suite", choices=["quick", "dev10", "dev50", "dev", "test", "all"], default="all")
     sanity.add_argument(
         "--tasks",

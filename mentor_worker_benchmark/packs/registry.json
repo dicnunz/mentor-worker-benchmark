@@ -1,0 +1,68 @@
+{
+  "packs": [
+    {
+      "pack_id": "task_pack_v1",
+      "version": "1.1.0",
+      "task_count": 300,
+      "splits": {
+        "train": 200,
+        "dev": 50,
+        "test": 50,
+        "quick": 18
+      },
+      "categories": [
+        "string_regex_parsing",
+        "ds_algo",
+        "file_io_serialization",
+        "concurrency_basics",
+        "numerical_edge_cases",
+        "multi_file_mini_module"
+      ],
+      "generator_commit": "not_recorded",
+      "license": "MIT",
+      "intended_use": "Local mentor-worker benchmark development and regression tracking.",
+      "limitations": "Synthetic tasks only; does not represent full production software engineering workloads.",
+      "contamination_risks": "Model pretraining may include overlapping coding patterns and idioms.",
+      "evaluation_recommendations": "Use deterministic seeds, compare worker-only vs mentored modes, and report confidence intervals.",
+      "loader": "builtin_v1",
+      "module_aliases": [
+        "mentor_worker_benchmark.tasks.task_pack_v1",
+        "mentor_worker_benchmark.tasks.task_pack_v1.pack"
+      ]
+    },
+    {
+      "pack_id": "task_pack_v2",
+      "version": "2.0.0",
+      "task_count": 500,
+      "splits": {
+        "train": 340,
+        "dev": 80,
+        "test": 80,
+        "quick": 30
+      },
+      "categories": [
+        "string_regex_parsing",
+        "ds_algo",
+        "file_io_serialization",
+        "concurrency_basics",
+        "numerical_edge_cases",
+        "multi_file_mini_module",
+        "mini_repo_bugfix",
+        "mini_repo_feature",
+        "mini_repo_cli",
+        "mini_repo_tool_sim"
+      ],
+      "generator_commit": "27d365efeda54f740e5f5feec232e9a7a783afef",
+      "license": "MIT",
+      "intended_use": "Primary default benchmark pack for official and community comparisons.",
+      "limitations": "Task scope remains bounded and intentionally excludes long-horizon repository maintenance.",
+      "contamination_risks": "Synthetic generation reduces direct copying risk but cannot eliminate learned pattern overlap.",
+      "evaluation_recommendations": "For headline claims use dev/dev50/test with multi-seed protocol and CI-aware analysis.",
+      "loader": "builtin_v2",
+      "module_aliases": [
+        "mentor_worker_benchmark.tasks.task_pack_v2",
+        "mentor_worker_benchmark.tasks.task_pack_v2.pack"
+      ]
+    }
+  ]
+}

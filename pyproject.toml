@@ -24,6 +24,7 @@ include = ["mentor_worker_benchmark*"]
 
 [tool.setuptools.package-data]
 mentor_worker_benchmark = [
+  "packs/registry.json",
   "tasks/task_codegen_py/templates/*.txt",
   "tasks/task_codegen_py/task_cases/*/prompt.md",
   "tasks/task_codegen_py/task_cases/*/src/*.py",

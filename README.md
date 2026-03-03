@@ -202,6 +202,7 @@ python -m mentor_worker_benchmark provenance --task-pack task_pack_v2
 ```bash
 python -m mentor_worker_benchmark setup [--models default|m1,m2] [--skip-pull]
 python -m mentor_worker_benchmark run [--task-pack task_pack_v2|task_pack_v1] [--suite quick|dev10|dev50|dev|test|all] [--seed 1337|--seeds 1337,2026,9001] [--repro] [--debug]
+python -m mentor_worker_benchmark run --task-pack-path /abs/path/to/pack --suite dev
 python -m mentor_worker_benchmark sanity [--task-pack task_pack_v2|task_pack_v1] [--suite quick|dev10|dev50|dev|test|all]
 python -m mentor_worker_benchmark leaderboard --results results/results.json --output results/leaderboard.md
 python -m mentor_worker_benchmark compare --before before.json --after after.json
@@ -259,6 +260,7 @@ python -m mentor_worker_benchmark verify --submission submissions/my_run.zip
 4. Open a submission issue and attach/link the zip.
 
 Submission details and maintainer verification flow are documented in `docs/SUBMIT_RESULTS.md`.
+Pack registry/data-card guidance is documented in `docs/PACKS.md`.
 
 ## Community Leaderboard Automation
 

@@ -821,6 +821,8 @@ def validate_task_pack_payload(
     allowlist_path: Path | None = None,
     mutation_timeout_seconds: int = DEFAULT_MUTATION_TIMEOUT_SECONDS,
     mutation_sample_limit: int = DEFAULT_MUTATION_SAMPLE_LIMIT,
+    expected_pack: dict[str, Any] | None = None,
+    allow_unknown_pack: bool = False,
 ) -> tuple[bool, list[str]] | tuple[bool, list[str], dict[str, Any]]:
     errors: list[str] = []
     report: dict[str, Any] = {
@@ -849,14 +851,19 @@ def validate_task_pack_payload(
         return False, errors
 
     pack_name = str(payload.get("pack_name", ""))
-    if pack_name not in PACK_EXPECTATIONS:
+    if expected_pack is not None:
+        expected = expected_pack
+    elif pack_name in PACK_EXPECTATIONS:
+        expected = PACK_EXPECTATIONS[pack_name]
+    elif allow_unknown_pack:
+        expected = {}
+    else:
         known = ", ".join(sorted(PACK_EXPECTATIONS))
         errors.append(f"Unsupported pack_name `{pack_name}`. Known: {known}")
         if return_report:
             report["schema_errors"] = list(errors)
             return False, errors, report
         return False, errors
-    expected = PACK_EXPECTATIONS[pack_name]
 
     tasks = payload.get("tasks", [])
     if not isinstance(tasks, list):
@@ -920,18 +927,30 @@ def validate_task_pack_payload(
                     "(expected at least one .py file besides __init__.py)."
                 )
 
-    expected_total = int(expected["total"])
-    if len(tasks) != expected_total:
-        errors.append(f"Expected {expected_total} tasks, found {len(tasks)}")
+    expected_total = expected.get("total")
+    if isinstance(expected_total, (int, float)) and not isinstance(expected_total, bool):
+        expected_total_int = int(expected_total)
+        if len(tasks) != expected_total_int:
+            errors.append(f"Expected {expected_total_int} tasks, found {len(tasks)}")
 
-    if split_counts != expected["splits"]:
-        errors.append(f"Unexpected split counts: {split_counts}")
+    expected_splits = expected.get("splits")
+    if isinstance(expected_splits, dict):
+        normalized_splits = {
+            "train": int(expected_splits.get("train", 0)),
+            "dev": int(expected_splits.get("dev", 0)),
+            "test": int(expected_splits.get("test", 0)),
+        }
+        if split_counts != normalized_splits:
+            errors.append(f"Unexpected split counts: {split_counts}")
 
     quick_count = sum(1 for task in tasks if isinstance(task, dict) and bool(task.get("quick")))
-    if quick_count != int(expected["quick"]):
-        errors.append(f"Expected quick count {expected['quick']}, found {quick_count}")
+    expected_quick = expected.get("quick")
+    if isinstance(expected_quick, (int, float)) and not isinstance(expected_quick, bool):
+        expected_quick_int = int(expected_quick)
+        if quick_count != expected_quick_int:
+            errors.append(f"Expected quick count {expected_quick_int}, found {quick_count}")
 
-    expected_difficulty = expected.get("difficulty")
+    expected_difficulty = expected.get("difficulty") if isinstance(expected, dict) else None
     if isinstance(expected_difficulty, dict) and difficulty_counts != expected_difficulty:
         errors.append(f"Unexpected difficulty counts: {difficulty_counts}")
 

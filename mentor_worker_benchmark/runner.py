@@ -92,6 +92,7 @@ class BenchmarkConfig:
     worker_provider: str | None = None
     max_turns: int = 4
     task_pack: str = "task_pack_v1"
+    task_pack_path: Path | None = None
     suite: str | None = None
     task_selector: str | None = None
     seed: int = 1337
@@ -1292,12 +1293,14 @@ Generated: {results['generated_at']}
 def run_sanity_check(
     *,
     task_pack: str,
+    task_pack_path: Path | None,
     suite: str | None,
     task_selector: str | None,
     seed: int,
 ) -> dict[str, Any]:
     selection = resolve_tasks(
         task_pack=task_pack,
+        task_pack_path=task_pack_path,
         suite=suite,
         legacy_selector=task_selector,
         seed=seed,
@@ -1339,6 +1342,9 @@ def run_sanity_check(
     elapsed = time.perf_counter() - started
     return {
         "task_pack": selection.task_pack,
+        "task_pack_version": selection.pack_version,
+        "task_pack_source": selection.pack_source,
+        "task_pack_hash": selection.pack_hash,
         "suite": selection.suite,
         "selector_source": selection.selector_source,
         "task_count": len(selection.tasks),
@@ -1403,6 +1409,7 @@ def run_benchmark(
 
     selection = resolve_tasks(
         task_pack=config.task_pack,
+        task_pack_path=config.task_pack_path,
         suite=config.suite,
         legacy_selector=config.task_selector,
         seed=config.seed,
@@ -1586,7 +1593,12 @@ def run_benchmark(
                 "mentor_num_predict": generation.mentor_num_predict,
                 "seed": generation.seed,
             },
-            "task_pack": config.task_pack,
+            "task_pack": selection.task_pack,
+            "task_pack_version": selection.pack_version,
+            "task_pack_source": selection.pack_source,
+            "task_pack_license": selection.pack_license,
+            "task_pack_hash": selection.pack_hash,
+            "task_pack_manifest_path": selection.pack_manifest_path,
             "suite": selection.suite,
             "selector_source": selection.selector_source,
             "task_selector": config.task_selector,
