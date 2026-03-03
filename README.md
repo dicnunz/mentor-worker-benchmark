@@ -5,7 +5,12 @@
 
 `mentor-worker-benchmark` is a fully local benchmark for measuring whether a **mentor LLM** improves a **worker LLM** on objective coding tasks.
 
-Live leaderboard: https://dicnunz.github.io/mentor-worker-benchmark/
+Core docs:
+- [Live Leaderboard](https://dicnunz.github.io/mentor-worker-benchmark/)
+- [Methodology](docs/METHODOLOGY.md)
+- [Reproducibility](docs/REPRODUCIBILITY.md)
+- [Submit Results](docs/SUBMIT_RESULTS.md)
+- [Pack Data Cards](docs/PACKS.md)
 
 - Inference is local via [Ollama](https://ollama.com/) (no paid APIs required).
 - Scoring is objective: generated patches are applied, then `pytest` decides pass/fail.

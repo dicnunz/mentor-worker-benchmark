@@ -5,6 +5,24 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.0] - 2026-03-03
+
+### Added
+- Release methodology and reproducibility documentation:
+  - `docs/METHODOLOGY.md`
+  - `docs/REPRODUCIBILITY.md`
+- Minimal front-page README doc index linking leaderboard, methodology, reproducibility, submission, and pack data-card docs.
+
+### Changed
+- Stabilized release metadata at `1.0.0`.
+- Multi-seed analysis and reporting are now first-class release methodology:
+  - confidence intervals and significance marker,
+  - task/test strength gates,
+  - official multi-seed protocol and compute budget manifest,
+  - pack registry + external pack hashing,
+  - Docker sanity path and CI docker sanity job,
+  - leaderboard UI v2 artifact flow.
+
 ## [0.3.0] - 2026-03-03
 
 ### Added

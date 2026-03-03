@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "mentor-worker-benchmark"
-version = "0.3.0"
+version = "1.0.0"
 description = "Local benchmark for mentor/worker LLM collaboration with objective coding tasks"
 readme = "README.md"
 requires-python = ">=3.11"
