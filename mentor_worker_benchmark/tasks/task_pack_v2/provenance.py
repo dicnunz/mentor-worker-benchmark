@@ -13,6 +13,8 @@ from pathlib import Path
 from statistics import mean
 from typing import Any
 
+from mentor_worker_benchmark.tasks.task_pack_validation import build_task_strength_report
+
 DEFAULT_SIMILARITY_THRESHOLD = 0.985
 DEFAULT_MAX_CLUSTERS = 12
 TOKEN_RE = re.compile(r"[a-zA-Z0-9_]+")
@@ -275,6 +277,13 @@ def build_provenance_payload(
 
     originality_flags = _originality_flags(records)
     file_count = sum(len(record.file_texts) for record in records)
+    strength_snapshot = build_task_strength_report(
+        root=_pack_root(),
+        payload=metadata,
+        strict=False,
+        allowlist_path=_pack_root() / "strength_allowlist.json",
+        run_mutation=False,
+    )
 
     payload: dict[str, Any] = {
         "pack_name": str(metadata["pack_name"]),
@@ -329,6 +338,17 @@ def build_provenance_payload(
                 "flagged_files_count": len(originality_flags),
                 "flagged_files": originality_flags,
             },
+            "test_strength_snapshot": {
+                "method": (
+                    "task validation strength heuristics (assertion count, edge keywords, "
+                    "negative tests, multi-file interaction) without mutation execution"
+                ),
+                "distribution": strength_snapshot.get("distribution", {}),
+                "policy": strength_snapshot.get("policy", {}),
+                "low_strength_non_allowlisted_count": (
+                    strength_snapshot.get("strict_evaluation", {}).get("low_strength_non_allowlisted_count", 0)
+                ),
+            },
         },
     }
     return payload
@@ -339,6 +359,7 @@ def render_provenance_markdown(payload: dict[str, Any]) -> str:
     contamination = payload["contamination"]
     similarity = payload["checks"]["similarity_scan"]
     originality = payload["checks"]["originality_scan"]
+    strength_snapshot = payload["checks"].get("test_strength_snapshot", {})
 
     lines = [
         "# task_pack_v2 Provenance",
@@ -410,6 +431,23 @@ def render_provenance_markdown(payload: dict[str, Any]) -> str:
     else:
         lines.extend(["", "- No external-source markers detected in task files."])
 
+    if isinstance(strength_snapshot, dict):
+        distribution = strength_snapshot.get("distribution", {})
+        policy = strength_snapshot.get("policy", {})
+        lines.extend(
+            [
+                "",
+                "## Test Strength Snapshot",
+                "",
+                f"- Method: `{strength_snapshot.get('method', '')}`",
+                f"- Mean strength score: `{distribution.get('mean', 0)}`",
+                f"- Median strength score: `{distribution.get('median', 0)}`",
+                f"- P10 / P90: `{distribution.get('p10', 0)}` / `{distribution.get('p90', 0)}`",
+                f"- Policy min_strength_score: `{policy.get('min_strength_score', 'n/a')}`",
+                f"- Low-strength non-allowlisted tasks: `{strength_snapshot.get('low_strength_non_allowlisted_count', 0)}`",
+            ]
+        )
+
     lines.append("")
     return "\n".join(lines)
 
@@ -472,12 +510,17 @@ def validate_provenance_files(metadata: dict[str, Any]) -> tuple[bool, list[str]
     checks = payload.get("checks", {})
     similarity_scan = checks.get("similarity_scan", {}) if isinstance(checks, dict) else {}
     originality_scan = checks.get("originality_scan", {}) if isinstance(checks, dict) else {}
+    strength_snapshot = checks.get("test_strength_snapshot", {}) if isinstance(checks, dict) else {}
     if int(similarity_scan.get("task_count", 0)) != int(metadata["counts"]["total"]):
         errors.append("provenance.json similarity scan task_count mismatch")
     if int(originality_scan.get("flagged_files_count", -1)) < 0:
         errors.append("provenance.json originality scan missing flagged_files_count")
     elif int(originality_scan.get("flagged_files_count", 0)) > 0:
         errors.append("provenance.json originality scan flagged external-source markers")
+    if not isinstance(strength_snapshot.get("distribution"), dict):
+        errors.append("provenance.json test_strength_snapshot missing distribution")
+    if not isinstance(strength_snapshot.get("policy"), dict):
+        errors.append("provenance.json test_strength_snapshot missing policy")
 
     return len(errors) == 0, errors
 

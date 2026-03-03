@@ -1,0 +1,9 @@
+{
+  "allowed_low_strength": [],
+  "allowed_mutation_skip": [],
+  "allowed_mutation_not_caught": [],
+  "min_strength_score": 22,
+  "max_low_strength_fraction": 0.20,
+  "max_mutation_skip_fraction": 0.05,
+  "require_mutation_caught": true
+}

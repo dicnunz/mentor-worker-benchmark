@@ -5,10 +5,10 @@
 - Pack: `task_pack_v2`
 - Pack version: `2.0.0`
 - Generator version: `2.0.0`
-- Git commit: `294bac218b0903cb20ec9b0c2d1c0aa480fa5ec4`
-- Git dirty state at generation: `False`
+- Git commit: `5900651362e4cbe632b9bb1381ef119ca6c6a542`
+- Git dirty state at generation: `True`
 - Seed: `1337`
-- Manifest generated at: `2026-03-01T15:43:42.669963+00:00`
+- Manifest generated at: `2026-03-03T00:49:06.816372+00:00`
 
 ## Synthetic Data Statement
 
@@ -60,3 +60,12 @@ Top clusters:
 - Flagged files: `0`
 
 - No external-source markers detected in task files.
+
+## Test Strength Snapshot
+
+- Method: `task validation strength heuristics (assertion count, edge keywords, negative tests, multi-file interaction) without mutation execution`
+- Mean strength score: `45.14`
+- Median strength score: `49.0`
+- P10 / P90: `33.0` / `53.3`
+- Policy min_strength_score: `22`
+- Low-strength non-allowlisted tasks: `0`

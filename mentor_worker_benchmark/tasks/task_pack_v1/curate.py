@@ -880,7 +880,7 @@ def run_curation(config: CurationConfig) -> dict[str, Any]:
     _write_metadata(metadata)
 
     print("Validating curated task pack...")
-    ok, errors = validate_task_pack()
+    ok, errors, validation_report = validate_task_pack(strict=True, return_report=True)
     if not ok:
         raise RuntimeError("Curation produced invalid task pack:\n" + "\n".join(errors))
 
@@ -968,6 +968,7 @@ def run_curation(config: CurationConfig) -> dict[str, Any]:
             "before_summary": _model_summary(before_calibration),
             "after_summary": _model_summary(after_calibration),
         },
+        "strength_gates": validation_report.get("strength_gates", {}),
     }
 
     config.results_dir.mkdir(parents=True, exist_ok=True)
