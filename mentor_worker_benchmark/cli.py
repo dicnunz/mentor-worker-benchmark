@@ -17,7 +17,6 @@ from mentor_worker_benchmark.runner import (
     BenchmarkConfig,
     DEFAULT_MODELS,
     DEFAULT_RUN_MODES,
-    REPRO_MAX_TURNS,
     compare_results,
     render_compare_report,
     run_benchmark,
@@ -231,8 +230,6 @@ def cmd_run(args: argparse.Namespace) -> int:
         return 1
     if args.tasks and args.suite:
         print("--tasks provided; ignoring --suite for task selection.")
-    if args.repro and args.max_turns != REPRO_MAX_TURNS:
-        print(f"Repro mode enabled: overriding max turns to fixed value {REPRO_MAX_TURNS}.")
 
     try:
         if mentor_provider == worker_provider:

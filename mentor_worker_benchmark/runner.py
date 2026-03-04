@@ -47,7 +47,6 @@ VALID_RUN_MODES = {
     "mentor_swap",
 }
 
-REPRO_MAX_TURNS = 3
 REPRO_WORKER_MAX_TOKENS = 640
 REPRO_MENTOR_MAX_TOKENS = 220
 REPRO_TEMPERATURE = 0.0
@@ -1476,7 +1475,7 @@ def run_benchmark(
         top_p=REPRO_TOP_P if config.repro_mode else REPRO_TOP_P,
         worker_num_predict=config.worker_num_predict_override or REPRO_WORKER_MAX_TOKENS,
         mentor_num_predict=config.mentor_num_predict_override or REPRO_MENTOR_MAX_TOKENS,
-        max_turns=REPRO_MAX_TURNS if config.repro_mode else config.max_turns,
+        max_turns=config.max_turns,
         seed=config.seed,
     )
 
@@ -1978,7 +1977,7 @@ def run_multi_seed_benchmark(
             worker_client=worker_client,
         )
 
-    effective_max_turns = REPRO_MAX_TURNS if config.repro_mode else config.max_turns
+    effective_max_turns = config.max_turns
     effective_worker_num_predict = config.worker_num_predict_override or REPRO_WORKER_MAX_TOKENS
     effective_mentor_num_predict = config.mentor_num_predict_override or REPRO_MENTOR_MAX_TOKENS
     run_group_id = deterministic_run_group_id(

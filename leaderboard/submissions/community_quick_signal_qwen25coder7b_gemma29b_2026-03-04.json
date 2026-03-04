@@ -1,20 +1,20 @@
 {
-  "submission_id": "community_quick_matrix_qwen25coder7b_mistral7b_2026-03-03",
-  "submission_file": "community_quick_matrix_qwen25coder7b_mistral7b_2026-03-03.zip",
-  "submission_path": "submissions/community_quick_matrix_qwen25coder7b_mistral7b_2026-03-03.zip",
+  "submission_id": "community_quick_signal_qwen25coder7b_gemma29b_2026-03-04",
+  "submission_file": "community_quick_signal_qwen25coder7b_gemma29b_2026-03-04.zip",
+  "submission_path": "submissions/community_quick_signal_qwen25coder7b_gemma29b_2026-03-04.zip",
   "official_submission": false,
   "submission_label": "community (not official)",
   "official_role": "community",
   "task_pack": "task_pack_v2",
   "task_pack_version": "2.0.0",
   "suite": "quick",
-  "generated_at": "2026-03-03T21:03:12.100996+00:00",
-  "manifest_created_at": "2026-03-03T22:02:29.973711+00:00",
-  "verified_at": "2026-03-03T22:02:29.973711+00:00",
-  "git_commit_hash": "8b1ade794dca6e3c033c587f5db571891a4c476e",
-  "cli_command": ".venv/bin/python -m mentor_worker_benchmark run --task-pack task_pack_v2 --suite quick --seed 1337 --max-turns 1 --timeout 90 --worker-num-predict 256 --mentor-num-predict 128 --run-modes worker_only,mentor_worker --worker-model qwen2.5-coder:7b --mentor-model mistral:7b --results-path results/community_quick_matrix_qwen25coder7b_mistral7b_2026-03-03.json",
+  "generated_at": "2026-03-04T23:14:01.017056+00:00",
+  "manifest_created_at": "2026-03-04T23:14:42.130450+00:00",
+  "verified_at": "2026-03-04T23:14:42.130450+00:00",
+  "git_commit_hash": "992fbce8336349e4268e273208d3d912dfe9fd95",
+  "cli_command": ".venv/bin/python -m mentor_worker_benchmark run --task-pack task_pack_v2 --suite quick --seed 1337 --repro --max-turns 3 --timeout 180 --worker-num-predict 512 --mentor-num-predict 256 --run-modes worker_only,mentor_worker --worker-model qwen2.5-coder:7b --mentor-model gemma2:9b --results-path results/community_quick_signal_qwen25coder7b_gemma29b_2026-03-04.json",
   "models": [
-    "mistral:7b",
+    "gemma2:9b",
     "qwen2.5-coder:7b"
   ],
   "worker_models": [
@@ -39,13 +39,15 @@
   "benchmark_wall_time_seconds": 1949.9019,
   "violation_count": 0,
   "model_call_errors_by_mode": {
-    "mentor_worker": 6
+    "worker_only": 0,
+    "mentor_worker": 0
   },
   "model_call_timeouts_by_mode": {
-    "mentor_worker": 6
+    "worker_only": 0,
+    "mentor_worker": 0
   },
-  "total_model_call_errors": 6,
-  "total_model_call_timeouts": 6,
+  "total_model_call_errors": 0,
+  "total_model_call_timeouts": 0,
   "metrics_source": {
     "total_runs": "summary",
     "passes_by_mode": "summary",
@@ -74,7 +76,7 @@
     "lift": -0.0333
   },
   "best_mentor": {
-    "mentor_model": "mistral:7b",
+    "mentor_model": "gemma2:9b",
     "avg_lift_across_workers": -0.0333,
     "overall_mentored_pass_rate": 0.1333,
     "mentor_violation_rate": 0.0
