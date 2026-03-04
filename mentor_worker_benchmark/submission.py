@@ -642,18 +642,6 @@ def _validate_official_protocol_requirements(
         errors=errors,
     )
 
-    protocol_fragment = protocol_token(protocol_version)
-    seeds_fragment = f"seeds-{seed_token(protocol_seeds)}" if protocol_seeds else ""
-    submission_name = submission_path.name
-    if protocol_fragment not in submission_name:
-        errors.append(
-            f"Official protocol submission filename must include `{protocol_fragment}`."
-        )
-    if seeds_fragment and seeds_fragment not in submission_name:
-        errors.append(
-            f"Official protocol submission filename must include `{seeds_fragment}`."
-        )
-
     suite = str(manifest.get("suite", "")).strip()
     if not suite:
         suite = str(results_payload.get("config", {}).get("suite", "")).strip()

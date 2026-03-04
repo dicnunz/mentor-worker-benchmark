@@ -1,0 +1,86 @@
+{
+  "submission_id": "official_dev50_signal_qwen_llama",
+  "submission_file": "official_dev50_signal_qwen_llama.zip",
+  "submission_path": "submissions/official_dev50_signal_qwen_llama.zip",
+  "official_submission": true,
+  "submission_label": "official",
+  "official_role": "headline",
+  "task_pack": "task_pack_v2",
+  "task_pack_version": "2.0.0",
+  "suite": "dev50",
+  "generated_at": "2026-03-04T19:38:16.143353+00:00",
+  "manifest_created_at": "2026-03-04T19:38:26.347390+00:00",
+  "verified_at": "2026-03-04T19:38:26.347390+00:00",
+  "git_commit_hash": "992fbce8336349e4268e273208d3d912dfe9fd95",
+  "cli_command": ".venv/bin/python -m mentor_worker_benchmark run --task-pack task_pack_v2 --suite dev50 --seeds 1337,2026,9001 --repro --max-turns 4 --timeout 240 --worker-num-predict 640 --mentor-num-predict 320 --run-modes worker_only,mentor_worker --worker-model qwen2.5-coder:7b --mentor-model llama3.1:8b --results-path results/official_dev50_signal_qwen_llama.json",
+  "models": [
+    "qwen2.5-coder:7b",
+    "llama3.1:8b"
+  ],
+  "worker_models": [
+    "qwen2.5-coder:7b"
+  ],
+  "run_modes": [
+    "worker_only",
+    "mentor_worker"
+  ],
+  "protocol_version": "v0.3.0",
+  "seeds_count": 3,
+  "protocol_seeds": [
+    1337,
+    2026,
+    9001
+  ],
+  "time_total_s": 2273.2634,
+  "total_runs": 100,
+  "total_passes": 0,
+  "passes_by_mode": {
+    "worker_only": 0,
+    "mentor_worker": 0
+  },
+  "benchmark_wall_time_seconds": 2273.2634,
+  "violation_count": 0,
+  "model_call_errors_by_mode": {
+    "worker_only": 0,
+    "mentor_worker": 0
+  },
+  "model_call_timeouts_by_mode": {
+    "worker_only": 0,
+    "mentor_worker": 0
+  },
+  "total_model_call_errors": 0,
+  "total_model_call_timeouts": 0,
+  "metrics_source": {
+    "total_runs": "summary",
+    "passes_by_mode": "summary",
+    "total_passes": "summary",
+    "model_call_errors_by_mode": "summary",
+    "model_call_timeouts_by_mode": "summary",
+    "total_model_call_errors": "summary",
+    "total_model_call_timeouts": "summary"
+  },
+  "benchmark_version": "0.1.0",
+  "baseline_mean": 0.0,
+  "baseline_ci_low": 0.0,
+  "baseline_ci_high": 0.0,
+  "mentored_mean": 0.0,
+  "mentored_ci_low": 0.0,
+  "mentored_ci_high": 0.0,
+  "lift_mean": 0.0,
+  "lift_ci_low": 0.0,
+  "lift_ci_high": 0.0,
+  "lift_significant": false,
+  "best_worker": {
+    "worker_model": "qwen2.5-coder:7b",
+    "baseline_pass_rate": 0.0,
+    "mentored_pass_rate": 0.0,
+    "control_pass_rate": 0.0,
+    "lift": 0.0
+  },
+  "best_mentor": {
+    "mentor_model": "llama3.1:8b",
+    "avg_lift_across_workers": 0.0,
+    "overall_mentored_pass_rate": 0.0,
+    "mentor_violation_rate": 0.0
+  }
+}
