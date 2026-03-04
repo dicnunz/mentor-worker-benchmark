@@ -111,8 +111,12 @@ python -m mentor_worker_benchmark run \
   --task-pack task_pack_v2 \
   --suite quick \
   --models phi3:mini \
-  --run-modes worker_only,mentor_worker,mentor_only_suggestion_noise \
+  --run-modes worker_only,mentor_worker \
   --repro \
+  --max-turns 3 \
+  --timeout 180 \
+  --worker-num-predict 512 \
+  --mentor-num-predict 256 \
   --seed 1337 \
   --results-path results/results.json
 ```
@@ -136,8 +140,12 @@ python -m mentor_worker_benchmark run \
   --mentor-model gpt-5 \
   --worker-model gpt-5-mini \
   --suite quick \
-  --max-turns 1 \
-  --timeout 60
+  --run-modes worker_only,mentor_worker \
+  --repro \
+  --max-turns 3 \
+  --timeout 180 \
+  --worker-num-predict 512 \
+  --mentor-num-predict 256
 ```
 
 ```bash
@@ -149,7 +157,12 @@ python -m mentor_worker_benchmark run \
   --mentor-model gpt-5 \
   --worker-model phi3:mini \
   --suite quick \
-  --max-turns 1
+  --run-modes worker_only,mentor_worker \
+  --repro \
+  --max-turns 3 \
+  --timeout 180 \
+  --worker-num-predict 512 \
+  --mentor-num-predict 256
 ```
 
 ```bash
@@ -163,7 +176,7 @@ python -m mentor_worker_benchmark run \
 
 Warning:
 - OpenAI runs are not free. You are responsible for API cost and rate limits.
-- Large suites can trigger throttling; start with `--suite quick` and conservative turn limits.
+- Large suites can trigger throttling; start with `--suite quick` and the reproducible quick profile shown above.
 
 ## Official Suites
 

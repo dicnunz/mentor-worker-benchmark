@@ -67,6 +67,21 @@ python -m mentor_worker_benchmark sanity --task-pack task_pack_v2 --suite quick 
 TASK_SUITE=dev50 ./scripts/run_official_dev_v1.sh
 ```
 
+`quick` sanity defaults (reliable local profile):
+
+```bash
+./scripts/run_official_quick.sh
+```
+
+Quick profile defaults:
+
+- `--run-modes worker_only,mentor_worker`
+- `--repro`
+- `--max-turns 3`
+- `--timeout 180`
+- `--worker-num-predict 512`
+- `--mentor-num-predict 256`
+
 Default headline seeds are:
 
 - `1337,2026,9001`
