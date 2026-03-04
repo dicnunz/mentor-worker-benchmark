@@ -22,6 +22,14 @@ Both scripts:
 - verify that zip locally,
 - mark the submission as `official`.
 
+Official quick default profile (`./scripts/run_official_quick.sh`):
+- `--run-modes worker_only,mentor_worker`
+- `--repro`
+- `--max-turns 3`
+- `--timeout 180`
+- `--worker-num-predict 512`
+- `--mentor-num-predict 256`
+
 Official protocol (`v0.3.0`):
 - Headline suites (`dev`/`dev50`/`test`) run 3 seeds: `1337,2026,9001`.
 - Official zip filenames include protocol + seeds (for example `protocol-v0.3.0_seeds-1337-2026-9001`).
