@@ -78,8 +78,12 @@ def test_run_benchmark_reproducibility_hash_stable_across_repeated_runs(
     monkeypatch.setattr(runner_module, "_git_commit_hash", lambda: "de5a929")
     monkeypatch.setattr(runner_module, "_git_is_dirty", lambda: False)
 
+    run_index = {"value": 0}
+
     def _run_once() -> dict[str, object]:
+        run_index["value"] += 1
         calls = {"count": 0}
+        suffix = 100 + run_index["value"] * 10
 
         def _fake_run_pytest(_workdir: Path, **_kwargs: object) -> HarnessTestRunResult:
             calls["count"] += 1
@@ -87,7 +91,11 @@ def test_run_benchmark_reproducibility_hash_stable_across_repeated_runs(
                 return HarnessTestRunResult(
                     exit_code=1,
                     passed=False,
-                    output="1 failed in 0.01s",
+                    output=(
+                        "tmp_path = PosixPath("
+                        f"'/private/var/folders/x/pytest-of-user/pytest-{suffix}/test_case0'"
+                        ")\n1 failed in 0.01s"
+                    ),
                     duration_seconds=0.01,
                     tests_executed=1,
                     tests_passed=0,
@@ -97,7 +105,11 @@ def test_run_benchmark_reproducibility_hash_stable_across_repeated_runs(
             return HarnessTestRunResult(
                 exit_code=0,
                 passed=True,
-                output="1 passed in 0.01s",
+                output=(
+                    "tmp_path = PosixPath("
+                    f"'/private/var/folders/x/pytest-of-user/pytest-{suffix + 1}/test_case0'"
+                    ")\n1 passed in 0.03s"
+                ),
                 duration_seconds=0.01,
                 tests_executed=1,
                 tests_passed=1,
@@ -135,6 +147,10 @@ def test_run_benchmark_reproducibility_hash_stable_across_repeated_runs(
     second_repro = second["reproducibility"]
     assert first_repro["deterministic_output_sha256"] == second_repro["deterministic_output_sha256"]
     assert first_repro["seed_policy"] == "deterministic"
+    assert "<TMP_PATH>" in first["runs"][0]["log"]["initial_test_output"]
+    assert "pytest-" not in first["runs"][0]["log"]["initial_test_output"]
+    assert "0.01s" not in first["runs"][0]["log"]["initial_test_output"]
+    assert "in <TIME>s" in first["runs"][0]["log"]["initial_test_output"]
 
     environment = first["environment"]
     assert environment["reproducibility"]["python_version"] == environment["python"]["version"]

@@ -29,6 +29,10 @@ _PYTEST_STAT_RE = re.compile(
     r"(?P<count>\d+)\s+(?P<label>passed|failed|error|errors|xfailed|xpassed|skipped)\b",
     re.IGNORECASE,
 )
+_PYTEST_POSIX_PATH_RE = re.compile(r"PosixPath\('([^']*pytest-of[^']*)'\)")
+_PYTEST_WINDOWS_PATH_RE = re.compile(r"WindowsPath\('([^']*pytest-of[^']*)'\)")
+_PYTEST_BARE_TEMP_PATH_RE = re.compile(r"((?:/|[A-Za-z]:\\)[^\s'\":)]*pytest-of[^\s'\":)]*)")
+_PYTEST_DURATION_RE = re.compile(r"(?<=\bin )\d+(?:\.\d+)?(?=s\b)")
 
 
 def _parse_pytest_stats(output: str) -> tuple[int, int, int]:
@@ -55,6 +59,15 @@ def _parse_pytest_stats(output: str) -> tuple[int, int, int]:
     tests_failed = failed + errors
     tests_executed = passed + tests_failed + xfailed + xpassed
     return tests_executed, passed, tests_failed
+
+
+def normalize_pytest_output(output: str) -> str:
+    normalized = output.replace("\r\n", "\n")
+    normalized = _PYTEST_POSIX_PATH_RE.sub("PosixPath('<TMP_PATH>')", normalized)
+    normalized = _PYTEST_WINDOWS_PATH_RE.sub("WindowsPath('<TMP_PATH>')", normalized)
+    normalized = _PYTEST_BARE_TEMP_PATH_RE.sub("<TMP_PATH>", normalized)
+    normalized = _PYTEST_DURATION_RE.sub("<TIME>", normalized)
+    return normalized.strip()
 
 
 def materialize_task(task: TaskDefinition) -> tuple[tempfile.TemporaryDirectory[str], Path]:
@@ -153,11 +166,12 @@ def run_pytest(
             timeout=timeout_seconds,
         )
         duration = time.perf_counter() - start
-        tests_executed, tests_passed, tests_failed = _parse_pytest_stats(process.stdout)
+        normalized_output = normalize_pytest_output(process.stdout)
+        tests_executed, tests_passed, tests_failed = _parse_pytest_stats(normalized_output)
         return TestRunResult(
             exit_code=process.returncode,
             passed=process.returncode == 0,
-            output=process.stdout,
+            output=normalized_output,
             duration_seconds=duration,
             tests_executed=tests_executed,
             tests_passed=tests_passed,
@@ -167,7 +181,9 @@ def run_pytest(
     except subprocess.TimeoutExpired as exc:
         duration = time.perf_counter() - start
         stdout_text = exc.stdout if isinstance(exc.stdout, str) else ""
-        merged_output = (stdout_text + "\n[timeout] pytest exceeded timeout budget.").strip()
+        merged_output = normalize_pytest_output(
+            stdout_text + "\n[timeout] pytest exceeded timeout budget."
+        )
         tests_executed, tests_passed, tests_failed = _parse_pytest_stats(merged_output)
         return TestRunResult(
             exit_code=124,

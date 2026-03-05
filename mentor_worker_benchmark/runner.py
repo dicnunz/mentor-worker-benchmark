@@ -19,6 +19,7 @@ from mentor_worker_benchmark.ollama_client import OllamaClient
 from mentor_worker_benchmark.protocol import deterministic_run_group_id
 from mentor_worker_benchmark.tasks.task_codegen_py.harness import (
     materialize_task,
+    normalize_pytest_output,
     project_snapshot,
     read_task_prompt,
     run_pytest,
@@ -171,6 +172,14 @@ def _seed_for_call(base_seed: int, *parts: str) -> int:
     joined = "|".join(parts)
     digest = hashlib.sha256(f"{base_seed}|{joined}".encode("utf-8")).hexdigest()
     return int(digest[:8], 16)
+
+
+def _run_pytest_deterministic(workdir: Path, *, evaluation_seed: int) -> Any:
+    result = run_pytest(workdir, pythonhashseed=evaluation_seed)
+    normalized_output = normalize_pytest_output(result.output)
+    if normalized_output == result.output:
+        return result
+    return replace(result, output=normalized_output)
 
 
 def _hash_patch_text(patch_text: str | None) -> str | None:
@@ -705,7 +714,7 @@ def _baseline_run(
 ) -> dict[str, Any]:
     start = time.perf_counter()
     evaluation_seed = _seed_for_call(generation.seed, "evaluation", "worker_only", worker_model, task_id)
-    initial_tests = run_pytest(workdir, pythonhashseed=evaluation_seed)
+    initial_tests = _run_pytest_deterministic(workdir, evaluation_seed=evaluation_seed)
     _assert_tests_executed(initial_tests, task_id=task_id, mode="worker_only", phase="initial")
     snapshot = project_snapshot(workdir)
     worker_prompt = _render_worker_prompt(
@@ -745,7 +754,7 @@ def _baseline_run(
     elif worker_error:
         patch_log = worker_error
 
-    final_tests = run_pytest(workdir, pythonhashseed=evaluation_seed)
+    final_tests = _run_pytest_deterministic(workdir, evaluation_seed=evaluation_seed)
     _assert_tests_executed(final_tests, task_id=task_id, mode="worker_only", phase="final")
     elapsed = time.perf_counter() - start
 
@@ -847,7 +856,7 @@ def _mentored_run(
         task_id,
     )
 
-    current_tests = run_pytest(workdir, pythonhashseed=evaluation_seed)
+    current_tests = _run_pytest_deterministic(workdir, evaluation_seed=evaluation_seed)
     _assert_tests_executed(current_tests, task_id=task_id, mode=effective_mode, phase="initial")
     token_accumulator = _estimate_tokens(current_tests.output)
     passed = current_tests.passed
@@ -904,7 +913,7 @@ def _mentored_run(
         elif worker_error:
             patch_log = worker_error
 
-        current_tests = run_pytest(workdir, pythonhashseed=evaluation_seed)
+        current_tests = _run_pytest_deterministic(workdir, evaluation_seed=evaluation_seed)
         _assert_tests_executed(
             current_tests,
             task_id=task_id,
@@ -1556,7 +1565,7 @@ def run_sanity_check(
         temp_dir, workdir = materialize_task(task)
         try:
             evaluation_seed = _seed_for_call(seed, "sanity", task.task_id)
-            test_result = run_pytest(workdir, pythonhashseed=evaluation_seed)
+            test_result = _run_pytest_deterministic(workdir, evaluation_seed=evaluation_seed)
             status = "expected_failure"
             if test_result.exit_code == 0:
                 status = "unexpected_pass"
