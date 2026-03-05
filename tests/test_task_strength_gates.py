@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import json
 from pathlib import Path
 from typing import Any
 
@@ -118,4 +117,3 @@ def test_validate_task_pack_payload_strict_flags_not_caught_mutation(
     strict_eval = report["strength_gates"]["strict_evaluation"]
     assert strict_eval["would_fail"] is True
     assert strict_eval["mutation_not_caught_non_allowlisted_ids"] == ["tiny_task"]
-
