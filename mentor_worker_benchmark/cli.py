@@ -1,7 +1,10 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
+import re
+import subprocess
 import sys
 from pathlib import Path
 
@@ -35,6 +38,10 @@ from mentor_worker_benchmark.tasks.task_pack_v2.provenance import (
     DEFAULT_SIMILARITY_THRESHOLD,
     write_provenance_artifacts,
 )
+
+
+_SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
+_GIT_HASH_RE = re.compile(r"^[0-9a-f]{7,40}$")
 
 
 def _parse_models(raw: str) -> list[str]:
@@ -86,6 +93,193 @@ def _parse_seeds(raw: str | None, *, fallback_seed: int) -> list[int]:
     if len(set(seeds)) != len(seeds):
         raise ValueError("--seeds must not contain duplicates.")
     return seeds
+
+
+def _is_sha256(value: object) -> bool:
+    return isinstance(value, str) and _SHA256_RE.fullmatch(value) is not None
+
+
+def _is_git_hash(value: object) -> bool:
+    return isinstance(value, str) and _GIT_HASH_RE.fullmatch(value) is not None
+
+
+def _iter_runs(payload: dict[str, object]) -> list[dict[str, object]]:
+    runs = payload.get("runs", [])
+    if not isinstance(runs, list):
+        return []
+    return [run for run in runs if isinstance(run, dict)]
+
+
+def _detect_baseline_reuse_groups(runs: list[dict[str, object]]) -> list[str]:
+    worker_only_runs = [run for run in runs if str(run.get("mode")) == "worker_only"]
+    grouped: dict[tuple[str, int], list[dict[str, object]]] = {}
+    for run in worker_only_runs:
+        worker_model = str(run.get("worker_model", "unknown"))
+        seed_raw = run.get("seed")
+        seed = int(seed_raw) if isinstance(seed_raw, (int, float)) and not isinstance(seed_raw, bool) else 0
+        grouped.setdefault((worker_model, seed), []).append(run)
+
+    signatures: dict[tuple[tuple[int, ...], tuple[str, ...]], list[tuple[str, int]]] = {}
+    for key, items in grouped.items():
+        ordered = sorted(items, key=lambda item: str(item.get("task_id", "")))
+        baseline_vector = tuple(1 if bool(item.get("pass")) else 0 for item in ordered)
+        patch_vector = tuple(str(item.get("patch_hash") or "") for item in ordered)
+        signatures.setdefault((baseline_vector, patch_vector), []).append(key)
+
+    suspicious: list[str] = []
+    for groups in signatures.values():
+        if len(groups) <= 1:
+            continue
+        suspicious.append(", ".join(f"{worker}@seed{seed}" for worker, seed in sorted(groups)))
+    return suspicious
+
+
+def _audit_patch_hashes(runs: list[dict[str, object]]) -> tuple[bool, str]:
+    total_patch_hashes = 0
+    missing: list[str] = []
+    mismatches: list[str] = []
+    short_patch_count = 0
+
+    for run in runs:
+        task_id = str(run.get("task_id", "unknown"))
+        mode = str(run.get("mode", ""))
+        log = run.get("log", {})
+        if not isinstance(log, dict):
+            log = {}
+
+        if mode == "worker_only":
+            extracted = log.get("extracted_patch")
+            patch_hash = run.get("patch_hash")
+            if isinstance(extracted, str):
+                if len(extracted.strip()) < 5:
+                    short_patch_count += 1
+                if not _is_sha256(patch_hash):
+                    missing.append(f"{task_id}:{mode}")
+                else:
+                    expected = hashlib.sha256(extracted.encode("utf-8")).hexdigest()
+                    if patch_hash != expected:
+                        mismatches.append(f"{task_id}:{mode}")
+                    total_patch_hashes += 1
+            continue
+
+        turns = log.get("turns", [])
+        if not isinstance(turns, list):
+            continue
+        for index, turn in enumerate(turns, start=1):
+            if not isinstance(turn, dict):
+                continue
+            extracted = turn.get("extracted_patch")
+            patch_hash = turn.get("patch_hash")
+            if not isinstance(extracted, str):
+                continue
+            if len(extracted.strip()) < 5:
+                short_patch_count += 1
+            if not _is_sha256(patch_hash):
+                missing.append(f"{task_id}:{mode}:turn{index}")
+            else:
+                expected = hashlib.sha256(extracted.encode("utf-8")).hexdigest()
+                if patch_hash != expected:
+                    mismatches.append(f"{task_id}:{mode}:turn{index}")
+                total_patch_hashes += 1
+
+    if short_patch_count > 0:
+        return False, f"Found {short_patch_count} patch attempts with length <5 characters."
+    if missing:
+        return False, "Missing patch hashes for extracted patches: " + ", ".join(missing[:12])
+    if mismatches:
+        return False, "Patch hash mismatches detected: " + ", ".join(mismatches[:12])
+    if total_patch_hashes == 0:
+        return False, "No patch hashes recorded in results."
+    return True, f"{total_patch_hashes} hashed patch attempts verified."
+
+
+def _audit_tests_executed(runs: list[dict[str, object]]) -> tuple[bool, str]:
+    zero_tasks: list[str] = []
+    for run in runs:
+        tests_executed = run.get("tests_executed")
+        if isinstance(tests_executed, bool) or not isinstance(tests_executed, (int, float)):
+            zero_tasks.append(f"{run.get('task_id')}:{run.get('mode')}")
+            continue
+        if int(tests_executed) <= 0:
+            zero_tasks.append(f"{run.get('task_id')}:{run.get('mode')}")
+
+    if zero_tasks:
+        return False, "Found runs with tests_executed <= 0: " + ", ".join(zero_tasks[:12])
+    return True, f"{len(runs)} runs recorded tests_executed > 0."
+
+
+def _audit_runtime_distribution(runs: list[dict[str, object]]) -> tuple[bool, str]:
+    runtimes: list[float] = []
+    for run in runs:
+        value = run.get("test_runtime_seconds")
+        if isinstance(value, bool) or not isinstance(value, (int, float)):
+            continue
+        runtimes.append(float(value))
+
+    if not runtimes:
+        return False, "No test runtime evidence found."
+
+    low_count = sum(1 for runtime in runtimes if runtime < 0.1)
+    share = low_count / len(runtimes)
+    if share > 0.8:
+        return False, (
+            "tests may not be executing "
+            f"(runtime <0.1s for {low_count}/{len(runtimes)} runs)."
+        )
+    return True, f"Runtime distribution plausible ({low_count}/{len(runtimes)} under 0.1s)."
+
+
+def _audit_baseline_reuse(runs: list[dict[str, object]]) -> tuple[bool, str]:
+    suspicious = _detect_baseline_reuse_groups(runs)
+    if suspicious:
+        return False, (
+            "Potential artifact reuse detected across worker-only baseline vectors: "
+            + "; ".join(suspicious[:4])
+        )
+    return True, "Baseline vectors appear freshly computed per run."
+
+
+def _audit_commit_metadata(payload: dict[str, object]) -> tuple[bool, str]:
+    env = payload.get("environment", {})
+    if not isinstance(env, dict):
+        return False, "Missing results.environment metadata."
+    git_data = env.get("git", {})
+    if not isinstance(git_data, dict):
+        return False, "Missing results.environment.git metadata."
+
+    artifact_commit = git_data.get("commit_hash") or git_data.get("commit")
+    if not _is_git_hash(artifact_commit):
+        return False, "Invalid or missing artifact commit hash."
+
+    artifact_commit_text = str(artifact_commit)
+    try:
+        subprocess.run(
+            ["git", "cat-file", "-e", f"{artifact_commit_text}^{{commit}}"],
+            check=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+        )
+    except subprocess.CalledProcessError:
+        return False, f"Artifact commit not found in local git object store: {artifact_commit_text}"
+
+    try:
+        head = subprocess.run(
+            ["git", "rev-parse", "HEAD"],
+            check=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+        ).stdout.strip()
+    except subprocess.CalledProcessError as exc:
+        return False, f"Unable to resolve local HEAD commit: {exc}"
+
+    if artifact_commit_text != head:
+        return False, (
+            "Artifact commit metadata mismatch: "
+            f"results={artifact_commit_text}, local_head={head}"
+        )
+    return True, f"Artifact commit verified: {artifact_commit_text}"
 
 
 def _head_lines(text: str, *, max_lines: int = 50) -> str:
@@ -433,6 +627,46 @@ def cmd_analyze(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_audit(args: argparse.Namespace) -> int:
+    results_path = Path(args.results)
+    if not results_path.exists():
+        print(f"Results file not found: {results_path}")
+        return 1
+
+    try:
+        payload = json.loads(results_path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as exc:
+        print(f"Invalid JSON at {results_path}: {exc}")
+        return 1
+
+    if not isinstance(payload, dict):
+        print("Results payload must be a JSON object.")
+        return 1
+
+    runs = _iter_runs(payload)
+    if not runs:
+        print("Results payload contains no runs to audit.")
+        return 1
+
+    checks = [
+        ("real patches generated", _audit_patch_hashes(runs)),
+        ("tests executed", _audit_tests_executed(runs)),
+        ("baseline computed", _audit_baseline_reuse(runs)),
+        ("runtime distribution plausible", _audit_runtime_distribution(runs)),
+        ("artifact integrity verified", _audit_commit_metadata(payload)),
+    ]
+
+    all_ok = True
+    for label, (ok, detail) in checks:
+        prefix = "✓" if ok else "✗"
+        print(f"{prefix} {label}")
+        print(f"  {detail}")
+        if not ok:
+            all_ok = False
+
+    return 0 if all_ok else 1
+
+
 def cmd_export(args: argparse.Namespace) -> int:
     try:
         manifest = export_submission_bundle(
@@ -697,6 +931,13 @@ def build_parser() -> argparse.ArgumentParser:
         help="Optional base bootstrap seed override (deterministic if omitted).",
     )
     analyze.set_defaults(func=cmd_analyze)
+
+    audit = subparsers.add_parser(
+        "audit",
+        help="Verify harness integrity signals in a benchmark results JSON artifact.",
+    )
+    audit.add_argument("results", help="Path to benchmark results JSON.")
+    audit.set_defaults(func=cmd_audit)
 
     export = subparsers.add_parser("export", help="Export a standardized submission zip from results.json.")
     export.add_argument("--results", default="results/results.json")

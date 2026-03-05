@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -18,7 +19,42 @@ class TestRunResult:
     passed: bool
     output: str
     duration_seconds: float
+    tests_executed: int = 0
+    tests_passed: int = 0
+    tests_failed: int = 0
     timed_out: bool = False
+
+
+_PYTEST_STAT_RE = re.compile(
+    r"(?P<count>\d+)\s+(?P<label>passed|failed|error|errors|xfailed|xpassed|skipped)\b",
+    re.IGNORECASE,
+)
+
+
+def _parse_pytest_stats(output: str) -> tuple[int, int, int]:
+    passed = 0
+    failed = 0
+    errors = 0
+    xfailed = 0
+    xpassed = 0
+
+    for match in _PYTEST_STAT_RE.finditer(output):
+        count = int(match.group("count"))
+        label = match.group("label").lower()
+        if label == "passed":
+            passed += count
+        elif label == "failed":
+            failed += count
+        elif label in {"error", "errors"}:
+            errors += count
+        elif label == "xfailed":
+            xfailed += count
+        elif label == "xpassed":
+            xpassed += count
+
+    tests_failed = failed + errors
+    tests_executed = passed + tests_failed + xfailed + xpassed
+    return tests_executed, passed, tests_failed
 
 
 def materialize_task(task: TaskDefinition) -> tuple[tempfile.TemporaryDirectory[str], Path]:
@@ -111,20 +147,29 @@ def run_pytest(workdir: Path, timeout_seconds: int = 8) -> TestRunResult:
             timeout=timeout_seconds,
         )
         duration = time.perf_counter() - start
+        tests_executed, tests_passed, tests_failed = _parse_pytest_stats(process.stdout)
         return TestRunResult(
             exit_code=process.returncode,
             passed=process.returncode == 0,
             output=process.stdout,
             duration_seconds=duration,
+            tests_executed=tests_executed,
+            tests_passed=tests_passed,
+            tests_failed=tests_failed,
             timed_out=False,
         )
     except subprocess.TimeoutExpired as exc:
         duration = time.perf_counter() - start
         stdout_text = exc.stdout if isinstance(exc.stdout, str) else ""
+        merged_output = (stdout_text + "\n[timeout] pytest exceeded timeout budget.").strip()
+        tests_executed, tests_passed, tests_failed = _parse_pytest_stats(merged_output)
         return TestRunResult(
             exit_code=124,
             passed=False,
-            output=(stdout_text + "\n[timeout] pytest exceeded timeout budget.").strip(),
+            output=merged_output,
             duration_seconds=duration,
+            tests_executed=tests_executed,
+            tests_passed=tests_passed,
+            tests_failed=tests_failed,
             timed_out=True,
         )

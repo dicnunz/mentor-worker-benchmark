@@ -173,6 +173,28 @@ def _seed_for_call(base_seed: int, *parts: str) -> int:
     return int(digest[:8], 16)
 
 
+def _hash_patch_text(patch_text: str | None) -> str | None:
+    if patch_text is None:
+        return None
+    return hashlib.sha256(patch_text.encode("utf-8")).hexdigest()
+
+
+def _is_patch_text_valid_length(patch_text: str | None) -> bool:
+    if patch_text is None:
+        return False
+    return len(patch_text.strip()) >= 5
+
+
+def _assert_tests_executed(test_result: Any, *, task_id: str, mode: str, phase: str) -> None:
+    tests_executed = int(getattr(test_result, "tests_executed", 0) or 0)
+    if tests_executed <= 0:
+        raise RuntimeError(
+            "No tests executed for "
+            f"task `{task_id}` (mode={mode}, phase={phase}). "
+            "Aborting benchmark run."
+        )
+
+
 def _normalize_patch_path(raw_path: str) -> str | None:
     token = raw_path.split("\t", 1)[0].strip()
     if token == "/dev/null":
@@ -682,6 +704,7 @@ def _baseline_run(
 ) -> dict[str, Any]:
     start = time.perf_counter()
     initial_tests = run_pytest(workdir)
+    _assert_tests_executed(initial_tests, task_id=task_id, mode="worker_only", phase="initial")
     snapshot = project_snapshot(workdir)
     worker_prompt = _render_worker_prompt(
         template=worker_template,
@@ -708,14 +731,20 @@ def _baseline_run(
         worker_error = str(exc)
 
     extracted = _extract_diff(worker_response)
+    patch_hash = _hash_patch_text(extracted)
+    patch_length = len(extracted.strip()) if extracted else 0
+    patch_valid_length = _is_patch_text_valid_length(extracted)
     patch_applied = False
     patch_log = "No valid unified diff found in worker response."
-    if extracted:
+    if extracted and not patch_valid_length:
+        patch_log = "Patch too short (<5 chars); marked invalid."
+    elif extracted:
         patch_applied, patch_log = _apply_patch(workdir, extracted)
     elif worker_error:
         patch_log = worker_error
 
     final_tests = run_pytest(workdir)
+    _assert_tests_executed(final_tests, task_id=task_id, mode="worker_only", phase="final")
     elapsed = time.perf_counter() - start
 
     total_tokens = (
@@ -728,23 +757,57 @@ def _baseline_run(
     return {
         "mode": "worker_only",
         "task_id": task_id,
+        "seed": generation.seed,
         "worker_model": worker_model,
         "mentor_model": None,
         "pass": final_tests.passed,
         "turns_used": 1,
         "wall_time_seconds": round(elapsed, 4),
         "total_tokens_estimate": total_tokens,
+        "patch_hash": patch_hash,
+        "test_runtime_seconds": round(final_tests.duration_seconds, 4),
+        "tests_executed": int(final_tests.tests_executed),
+        "tests_passed": int(final_tests.tests_passed),
+        "tests_failed": int(final_tests.tests_failed),
         "mentor_turn_count": 0,
         "mentor_violation_count": 0,
+        "execution_evidence": {
+            "initial_test_runtime_seconds": round(initial_tests.duration_seconds, 4),
+            "initial_tests_executed": int(initial_tests.tests_executed),
+            "initial_tests_passed": int(initial_tests.tests_passed),
+            "initial_tests_failed": int(initial_tests.tests_failed),
+            "final_test_runtime_seconds": round(final_tests.duration_seconds, 4),
+            "final_tests_executed": int(final_tests.tests_executed),
+            "final_tests_passed": int(final_tests.tests_passed),
+            "final_tests_failed": int(final_tests.tests_failed),
+            "patch_hash": patch_hash,
+            "patch_length": patch_length,
+            "patch_length_valid": patch_valid_length,
+        },
         "log": {
             "initial_test_output": initial_tests.output,
             "worker_prompt": worker_prompt,
             "worker_response": worker_response,
             "worker_error": worker_error,
             "extracted_patch": extracted,
+            "patch_hash": patch_hash,
+            "patch_length": patch_length,
+            "patch_length_valid": patch_valid_length,
             "patch_applied": patch_applied,
             "patch_log": patch_log,
             "final_test_output": final_tests.output,
+            "initial_test_stats": {
+                "tests_executed": int(initial_tests.tests_executed),
+                "tests_passed": int(initial_tests.tests_passed),
+                "tests_failed": int(initial_tests.tests_failed),
+                "duration_seconds": round(initial_tests.duration_seconds, 4),
+            },
+            "final_test_stats": {
+                "tests_executed": int(final_tests.tests_executed),
+                "tests_passed": int(final_tests.tests_passed),
+                "tests_failed": int(final_tests.tests_failed),
+                "duration_seconds": round(final_tests.duration_seconds, 4),
+            },
         },
     }
 
@@ -762,14 +825,19 @@ def _mentored_run(
     generation: GenerationSettings,
     mentor_strategy: Literal["real", "dummy_control"] = "real",
 ) -> dict[str, Any]:
+    effective_mode = "mentor_worker" if mentor_strategy == "real" else "mentor_only_suggestion_noise"
     start = time.perf_counter()
     guidance_history: list[str] = []
     turns: list[dict[str, Any]] = []
     violations: list[dict[str, Any]] = []
+    patch_hashes: list[str] = []
 
     current_tests = run_pytest(workdir)
+    _assert_tests_executed(current_tests, task_id=task_id, mode=effective_mode, phase="initial")
     token_accumulator = _estimate_tokens(current_tests.output)
     passed = current_tests.passed
+    initial_test_result = current_tests
+    final_patch_hash: str | None = None
 
     for turn_index in range(1, generation.max_turns + 1):
         snapshot = project_snapshot(workdir)
@@ -806,14 +874,28 @@ def _mentored_run(
 
         token_accumulator += _estimate_tokens(worker_prompt) + _estimate_tokens(worker_response)
         extracted = _extract_diff(worker_response)
+        patch_hash = _hash_patch_text(extracted)
+        patch_length = len(extracted.strip()) if extracted else 0
+        patch_valid_length = _is_patch_text_valid_length(extracted)
+        if patch_hash:
+            patch_hashes.append(patch_hash)
+            final_patch_hash = patch_hash
         patch_applied = False
         patch_log = "No valid unified diff found in worker response."
-        if extracted:
+        if extracted and not patch_valid_length:
+            patch_log = "Patch too short (<5 chars); marked invalid."
+        elif extracted:
             patch_applied, patch_log = _apply_patch(workdir, extracted)
         elif worker_error:
             patch_log = worker_error
 
         current_tests = run_pytest(workdir)
+        _assert_tests_executed(
+            current_tests,
+            task_id=task_id,
+            mode=effective_mode,
+            phase=f"turn_{turn_index}",
+        )
         token_accumulator += _estimate_tokens(current_tests.output)
         passed = current_tests.passed
 
@@ -823,10 +905,17 @@ def _mentored_run(
             "worker_response": worker_response,
             "worker_error": worker_error,
             "extracted_patch": extracted,
+            "patch_hash": patch_hash,
+            "patch_length": patch_length,
+            "patch_length_valid": patch_valid_length,
             "patch_applied": patch_applied,
             "patch_log": patch_log,
             "test_output": current_tests.output,
             "pass_after_turn": passed,
+            "test_runtime_seconds": round(current_tests.duration_seconds, 4),
+            "tests_executed": int(current_tests.tests_executed),
+            "tests_passed": int(current_tests.tests_passed),
+            "tests_failed": int(current_tests.tests_failed),
         }
 
         if worker_error:
@@ -912,24 +1001,55 @@ def _mentored_run(
         turns.append(turn_log)
 
     elapsed = time.perf_counter() - start
-    mode_name = "mentor_worker" if mentor_strategy == "real" else "mentor_only_suggestion_noise"
+    mode_name = effective_mode
     mentor_turn_count = sum(1 for turn in turns if "mentor_prompt" in turn)
 
     return {
         "mode": mode_name,
         "task_id": task_id,
+        "seed": generation.seed,
         "worker_model": worker_model,
         "mentor_model": mentor_model,
         "pass": passed,
         "turns_used": len(turns),
         "wall_time_seconds": round(elapsed, 4),
         "total_tokens_estimate": token_accumulator,
+        "patch_hash": final_patch_hash,
+        "patch_hashes": patch_hashes,
+        "test_runtime_seconds": round(current_tests.duration_seconds, 4),
+        "tests_executed": int(current_tests.tests_executed),
+        "tests_passed": int(current_tests.tests_passed),
+        "tests_failed": int(current_tests.tests_failed),
         "mentor_turn_count": mentor_turn_count,
         "mentor_violation_count": len(violations),
+        "execution_evidence": {
+            "initial_test_runtime_seconds": round(initial_test_result.duration_seconds, 4),
+            "initial_tests_executed": int(initial_test_result.tests_executed),
+            "initial_tests_passed": int(initial_test_result.tests_passed),
+            "initial_tests_failed": int(initial_test_result.tests_failed),
+            "final_test_runtime_seconds": round(current_tests.duration_seconds, 4),
+            "final_tests_executed": int(current_tests.tests_executed),
+            "final_tests_passed": int(current_tests.tests_passed),
+            "final_tests_failed": int(current_tests.tests_failed),
+            "patch_hashes": patch_hashes,
+            "final_patch_hash": final_patch_hash,
+        },
         "log": {
             "task_prompt": task_prompt,
             "turns": turns,
             "violations": violations,
+            "initial_test_stats": {
+                "tests_executed": int(initial_test_result.tests_executed),
+                "tests_passed": int(initial_test_result.tests_passed),
+                "tests_failed": int(initial_test_result.tests_failed),
+                "duration_seconds": round(initial_test_result.duration_seconds, 4),
+            },
+            "final_test_stats": {
+                "tests_executed": int(current_tests.tests_executed),
+                "tests_passed": int(current_tests.tests_passed),
+                "tests_failed": int(current_tests.tests_failed),
+                "duration_seconds": round(current_tests.duration_seconds, 4),
+            },
         },
     }
 
@@ -1608,6 +1728,7 @@ def run_benchmark(
         timeout_seconds=config.timeout_seconds,
         total_wall_time_seconds=elapsed,
     )
+    integrity = _build_integrity_payload(runs)
 
     results = {
         "generated_at": datetime.now(tz=UTC).isoformat(),
@@ -1649,6 +1770,7 @@ def run_benchmark(
             "runs_by_mode": run_counts_by_mode,
             "benchmark_wall_time_seconds": round(elapsed, 4),
             "violation_count": len(all_violations),
+            "integrity_warning_count": len(integrity["warnings"]),
             "total_passes": int(error_summary["total_passes"]),
             "total_failed_runs": int(error_summary["total_failed_runs"]),
             "passes_by_mode": error_summary["passes_by_mode"],
@@ -1659,6 +1781,7 @@ def run_benchmark(
             "total_model_call_timeouts": int(error_summary["total_model_call_timeouts"]),
         },
         "compute_budget": compute_budget,
+        "integrity": integrity,
         "runs": runs,
         "violations": all_violations,
         "aggregates": aggregates,
@@ -1727,6 +1850,75 @@ def _collect_run_error_summary(runs: list[dict[str, Any]]) -> dict[str, Any]:
         "model_call_timeouts_by_mode": model_call_timeouts_by_mode,
         "total_model_call_errors": sum(model_call_errors_by_mode.values()),
         "total_model_call_timeouts": sum(model_call_timeouts_by_mode.values()),
+    }
+
+
+def _detect_low_runtime_warning(runs: list[dict[str, Any]]) -> list[str]:
+    runtimes: list[float] = []
+    for run in runs:
+        value = run.get("test_runtime_seconds")
+        if isinstance(value, bool) or not isinstance(value, (int, float)):
+            continue
+        runtimes.append(float(value))
+
+    if not runtimes:
+        return []
+
+    low_runtime_count = sum(1 for item in runtimes if item < 0.1)
+    share = low_runtime_count / len(runtimes)
+    if share > 0.8:
+        return [
+            (
+                "tests may not be executing "
+                f"(runtime <0.1s for {low_runtime_count}/{len(runtimes)} task runs)."
+            )
+        ]
+    return []
+
+
+def _detect_baseline_reuse_warning(runs: list[dict[str, Any]]) -> list[str]:
+    worker_only_runs = [run for run in runs if str(run.get("mode")) == "worker_only"]
+    if not worker_only_runs:
+        return []
+
+    grouped: dict[tuple[str, int], list[dict[str, Any]]] = {}
+    for run in worker_only_runs:
+        worker = str(run.get("worker_model", "unknown"))
+        seed_raw = run.get("seed")
+        if isinstance(seed_raw, bool) or not isinstance(seed_raw, (int, float)):
+            seed = 0
+        else:
+            seed = int(seed_raw)
+        grouped.setdefault((worker, seed), []).append(run)
+
+    by_signature: dict[tuple[tuple[int, ...], tuple[str, ...]], list[tuple[str, int]]] = {}
+    for key, items in grouped.items():
+        ordered = sorted(items, key=lambda item: str(item.get("task_id", "")))
+        baseline_vector = tuple(1 if bool(item.get("pass")) else 0 for item in ordered)
+        patch_vector = tuple(str(item.get("patch_hash") or "") for item in ordered)
+        signature = (baseline_vector, patch_vector)
+        by_signature.setdefault(signature, []).append(key)
+
+    warnings: list[str] = []
+    for groups in by_signature.values():
+        if len(groups) <= 1:
+            continue
+        labels = ", ".join(f"{worker}@seed{seed}" for worker, seed in sorted(groups))
+        warnings.append(
+            "potential artifact reuse detected: identical baseline vectors and patch hashes across "
+            f"worker-only groups ({labels})."
+        )
+    return warnings
+
+
+def _build_integrity_payload(runs: list[dict[str, Any]]) -> dict[str, Any]:
+    runtime_warnings = _detect_low_runtime_warning(runs)
+    baseline_warnings = _detect_baseline_reuse_warning(runs)
+    warnings = runtime_warnings + baseline_warnings
+    return {
+        "warnings": warnings,
+        "runtime_warnings": runtime_warnings,
+        "baseline_reuse_warnings": baseline_warnings,
     }
 
 
@@ -1907,6 +2099,7 @@ def _combine_replicate_results(
         run_counts_by_mode[mode_name] = run_counts_by_mode.get(mode_name, 0) + 1
 
     error_summary = _collect_run_error_summary(merged_runs)
+    integrity = _build_integrity_payload(merged_runs)
     max_turns_raw = first_config.get("max_turns", config.max_turns)
     timeout_raw = first_config.get("timeout_seconds", config.timeout_seconds)
     max_turns = int(max_turns_raw) if isinstance(max_turns_raw, (int, float)) else int(config.max_turns)
@@ -1937,6 +2130,7 @@ def _combine_replicate_results(
             "runs_by_mode": run_counts_by_mode,
             "benchmark_wall_time_seconds": compute_budget["total_wall_time_seconds"],
             "violation_count": len(merged_violations),
+            "integrity_warning_count": len(integrity["warnings"]),
             "total_passes": int(error_summary["total_passes"]),
             "total_failed_runs": int(error_summary["total_failed_runs"]),
             "passes_by_mode": error_summary["passes_by_mode"],
@@ -1948,6 +2142,7 @@ def _combine_replicate_results(
             "replicate_count": len(seeds),
         },
         "compute_budget": compute_budget,
+        "integrity": integrity,
         "runs": merged_runs,
         "violations": merged_violations,
         "aggregates": first.get("aggregates", {}),
