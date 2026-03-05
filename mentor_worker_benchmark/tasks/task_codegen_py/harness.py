@@ -123,7 +123,12 @@ def project_snapshot(workdir: Path, max_total_chars: int = 8000) -> str:
     return "\n".join(blocks).strip()
 
 
-def run_pytest(workdir: Path, timeout_seconds: int = 8) -> TestRunResult:
+def run_pytest(
+    workdir: Path,
+    timeout_seconds: int = 8,
+    *,
+    pythonhashseed: int = 0,
+) -> TestRunResult:
     start = time.perf_counter()
     runtime_hook_dir = Path(__file__).resolve().parents[2] / "_runtime"
     env = os.environ.copy()
@@ -135,6 +140,7 @@ def run_pytest(workdir: Path, timeout_seconds: int = 8) -> TestRunResult:
     )
     env["MWB_BLOCK_NETWORK"] = "1"
     env["PYTEST_DISABLE_PLUGIN_AUTOLOAD"] = "1"
+    env["PYTHONHASHSEED"] = str(int(pythonhashseed))
 
     try:
         process = subprocess.run(

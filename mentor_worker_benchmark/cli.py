@@ -10,7 +10,7 @@ from pathlib import Path
 
 from mentor_worker_benchmark.analysis import DEFAULT_BOOTSTRAP_SAMPLES, generate_analysis_payload
 from mentor_worker_benchmark.ollama_client import OllamaClient
-from mentor_worker_benchmark.protocol import parse_seed_list
+from mentor_worker_benchmark.protocol import expand_replicate_seeds, parse_seed_list
 from mentor_worker_benchmark.provider_factory import (
     SUPPORTED_PROVIDERS,
     build_client,
@@ -93,6 +93,17 @@ def _parse_seeds(raw: str | None, *, fallback_seed: int) -> list[int]:
     if len(set(seeds)) != len(seeds):
         raise ValueError("--seeds must not contain duplicates.")
     return seeds
+
+
+def _resolve_run_seeds(*, seed: int, seeds_raw: str | None, replicates: int) -> list[int]:
+    if replicates < 1:
+        raise ValueError("--replicates must be >= 1.")
+    has_seed_list = bool(seeds_raw and seeds_raw.strip())
+    if has_seed_list:
+        if replicates != 1:
+            raise ValueError("--replicates cannot be combined with --seeds.")
+        return _parse_seeds(seeds_raw, fallback_seed=seed)
+    return expand_replicate_seeds(base_seed=seed, replicates=replicates)
 
 
 def _is_sha256(value: object) -> bool:
@@ -414,7 +425,11 @@ def cmd_run(args: argparse.Namespace) -> int:
 
     run_modes = _parse_run_modes(args.run_modes)
     try:
-        seeds = _parse_seeds(args.seeds, fallback_seed=args.seed)
+        seeds = _resolve_run_seeds(
+            seed=args.seed,
+            seeds_raw=args.seeds,
+            replicates=args.replicates,
+        )
     except ValueError as exc:
         print(str(exc))
         return 1
@@ -841,6 +856,15 @@ def build_parser() -> argparse.ArgumentParser:
         help=(
             "Optional comma-separated seed list for multi-replicate runs. "
             "When set, --seed is ignored."
+        ),
+    )
+    run.add_argument(
+        "--replicates",
+        type=int,
+        default=1,
+        help=(
+            "Number of deterministic replicate seeds to run (derived from --seed). "
+            "Cannot be combined with --seeds."
         ),
     )
     run.add_argument("--repro", action="store_true", help="Enable deterministic reproducibility mode.")

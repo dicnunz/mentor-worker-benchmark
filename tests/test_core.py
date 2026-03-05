@@ -156,3 +156,7 @@ def test_capture_runtime_context_records_pip_hash_and_task_pack(monkeypatch: Any
     assert context["task_pack"]["id"] == "task_pack_v2"
     assert context["task_pack"]["source"] == "registry"
     assert context["task_pack"]["hash"] == "b" * 64
+    assert context["reproducibility"]["python_version"] == context["python"]["version"]
+    assert context["reproducibility"]["cpu_architecture"] == context["platform"]["machine"]
+    assert context["reproducibility"]["commit_hash"] == "de5a929"
+    assert isinstance(context["reproducibility"]["model_versions"], list)

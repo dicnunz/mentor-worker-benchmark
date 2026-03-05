@@ -70,7 +70,7 @@ def test_guard_aborts_when_no_tests_execute(monkeypatch, tmp_path: Path) -> None
     monkeypatch.setattr(
         runner_module,
         "run_pytest",
-        lambda _workdir: HarnessTestRunResult(
+        lambda _workdir, **_kwargs: HarnessTestRunResult(
             exit_code=1,
             passed=False,
             output="no tests ran in 0.01s",
@@ -115,7 +115,7 @@ def test_quick_run_simulation_records_integrity_and_audit_passes(monkeypatch, tm
 
     calls = {"count": 0}
 
-    def _fake_run_pytest(_workdir: Path) -> HarnessTestRunResult:
+    def _fake_run_pytest(_workdir: Path, **_kwargs: object) -> HarnessTestRunResult:
         calls["count"] += 1
         if calls["count"] == 1:
             return HarnessTestRunResult(

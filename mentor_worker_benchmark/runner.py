@@ -703,7 +703,8 @@ def _baseline_run(
     generation: GenerationSettings,
 ) -> dict[str, Any]:
     start = time.perf_counter()
-    initial_tests = run_pytest(workdir)
+    evaluation_seed = _seed_for_call(generation.seed, "evaluation", "worker_only", worker_model, task_id)
+    initial_tests = run_pytest(workdir, pythonhashseed=evaluation_seed)
     _assert_tests_executed(initial_tests, task_id=task_id, mode="worker_only", phase="initial")
     snapshot = project_snapshot(workdir)
     worker_prompt = _render_worker_prompt(
@@ -743,7 +744,7 @@ def _baseline_run(
     elif worker_error:
         patch_log = worker_error
 
-    final_tests = run_pytest(workdir)
+    final_tests = run_pytest(workdir, pythonhashseed=evaluation_seed)
     _assert_tests_executed(final_tests, task_id=task_id, mode="worker_only", phase="final")
     elapsed = time.perf_counter() - start
 
@@ -758,6 +759,7 @@ def _baseline_run(
         "mode": "worker_only",
         "task_id": task_id,
         "seed": generation.seed,
+        "evaluation_seed": evaluation_seed,
         "worker_model": worker_model,
         "mentor_model": None,
         "pass": final_tests.passed,
@@ -783,6 +785,7 @@ def _baseline_run(
             "patch_hash": patch_hash,
             "patch_length": patch_length,
             "patch_length_valid": patch_valid_length,
+            "evaluation_seed": evaluation_seed,
         },
         "log": {
             "initial_test_output": initial_tests.output,
@@ -793,6 +796,7 @@ def _baseline_run(
             "patch_hash": patch_hash,
             "patch_length": patch_length,
             "patch_length_valid": patch_valid_length,
+            "evaluation_seed": evaluation_seed,
             "patch_applied": patch_applied,
             "patch_log": patch_log,
             "final_test_output": final_tests.output,
@@ -831,8 +835,16 @@ def _mentored_run(
     turns: list[dict[str, Any]] = []
     violations: list[dict[str, Any]] = []
     patch_hashes: list[str] = []
+    evaluation_seed = _seed_for_call(
+        generation.seed,
+        "evaluation",
+        mentor_strategy,
+        mentor_model,
+        worker_model,
+        task_id,
+    )
 
-    current_tests = run_pytest(workdir)
+    current_tests = run_pytest(workdir, pythonhashseed=evaluation_seed)
     _assert_tests_executed(current_tests, task_id=task_id, mode=effective_mode, phase="initial")
     token_accumulator = _estimate_tokens(current_tests.output)
     passed = current_tests.passed
@@ -889,7 +901,7 @@ def _mentored_run(
         elif worker_error:
             patch_log = worker_error
 
-        current_tests = run_pytest(workdir)
+        current_tests = run_pytest(workdir, pythonhashseed=evaluation_seed)
         _assert_tests_executed(
             current_tests,
             task_id=task_id,
@@ -916,6 +928,7 @@ def _mentored_run(
             "tests_executed": int(current_tests.tests_executed),
             "tests_passed": int(current_tests.tests_passed),
             "tests_failed": int(current_tests.tests_failed),
+            "evaluation_seed": evaluation_seed,
         }
 
         if worker_error:
@@ -1008,6 +1021,7 @@ def _mentored_run(
         "mode": mode_name,
         "task_id": task_id,
         "seed": generation.seed,
+        "evaluation_seed": evaluation_seed,
         "worker_model": worker_model,
         "mentor_model": mentor_model,
         "pass": passed,
@@ -1033,6 +1047,7 @@ def _mentored_run(
             "final_tests_failed": int(current_tests.tests_failed),
             "patch_hashes": patch_hashes,
             "final_patch_hash": final_patch_hash,
+            "evaluation_seed": evaluation_seed,
         },
         "log": {
             "task_prompt": task_prompt,
@@ -1243,6 +1258,49 @@ def _capture_pip_freeze_hash() -> tuple[str, int]:
     return digest, len(lines)
 
 
+def _model_version_rows(
+    *,
+    provider: str,
+    models: list[str],
+    provider_metadata: dict[str, Any],
+) -> list[dict[str, str]]:
+    model_tags = provider_metadata.get("model_tags", [])
+    tags_by_name: dict[str, dict[str, Any]] = {}
+    if isinstance(model_tags, list):
+        for item in model_tags:
+            if not isinstance(item, dict):
+                continue
+            candidates = (
+                item.get("name"),
+                item.get("model"),
+                item.get("id"),
+            )
+            for candidate in candidates:
+                if isinstance(candidate, str) and candidate:
+                    tags_by_name.setdefault(candidate, item)
+
+    rows: list[dict[str, str]] = []
+    for model in sorted(set(models)):
+        metadata = tags_by_name.get(model, {})
+        version = ""
+        if isinstance(metadata, dict):
+            for key in ("digest", "id", "model", "name", "modified_at"):
+                value = metadata.get(key)
+                if isinstance(value, str) and value.strip():
+                    version = value.strip()
+                    break
+        if not version:
+            version = model
+        rows.append(
+            {
+                "provider": provider,
+                "model": model,
+                "version": version,
+            }
+        )
+    return rows
+
+
 def _capture_runtime_context(
     *,
     mentor_client: LLMClient,
@@ -1276,6 +1334,25 @@ def _capture_runtime_context(
         provider_details["openai"] = {}
 
     pip_freeze_sha256, pip_freeze_line_count = _capture_pip_freeze_hash()
+    git_commit = _git_commit_hash()
+    git_dirty = _git_is_dirty()
+
+    model_versions = sorted(
+        _model_version_rows(
+            provider=mentor_provider,
+            models=mentor_models,
+            provider_metadata=provider_details.get(mentor_provider, {}),
+        )
+        + _model_version_rows(
+            provider=worker_provider,
+            models=worker_models,
+            provider_metadata=provider_details.get(worker_provider, {}),
+        ),
+        key=lambda row: (row["provider"], row["model"], row["version"]),
+    )
+    os_label = f"{platform.system()} {platform.release()}".strip()
+    python_version = platform.python_version()
+    architecture = platform.machine()
 
     return {
         "benchmark_version": __version__,
@@ -1299,8 +1376,15 @@ def _capture_runtime_context(
         "ollama": provider_details["ollama"],
         "openai": provider_details["openai"],
         "git": {
-            "commit": _git_commit_hash(),
-            "dirty": _git_is_dirty(),
+            "commit": git_commit,
+            "dirty": git_dirty,
+        },
+        "reproducibility": {
+            "python_version": python_version,
+            "os": os_label,
+            "cpu_architecture": architecture,
+            "model_versions": model_versions,
+            "commit_hash": git_commit,
         },
         "task_pack": {
             "id": task_pack_id,
@@ -1467,7 +1551,8 @@ def run_sanity_check(
     for task in selection.tasks:
         temp_dir, workdir = materialize_task(task)
         try:
-            test_result = run_pytest(workdir)
+            evaluation_seed = _seed_for_call(seed, "sanity", task.task_id)
+            test_result = run_pytest(workdir, pythonhashseed=evaluation_seed)
             status = "expected_failure"
             if test_result.exit_code == 0:
                 status = "unexpected_pass"
@@ -1483,6 +1568,7 @@ def run_sanity_check(
                     "task_id": task.task_id,
                     "category": task.category,
                     "split": task.split,
+                    "evaluation_seed": evaluation_seed,
                     "status": status,
                     "exit_code": test_result.exit_code,
                     "duration_seconds": round(test_result.duration_seconds, 4),
@@ -1622,6 +1708,7 @@ def run_benchmark(
                         workdir=workdir,
                         generation=generation,
                     )
+                    baseline["task_category"] = task.category
                     runs.append(baseline)
                     baseline_lookup[(worker_model, task.task_id)] = bool(baseline["pass"])
                 finally:
@@ -1647,6 +1734,7 @@ def run_benchmark(
                             generation=generation,
                             mentor_strategy="real",
                         )
+                        mentored["task_category"] = task.category
                         mentored["baseline_pass"] = baseline_lookup.get((worker_model, task.task_id))
                         runs.append(mentored)
                     finally:
@@ -1671,6 +1759,7 @@ def run_benchmark(
                         generation=generation,
                         mentor_strategy="dummy_control",
                     )
+                    control["task_category"] = task.category
                     control["baseline_pass"] = baseline_lookup.get((worker_model, task.task_id))
                     runs.append(control)
                 finally:
@@ -1751,6 +1840,12 @@ def run_benchmark(
                 "mentor_num_predict": generation.mentor_num_predict,
                 "seed": generation.seed,
             },
+            "determinism": {
+                "task_order_seed": int(config.seed),
+                "prompt_seed_base": int(generation.seed),
+                "evaluation_seed_base": int(_seed_for_call(generation.seed, "evaluation")),
+                "pythonhashseed": 0,
+            },
             "task_pack": selection.task_pack,
             "task_pack_version": selection.pack_version,
             "task_pack_source": selection.pack_source,
@@ -1786,6 +1881,7 @@ def run_benchmark(
         "violations": all_violations,
         "aggregates": aggregates,
     }
+    _attach_reproducibility_manifest(results)
 
     if write_outputs:
         config.results_path.parent.mkdir(parents=True, exist_ok=True)
@@ -1989,6 +2085,99 @@ def _compute_budget_manifest(
     }
 
 
+def _run_signature_rows(runs: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    rows: list[dict[str, Any]] = []
+    for run in runs:
+        if not isinstance(run, dict):
+            continue
+        seed_raw = run.get("seed")
+        seed = int(seed_raw) if isinstance(seed_raw, (int, float)) and not isinstance(seed_raw, bool) else 0
+        patch_hashes_raw = run.get("patch_hashes", [])
+        patch_hashes = (
+            [str(item) for item in patch_hashes_raw if isinstance(item, str)]
+            if isinstance(patch_hashes_raw, list)
+            else []
+        )
+        rows.append(
+            {
+                "seed": seed,
+                "mode": str(run.get("mode", "")),
+                "task_id": str(run.get("task_id", "")),
+                "worker_model": str(run.get("worker_model", "")),
+                "mentor_model": str(run.get("mentor_model", "")),
+                "pass": bool(run.get("pass", False)),
+                "turns_used": int(run.get("turns_used", 0) or 0),
+                "tests_executed": int(run.get("tests_executed", 0) or 0),
+                "tests_passed": int(run.get("tests_passed", 0) or 0),
+                "tests_failed": int(run.get("tests_failed", 0) or 0),
+                "patch_hash": str(run.get("patch_hash", "") or ""),
+                "patch_hashes": patch_hashes,
+            }
+        )
+    rows.sort(
+        key=lambda row: (
+            int(row["seed"]),
+            str(row["mode"]),
+            str(row["worker_model"]),
+            str(row["mentor_model"]),
+            str(row["task_id"]),
+        )
+    )
+    return rows
+
+
+def _deterministic_reproducibility_hash(results_payload: dict[str, Any]) -> str:
+    config = results_payload.get("config", {})
+    if not isinstance(config, dict):
+        config = {}
+
+    determinism = config.get("determinism", {})
+    if not isinstance(determinism, dict):
+        determinism = {}
+
+    material = {
+        "task_pack": config.get("task_pack"),
+        "suite": config.get("suite"),
+        "run_modes": config.get("run_modes"),
+        "seed_list": config.get("seed_list"),
+        "generation_seed": config.get("generation", {}).get("seed")
+        if isinstance(config.get("generation"), dict)
+        else None,
+        "determinism": determinism,
+        "runs": _run_signature_rows(results_payload.get("runs", []) if isinstance(results_payload.get("runs"), list) else []),
+        "aggregates": results_payload.get("aggregates", {}),
+    }
+    payload = json.dumps(material, sort_keys=True, separators=(",", ":"), ensure_ascii=True)
+    return hashlib.sha256(payload.encode("utf-8")).hexdigest()
+
+
+def _attach_reproducibility_manifest(results_payload: dict[str, Any]) -> None:
+    config = results_payload.get("config", {})
+    if not isinstance(config, dict):
+        config = {}
+    determinism = config.get("determinism", {})
+    if not isinstance(determinism, dict):
+        determinism = {}
+
+    seed_list = config.get("seed_list")
+    if isinstance(seed_list, list):
+        normalized_seeds = [int(seed) for seed in seed_list if isinstance(seed, int)]
+    else:
+        generation = config.get("generation", {})
+        seed = generation.get("seed") if isinstance(generation, dict) else None
+        normalized_seeds = [int(seed)] if isinstance(seed, int) else []
+
+    results_payload["reproducibility"] = {
+        "seed_policy": "deterministic",
+        "task_order_seed": determinism.get("task_order_seed"),
+        "prompt_seed_base": determinism.get("prompt_seed_base"),
+        "evaluation_seed_base": determinism.get("evaluation_seed_base"),
+        "pythonhashseed": determinism.get("pythonhashseed"),
+        "seed_list": normalized_seeds,
+        "deterministic_output_sha256": _deterministic_reproducibility_hash(results_payload),
+    }
+
+
 def _merge_compute_budget(
     *,
     replicate_results: list[dict[str, Any]],
@@ -2113,6 +2302,34 @@ def _combine_replicate_results(
         max_turns=max_turns,
         timeout_seconds=timeout_seconds,
     )
+    worker_models = (
+        [str(item) for item in first_config.get("worker_models", []) if isinstance(item, str)]
+        if isinstance(first_config.get("worker_models"), list)
+        else []
+    )
+    mentor_models = (
+        [str(item) for item in first_config.get("mentor_models", []) if isinstance(item, str)]
+        if isinstance(first_config.get("mentor_models"), list)
+        else []
+    )
+    if not mentor_models:
+        mentor_models = worker_models
+
+    task_categories: dict[str, str] = {}
+    for run in merged_runs:
+        if not isinstance(run, dict):
+            continue
+        task_id = run.get("task_id")
+        task_category = run.get("task_category")
+        if isinstance(task_id, str) and task_id and isinstance(task_category, str) and task_category:
+            task_categories[task_id] = task_category
+
+    merged_aggregates = _compute_aggregates(
+        runs=merged_runs,
+        worker_models=worker_models,
+        mentor_models=mentor_models,
+        task_categories=task_categories,
+    )
 
     merged = {
         "generated_at": datetime.now(tz=UTC).isoformat(),
@@ -2122,6 +2339,15 @@ def _combine_replicate_results(
             "run_group_id": run_group_id,
             "seed_list": [int(seed) for seed in seeds],
             "seed_count": len(seeds),
+            "determinism": {
+                **(
+                    first_config.get("determinism", {})
+                    if isinstance(first_config.get("determinism"), dict)
+                    else {}
+                ),
+                "seed_list": [int(seed) for seed in seeds],
+                "seed_count": len(seeds),
+            },
             "run_modes": run_modes,
         },
         "environment": first.get("environment", {}),
@@ -2145,7 +2371,7 @@ def _combine_replicate_results(
         "integrity": integrity,
         "runs": merged_runs,
         "violations": merged_violations,
-        "aggregates": first.get("aggregates", {}),
+        "aggregates": merged_aggregates,
         "replicates": replicate_payloads,
     }
     return merged
@@ -2210,6 +2436,7 @@ def run_multi_seed_benchmark(
         seeds=[int(seed) for seed in seeds],
         run_group_id=run_group_id,
     )
+    _attach_reproducibility_manifest(merged)
 
     config.results_path.parent.mkdir(parents=True, exist_ok=True)
     config.results_path.write_text(json.dumps(merged, indent=2), encoding="utf-8")
