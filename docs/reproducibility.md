@@ -2,6 +2,33 @@
 
 This document lists the exact commands used to reproduce benchmark checks and artifacts.
 
+## One-Command Leaderboard Reproduction
+
+Run the full reproducibility pipeline:
+
+```bash
+./scripts/reproduce_leaderboard.sh
+```
+
+This command performs all required steps in order:
+
+1. Installs pinned Python dependencies into `.venv`.
+2. Verifies/pulls required Ollama models.
+3. Runs the canonical quick benchmark protocol.
+4. Rebuilds leaderboard artifacts with strict submission verification.
+5. Audits the resulting benchmark artifact integrity.
+
+Useful environment overrides:
+
+- `PYTHON_BIN` (bootstrap Python, default: `python3`)
+- `VENV_DIR` (default: `.venv`)
+- `RESULTS_PATH` (default: `results/reproducible_quick_protocol-v0.3.0_results.json`)
+- `RUN_LOG_PATH`
+- `SUBMISSION_PATH`
+- `SEEDS` (default: `1337`)
+- `CANONICAL_WORKER_MODELS` (default: `phi3:mini,qwen2.5-coder:7b`)
+- `CANONICAL_MENTOR_MODELS` (default: `llama3.1:8b,mistral:7b`)
+
 ## Python Command
 
 Use the virtualenv interpreter when available:

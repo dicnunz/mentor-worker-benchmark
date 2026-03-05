@@ -8,7 +8,7 @@
 Core docs:
 - [Live Leaderboard](https://dicnunz.github.io/mentor-worker-benchmark/)
 - [Methodology](docs/METHODOLOGY.md)
-- [Reproducibility](docs/REPRODUCIBILITY.md)
+- [Reproducibility](docs/reproducibility.md)
 - [Submit Results](docs/SUBMIT_RESULTS.md)
 - [Pack Data Cards](docs/PACKS.md)
 
