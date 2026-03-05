@@ -312,6 +312,15 @@ def _two_sided_pvalue(distribution: list[float]) -> float | None:
     return min(1.0, 2.0 * min(less_equal_zero, greater_equal_zero))
 
 
+def _one_sided_pvalue_lift_gt_zero(distribution: list[float]) -> float | None:
+    if not distribution:
+        return None
+    # Add-one smoothing avoids returning exactly 0.0 for finite bootstrap draws.
+    n = len(distribution)
+    non_positive = sum(1 for value in distribution if value <= 0.0)
+    return (non_positive + 1.0) / (n + 1.0)
+
+
 def generate_analysis_payload(
     results_payload: dict[str, Any],
     *,
@@ -438,8 +447,13 @@ def generate_analysis_payload(
         lift_ci_excludes_zero = False
         if lift_ci_low is not None and lift_ci_high is not None:
             lift_ci_excludes_zero = lift_ci_low > 0.0 or lift_ci_high < 0.0
-        paired_pvalue = _two_sided_pvalue(lift_distribution)
-        paired_significant = bool(paired_pvalue is not None and paired_pvalue < 0.05)
+        paired_pvalue_two_sided = _two_sided_pvalue(lift_distribution)
+        paired_pvalue_lift_gt_zero = _one_sided_pvalue_lift_gt_zero(lift_distribution)
+        paired_significant = bool(
+            paired_pvalue_lift_gt_zero is not None
+            and paired_pvalue_lift_gt_zero < 0.05
+            and (lift_mean or 0.0) > 0.0
+        )
 
         groups_payload.append(
             {
@@ -460,10 +474,12 @@ def generate_analysis_payload(
                 "lift_ci_high": _round_or_none(lift_ci_high),
                 "lift_ci_excludes_zero": lift_ci_excludes_zero,
                 "lift_significant": lift_ci_excludes_zero,
+                "lift_p_value_gt_zero": _round_or_none(paired_pvalue_lift_gt_zero, 8),
                 "paired_significance": {
                     "method": PAIRED_SIGNIFICANCE_METHOD,
                     "significant": paired_significant,
-                    "p_value_two_sided": _round_or_none(paired_pvalue, 8),
+                    "p_value_two_sided": _round_or_none(paired_pvalue_two_sided, 8),
+                    "p_value_lift_gt_zero": _round_or_none(paired_pvalue_lift_gt_zero, 8),
                     "ci_low": _round_or_none(lift_ci_low),
                     "ci_high": _round_or_none(lift_ci_high),
                     "task_pair_count": int(sum(len(item) for item in replicate_pair_diffs)),
@@ -575,6 +591,17 @@ def validate_analysis_payload(payload: dict[str, Any]) -> list[str]:
                             f"{path}.paired_significance.{paired_numeric}",
                             errors,
                         )
+                    _expect_number_or_none(
+                        paired.get("p_value_lift_gt_zero"),
+                        f"{path}.paired_significance.p_value_lift_gt_zero",
+                        errors,
+                    )
+
+            _expect_number_or_none(
+                item.get("lift_p_value_gt_zero"),
+                f"{path}.lift_p_value_gt_zero",
+                errors,
+            )
 
     return errors
 

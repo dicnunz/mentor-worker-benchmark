@@ -368,7 +368,16 @@ def _normalize_submission(submission_path: Path) -> dict[str, Any]:
     mentored_ci_high = round(_metric_or_default(primary_group.get("mentored_ci_high"), mentored_mean), 4)
     lift_ci_low = round(_metric_or_default(primary_group.get("lift_ci_low"), lift_mean), 4)
     lift_ci_high = round(_metric_or_default(primary_group.get("lift_ci_high"), lift_mean), 4)
-    lift_significant = bool(primary_group.get("lift_significant", False))
+    lift_ci_excludes_zero = lift_ci_low > 0.0 or lift_ci_high < 0.0
+    if isinstance(primary_group.get("lift_significant"), bool):
+        lift_significant = bool(primary_group.get("lift_significant"))
+    else:
+        lift_significant = lift_ci_excludes_zero
+    lift_p_value_gt_zero = _safe_float(primary_group.get("lift_p_value_gt_zero"))
+    if lift_p_value_gt_zero is None:
+        paired = primary_group.get("paired_significance")
+        if isinstance(paired, dict):
+            lift_p_value_gt_zero = _safe_float(paired.get("p_value_lift_gt_zero"))
 
     return {
         "submission_id": stem,
@@ -415,6 +424,9 @@ def _normalize_submission(submission_path: Path) -> dict[str, Any]:
         "lift_ci_low": lift_ci_low,
         "lift_ci_high": lift_ci_high,
         "lift_significant": lift_significant,
+        "lift_p_value_gt_zero": round(lift_p_value_gt_zero, 8)
+        if isinstance(lift_p_value_gt_zero, float)
+        else None,
         "best_worker": {
             "worker_model": str(best_worker.get("worker_model", "")) if isinstance(best_worker, dict) else "",
             # Keep legacy fields but map to analysis means for backward-compatible UI consumers.

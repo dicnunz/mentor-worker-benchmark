@@ -215,6 +215,8 @@ def test_normalize_submission_surfaces_analysis_means_cis_and_significance(
     assert normalized["mentored_ci_low"] <= normalized["mentored_ci_high"]
     assert normalized["lift_ci_low"] <= normalized["lift_ci_high"]
     assert isinstance(normalized["lift_significant"], bool)
+    assert isinstance(normalized["lift_p_value_gt_zero"], float)
+    assert 0.0 <= normalized["lift_p_value_gt_zero"] <= 1.0
     assert normalized["best_worker"]["baseline_pass_rate"] == normalized["baseline_mean"]
     assert normalized["best_worker"]["mentored_pass_rate"] == normalized["mentored_mean"]
     assert normalized["best_worker"]["lift"] == normalized["lift_mean"]

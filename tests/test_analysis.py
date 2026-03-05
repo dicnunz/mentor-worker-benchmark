@@ -46,4 +46,8 @@ def test_generate_analysis_includes_ci_and_significance_fields() -> None:
     assert group["mentored_ci_low"] <= group["mentored_ci_high"]
     assert group["lift_ci_low"] <= group["lift_ci_high"]
     assert isinstance(group["lift_significant"], bool)
+    assert isinstance(group["lift_p_value_gt_zero"], float)
+    assert 0.0 <= group["lift_p_value_gt_zero"] <= 1.0
     assert isinstance(group["paired_significance"]["significant"], bool)
+    assert isinstance(group["paired_significance"]["p_value_lift_gt_zero"], float)
+    assert group["paired_significance"]["p_value_lift_gt_zero"] == group["lift_p_value_gt_zero"]
