@@ -1,1 +1,0 @@
-RULE:unused_import|SEVERITY:warn|FILE:quartz.py|LINE:69\nRULE:unsafe_eval|SEVERITY:error|FILE:umbra.py|LINE:79\nRULE:line_too_long|SEVERITY:info|FILE:quartz.py|LINE:89\nRULE:unused_import|SEVERITY:warn|FILE:umbra.py|LINE:99\n

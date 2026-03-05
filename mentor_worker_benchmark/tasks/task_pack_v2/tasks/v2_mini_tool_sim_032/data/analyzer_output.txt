@@ -1,1 +1,0 @@
-RULE:unused_import|SEVERITY:warn|FILE:ion.py|LINE:42\nRULE:unsafe_eval|SEVERITY:error|FILE:signal.py|LINE:52\nRULE:line_too_long|SEVERITY:info|FILE:ion.py|LINE:62\nRULE:unused_import|SEVERITY:warn|FILE:signal.py|LINE:72\n

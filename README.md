@@ -3,7 +3,7 @@
 [![CI](https://github.com/dicnunz/mentor-worker-benchmark/actions/workflows/ci.yml/badge.svg)](https://github.com/dicnunz/mentor-worker-benchmark/actions/workflows/ci.yml)
 [![GitHub Pages](https://img.shields.io/website?down_color=lightgrey&down_message=down&label=pages&up_color=brightgreen&up_message=live&url=https%3A%2F%2Fdicnunz.github.io%2Fmentor-worker-benchmark%2F)](https://dicnunz.github.io/mentor-worker-benchmark/)
 
-`mentor-worker-benchmark` is a fully local benchmark for measuring whether a **mentor LLM** improves a **worker LLM** on objective coding tasks.
+`mentor-worker-benchmark` is a fully local benchmark for measuring whether a **mentor LLM** improves a **worker LLM** on deterministic, objectively scored coding tasks.
 
 Core docs:
 - [Live Leaderboard](https://dicnunz.github.io/mentor-worker-benchmark/)
@@ -24,10 +24,18 @@ Many “AI collaboration” evaluations are hard to verify and easy to game. Thi
 
 The benchmark includes controls and ablations (baseline worker-only and dummy-mentor control), plus guardrails against mentor cheating and unsafe patches.
 
+## Benchmark Construct
+
+- The worker sees the task prompt, a workspace snapshot, failing `pytest` output, and test files.
+- The benchmark therefore measures **test-driven repair ability**, not blind synthesis from a hidden oracle.
+- Tasks are deterministic local Python repair tasks.
+- No internet access is allowed or required during execution.
+- The evaluation oracle is the local `pytest` suite bundled with each task.
+
 ## What It Measures (And What It Doesn’t)
 
 What it measures:
-- Task success rate on objective Python microtasks with unit tests.
+- Task success rate on deterministic Python repair tasks scored by unit tests.
 - Mentorship lift: mentored pass rate minus worker-only baseline.
 - Control performance with non-informative mentor advice.
 - Mentor constraint violation rate.
@@ -37,13 +45,19 @@ What it does not measure:
 - Subjective style or readability judgments.
 - Real-world long-horizon software engineering workflows.
 
+Open-benchmark limitation:
+- The task corpus, tests, and submission bundles are public, so leaderboard overfitting is possible. Treat leaderboard results as transparent benchmark behavior on an open corpus, not as performance on a hidden holdout.
+
 ## Task Pack and Splits
 
 Default pack: `task_pack_v2` (mini-repo realism).
 
-`task_pack_v2` contains 500 deterministic tasks:
-- `300` curated tasks from the v1-style corpus.
-- `200` new mini-repo tasks (4-12 files) that require cross-module reasoning.
+`task_pack_v2` contains `473` active deterministic tasks after exact-family deduplication for split independence.
+
+Source provenance:
+- `652` source tasks were generated and audited.
+- `38` exact duplicate families were detected in the source corpus.
+- The active release keeps one representative per exact family.
 
 Categories:
 
@@ -59,9 +73,9 @@ Categories:
 10. `mini_repo_tool_sim`
 
 Splits:
-- `train`: 340
-- `dev`: 80
-- `test`: 80
+- `train`: 265
+- `dev`: 104
+- `test`: 104
 - `quick`: 30 curated eval tasks (balanced fast profile)
 
 Default benchmark behavior runs `dev+test` unless overridden.
@@ -199,7 +213,7 @@ Headline policy:
 ## How To Interpret Headline Numbers
 
 - Headline `Baseline`, `Mentored`, and `Lift` are multi-seed means (not single-point pass rates).
-- Confidence intervals are 95% bootstrap CIs computed deterministically from task outcomes.
+- Confidence intervals are 95% bootstrap CIs computed deterministically from task-family outcomes.
 - A `sig` lift marker means the 95% lift CI excludes `0`.
 - Sanity suites (`quick`/`dev10`) remain harness-health checks, not headline claims.
 

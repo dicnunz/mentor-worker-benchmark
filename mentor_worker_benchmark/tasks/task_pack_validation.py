@@ -12,6 +12,9 @@ from statistics import mean, median
 from typing import Any
 
 from mentor_worker_benchmark.tasks.task_codegen_py.harness import run_pytest
+from mentor_worker_benchmark.tasks.task_pack_v2.exact_families import (
+    compute_exact_family_hash_for_task_dir,
+)
 
 REQUIRED_TOP_LEVEL_KEYS = {"pack_name", "pack_version", "counts", "categories", "tasks"}
 REQUIRED_TASK_FIELDS = {
@@ -69,10 +72,10 @@ PACK_EXPECTATIONS: dict[str, dict[str, Any]] = {
         },
     },
     "task_pack_v2": {
-        "total": 652,
-        "splits": {"train": 444, "dev": 104, "test": 104},
+        "total": 473,
+        "splits": {"train": 265, "dev": 104, "test": 104},
         "quick": 30,
-        "difficulty": {"easy": 228, "medium": 293, "hard": 131},
+        "difficulty": {"easy": 167, "medium": 205, "hard": 101},
         "strength_policy": {
             "min_strength_score": 22,
             "max_low_strength_fraction": 0.20,
@@ -181,6 +184,83 @@ def _safe_int(value: Any, default: int = 0) -> int:
     if isinstance(value, float):
         return int(value)
     return default
+
+
+def _validate_exact_family_integrity(*, root: Path, tasks: list[dict[str, Any]]) -> tuple[list[str], dict[str, Any]]:
+    errors: list[str] = []
+    report: dict[str, Any] = {
+        "enabled": False,
+        "active_family_count": 0,
+        "duplicate_family_count": 0,
+        "cross_split_family_count": 0,
+        "cross_split_task_count": 0,
+        "eval_family_duplicates": 0,
+        "metadata_hash_mismatches": 0,
+    }
+
+    if not tasks or not any(isinstance(task, dict) and "family_id" in task for task in tasks):
+        report["reason"] = "family_id_not_present"
+        return errors, report
+
+    report["enabled"] = True
+    families: dict[str, list[tuple[str, str]]] = {}
+    metadata_mismatches = 0
+    for task in tasks:
+        if not isinstance(task, dict):
+            continue
+        task_id = str(task.get("task_id", ""))
+        split = str(task.get("split", ""))
+        rel_path = str(task.get("path", ""))
+        metadata_family_id = str(task.get("family_id", ""))
+        task_dir = (root / rel_path).resolve()
+        if not task_dir.exists():
+            continue
+        actual_family_id = compute_exact_family_hash_for_task_dir(task_dir)
+        if metadata_family_id and metadata_family_id != actual_family_id:
+            metadata_mismatches += 1
+            errors.append(
+                f"Task {task_id} family_id mismatch: metadata={metadata_family_id}, actual={actual_family_id}"
+            )
+        family_key = actual_family_id if actual_family_id else metadata_family_id
+        families.setdefault(family_key, []).append((task_id, split))
+
+    duplicate_family_count = sum(1 for members in families.values() if len(members) > 1)
+    cross_split_family_count = 0
+    cross_split_task_count = 0
+    eval_family_duplicates = 0
+    for members in families.values():
+        splits = {split for _, split in members}
+        eval_members = [item for item in members if item[1] in {"dev", "test"}]
+        if len(splits) > 1:
+            cross_split_family_count += 1
+            cross_split_task_count += len(members)
+        if len(eval_members) > 1:
+            eval_family_duplicates += 1
+
+    report.update(
+        {
+            "active_family_count": len(families),
+            "duplicate_family_count": duplicate_family_count,
+            "cross_split_family_count": cross_split_family_count,
+            "cross_split_task_count": cross_split_task_count,
+            "eval_family_duplicates": eval_family_duplicates,
+            "metadata_hash_mismatches": metadata_mismatches,
+        }
+    )
+
+    if duplicate_family_count:
+        errors.append(f"Active pack still contains {duplicate_family_count} duplicated exact families.")
+    if cross_split_family_count:
+        errors.append(
+            f"Active pack has {cross_split_family_count} exact families spanning multiple splits "
+            f"({cross_split_task_count} tasks)."
+        )
+    if eval_family_duplicates:
+        errors.append(
+            f"Active pack has {eval_family_duplicates} exact families with multiple dev/test representatives."
+        )
+
+    return errors, report
 
 
 def _score_distribution(values: list[int]) -> dict[str, Any]:
@@ -830,6 +910,7 @@ def validate_task_pack_payload(
         "strict": bool(strict),
         "schema_errors": [],
         "strength_gates": {"enabled": False, "reason": "not_computed"},
+        "exact_family_integrity": {"enabled": False, "reason": "not_computed"},
     }
 
     if not isinstance(schema, dict):
@@ -953,6 +1034,37 @@ def validate_task_pack_payload(
     expected_difficulty = expected.get("difficulty") if isinstance(expected, dict) else None
     if isinstance(expected_difficulty, dict) and difficulty_counts != expected_difficulty:
         errors.append(f"Unexpected difficulty counts: {difficulty_counts}")
+
+    exact_family_errors, exact_family_report = _validate_exact_family_integrity(root=root, tasks=tasks)
+    report["exact_family_integrity"] = exact_family_report
+    errors.extend(exact_family_errors)
+
+    source_audit = payload.get("source_audit")
+    if isinstance(source_audit, dict) and exact_family_report.get("enabled"):
+        source_total = _safe_int(source_audit.get("total_tasks"))
+        source_exact = _safe_int(source_audit.get("exact_family_count"))
+        duplicate_removed = _safe_int(source_audit.get("duplicate_tasks_removed"))
+        cross_split = source_audit.get("cross_split_overlap", {})
+        if source_total is not None and source_total < len(tasks):
+            errors.append(
+                f"source_audit.total_tasks ({source_total}) cannot be smaller than active task count ({len(tasks)})."
+            )
+        if source_exact is not None and source_exact != len(tasks):
+            errors.append(
+                f"source_audit.exact_family_count mismatch: expected {len(tasks)}, found {source_exact}"
+            )
+        if source_total is not None and duplicate_removed is not None:
+            expected_removed = source_total - len(tasks)
+            if duplicate_removed != expected_removed:
+                errors.append(
+                    f"source_audit.duplicate_tasks_removed mismatch: expected {expected_removed}, "
+                    f"found {duplicate_removed}"
+                )
+        if isinstance(cross_split, dict):
+            family_count = _safe_int(cross_split.get("family_count"), default=-1)
+            task_count = _safe_int(cross_split.get("task_count"), default=-1)
+            if family_count < 0 or task_count < 0:
+                errors.append("source_audit.cross_split_overlap must include non-negative family/task counts")
 
     allowlist = allowlist_path or (root / "strength_allowlist.json")
     strength_report = build_task_strength_report(

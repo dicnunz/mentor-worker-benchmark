@@ -59,7 +59,7 @@ python -m mentor_worker_benchmark verify \
 Submission zip contents:
 - `results.json`
 - `environment.json`
-- `analysis.json` (deterministic CI/significance analysis)
+- `analysis.json` (deterministic task-family CI/significance analysis)
 - `submission_manifest.json` (commit, task-pack version, CLI command, protocol metadata, compute budget)
 
 By default, manual exports are labeled `community (not official)`.

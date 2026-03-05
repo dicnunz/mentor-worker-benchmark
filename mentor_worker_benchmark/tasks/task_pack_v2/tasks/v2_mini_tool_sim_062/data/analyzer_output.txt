@@ -1,1 +1,0 @@
-RULE:unused_import|SEVERITY:warn|FILE:onyx.py|LINE:72\nRULE:unsafe_eval|SEVERITY:error|FILE:yonder.py|LINE:82\nRULE:line_too_long|SEVERITY:info|FILE:onyx.py|LINE:92\nRULE:unused_import|SEVERITY:warn|FILE:yonder.py|LINE:102\n

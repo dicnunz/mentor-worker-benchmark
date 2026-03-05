@@ -60,7 +60,7 @@ def _selection_for_task(task: TaskDefinition) -> TaskSelection:
         selector_source="suite",
         suite="quick",
         tasks=[task],
-        pack_version="2.0.0",
+        pack_version="2.1.0",
         pack_source="registry",
         pack_license="MIT",
         pack_hash="a" * 64,

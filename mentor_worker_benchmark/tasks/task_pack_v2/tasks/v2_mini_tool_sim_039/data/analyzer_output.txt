@@ -1,1 +1,0 @@
-RULE:unused_import|SEVERITY:warn|FILE:beacon.py|LINE:49\nRULE:unsafe_eval|SEVERITY:error|FILE:grove.py|LINE:59\nRULE:line_too_long|SEVERITY:info|FILE:beacon.py|LINE:69\nRULE:unused_import|SEVERITY:warn|FILE:grove.py|LINE:79\n

@@ -1,1 +1,0 @@
-RULE:unused_import|SEVERITY:warn|FILE:umbra.py|LINE:81\nRULE:unsafe_eval|SEVERITY:error|FILE:nova.py|LINE:91\nRULE:line_too_long|SEVERITY:info|FILE:umbra.py|LINE:101\nRULE:unused_import|SEVERITY:warn|FILE:nova.py|LINE:111\n

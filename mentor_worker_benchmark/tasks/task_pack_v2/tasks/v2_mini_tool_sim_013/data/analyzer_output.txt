@@ -1,1 +1,0 @@
-RULE:unused_import|SEVERITY:warn|FILE:quartz.py|LINE:23\nRULE:unsafe_eval|SEVERITY:error|FILE:onyx.py|LINE:33\nRULE:line_too_long|SEVERITY:info|FILE:quartz.py|LINE:43\nRULE:unused_import|SEVERITY:warn|FILE:onyx.py|LINE:53\n

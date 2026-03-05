@@ -1,1 +1,0 @@
-RULE:unused_import|SEVERITY:warn|FILE:nova.py|LINE:80\nRULE:unsafe_eval|SEVERITY:error|FILE:ion.py|LINE:90\nRULE:line_too_long|SEVERITY:info|FILE:nova.py|LINE:100\nRULE:unused_import|SEVERITY:warn|FILE:ion.py|LINE:110\n

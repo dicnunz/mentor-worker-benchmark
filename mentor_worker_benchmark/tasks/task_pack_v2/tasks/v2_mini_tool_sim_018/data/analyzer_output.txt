@@ -1,1 +1,0 @@
-RULE:unused_import|SEVERITY:warn|FILE:timber.py|LINE:28\nRULE:unsafe_eval|SEVERITY:error|FILE:zenith.py|LINE:38\nRULE:line_too_long|SEVERITY:info|FILE:timber.py|LINE:48\nRULE:unused_import|SEVERITY:warn|FILE:zenith.py|LINE:58\n

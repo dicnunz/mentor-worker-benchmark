@@ -6,8 +6,8 @@ def test_task_pack_v2_counts() -> None:
     metadata = read_pack_metadata()
     counts = metadata["counts"]
 
-    assert counts["total"] == 652
-    assert counts["train"] == 444
+    assert counts["total"] == 473
+    assert counts["train"] == 265
     assert counts["dev"] == 104
     assert counts["test"] == 104
     assert counts["quick"] == 30
@@ -36,7 +36,18 @@ def test_task_pack_v2_difficulty_distribution() -> None:
     counts = {"easy": 0, "medium": 0, "hard": 0}
     for row in tasks:
         counts[row["difficulty"]] += 1
-    assert counts == {"easy": 228, "medium": 293, "hard": 131}
+    assert counts == {"easy": 167, "medium": 205, "hard": 101}
+
+
+def test_task_pack_v2_source_audit_and_family_ids() -> None:
+    metadata = read_pack_metadata()
+    source_audit = metadata["source_audit"]
+    family_ids = [row["family_id"] for row in metadata["tasks"]]
+
+    assert source_audit["total_tasks"] == 652
+    assert source_audit["exact_family_count"] == 473
+    assert source_audit["duplicate_families_detected"] == 38
+    assert len(family_ids) == len(set(family_ids))
 
 
 def test_task_pack_v2_schema_validation() -> None:

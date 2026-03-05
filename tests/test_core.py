@@ -144,7 +144,7 @@ def test_capture_runtime_context_records_pip_hash_and_task_pack(monkeypatch: Any
         mentor_provider="ollama",
         worker_provider="ollama",
         task_pack_id="task_pack_v2",
-        task_pack_version="2.0.0",
+        task_pack_version="2.1.0",
         task_pack_source="registry",
         task_pack_hash="b" * 64,
         task_pack_manifest_path="mentor_worker_benchmark/tasks/task_pack_v2/metadata.json",

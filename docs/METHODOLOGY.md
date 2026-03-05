@@ -11,7 +11,13 @@ Primary question:
 - The worker is the only actor allowed to emit code changes.
 - The mentor is constrained to high-level natural language guidance; code-like output is blocked/sanitized and logged as a violation.
 - The worker output must be a unified diff patch applied inside an isolated task workspace.
-- Task outcome is objective: `pytest` pass/fail on task tests.
+- The worker sees the task prompt, local workspace snapshot, failing `pytest` output, and test files.
+- No internet access is allowed during execution.
+- Task outcome is objective: the bundled `pytest` suite is the evaluation oracle.
+
+Construct note:
+
+- This benchmark measures deterministic, test-driven repair ability under a visible local test oracle.
 
 Scored modes include:
 
@@ -59,13 +65,14 @@ Analysis (`python -m mentor_worker_benchmark analyze`) reports:
 
 Current CI method label:
 
-- `bootstrap_percentile_95_task_within_replicate_pooled`
+- `bootstrap_percentile_95_task_family_within_replicate_pooled`
 
 Paired significance method label:
 
-- `paired_bootstrap_over_tasks`
+- `paired_bootstrap_over_task_families`
 
 Bootstrap is deterministic; seed provenance is stored (`bootstrap_samples`, `bootstrap_seed`, per-group derived seeds).
+When exact duplicate task families exist in the source corpus, resampling is performed at the task-family level rather than the raw task row level to avoid inflated effective sample size.
 
 ### Determinism Guarantees
 
@@ -125,6 +132,8 @@ What these gates do not guarantee:
 
 ## Pack Registry, External Packs, and Contamination
 
+For `task_pack_v2`, the active release pack contains `473` exact-family-independent tasks selected from a `652`-task generated source corpus. The source corpus audit detected `38` exact duplicate families; split hardening removes those duplicates from the active evaluation corpus by keeping one representative per exact family.
+
 Built-in packs are declared in `mentor_worker_benchmark/packs/registry.json` with data-card fields (license, intended use, limitations, contamination risks, recommendations).
 
 Pack selection supports:
@@ -145,3 +154,4 @@ Contamination remains a limitation:
 
 - task generation is synthetic, but overlap with pretraining patterns cannot be fully excluded;
 - claims should be bounded to measured benchmark behavior and not over-generalized to all software engineering tasks.
+- the task corpus, tests, and exported submission bundles are open, so leaderboard-specific overfitting is possible and headline numbers should not be interpreted as hidden-holdout estimates.

@@ -2,6 +2,12 @@
 
 This document lists the exact commands used to reproduce benchmark checks and artifacts.
 
+`task_pack_v2` reproducibility note:
+
+- Active release pack: `473` exact-family-independent tasks.
+- Audited source corpus: `652` generated tasks.
+- The provenance `--fail-on-overlap` check fails on active exact-family leakage, not on softer near-similarity clusters.
+
 ## One-Command Leaderboard Reproduction
 
 Run the full reproducibility pipeline:

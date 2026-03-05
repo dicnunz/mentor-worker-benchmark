@@ -1,1 +1,0 @@
-RULE:unused_import|SEVERITY:warn|FILE:pioneer.py|LINE:47\nRULE:unsafe_eval|SEVERITY:error|FILE:grove.py|LINE:57\nRULE:line_too_long|SEVERITY:info|FILE:pioneer.py|LINE:67\nRULE:unused_import|SEVERITY:warn|FILE:grove.py|LINE:77\n

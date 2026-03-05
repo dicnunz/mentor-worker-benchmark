@@ -1,1 +1,0 @@
-RULE:unused_import|SEVERITY:warn|FILE:onyx.py|LINE:17\nRULE:unsafe_eval|SEVERITY:error|FILE:kepler.py|LINE:27\nRULE:line_too_long|SEVERITY:info|FILE:onyx.py|LINE:37\nRULE:unused_import|SEVERITY:warn|FILE:kepler.py|LINE:47\n

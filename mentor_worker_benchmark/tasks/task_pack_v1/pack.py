@@ -41,6 +41,7 @@ def load_task_pack_v1() -> list[TaskDefinition]:
                 task_id=task_id,
                 title=str(item["title"]),
                 category=str(item["category"]),
+                family_id=str(item.get("family_id", "")) or None,
                 difficulty=str(item["difficulty"]),
                 split=str(item["split"]),
                 pack_name="task_pack_v1",

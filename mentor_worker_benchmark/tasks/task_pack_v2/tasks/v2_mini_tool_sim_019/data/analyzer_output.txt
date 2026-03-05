@@ -1,1 +1,0 @@
-RULE:unused_import|SEVERITY:warn|FILE:zenith.py|LINE:29\nRULE:unsafe_eval|SEVERITY:error|FILE:mosaic.py|LINE:39\nRULE:line_too_long|SEVERITY:info|FILE:zenith.py|LINE:49\nRULE:unused_import|SEVERITY:warn|FILE:mosaic.py|LINE:59\n

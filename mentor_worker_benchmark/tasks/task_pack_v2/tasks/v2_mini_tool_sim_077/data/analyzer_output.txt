@@ -1,1 +1,0 @@
-RULE:unused_import|SEVERITY:warn|FILE:pioneer.py|LINE:87\nRULE:unsafe_eval|SEVERITY:error|FILE:zenith.py|LINE:97\nRULE:line_too_long|SEVERITY:info|FILE:pioneer.py|LINE:107\nRULE:unused_import|SEVERITY:warn|FILE:zenith.py|LINE:117\n

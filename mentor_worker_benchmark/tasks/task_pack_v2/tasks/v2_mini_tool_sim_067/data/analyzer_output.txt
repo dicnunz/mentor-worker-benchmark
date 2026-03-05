@@ -1,1 +1,0 @@
-RULE:unused_import|SEVERITY:warn|FILE:umbra.py|LINE:77\nRULE:unsafe_eval|SEVERITY:error|FILE:xylem.py|LINE:87\nRULE:line_too_long|SEVERITY:info|FILE:umbra.py|LINE:97\nRULE:unused_import|SEVERITY:warn|FILE:xylem.py|LINE:107\n

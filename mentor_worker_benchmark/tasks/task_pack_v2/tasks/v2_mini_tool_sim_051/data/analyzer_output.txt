@@ -1,1 +1,0 @@
-RULE:unused_import|SEVERITY:warn|FILE:onyx.py|LINE:61\nRULE:unsafe_eval|SEVERITY:error|FILE:ion.py|LINE:71\nRULE:line_too_long|SEVERITY:info|FILE:onyx.py|LINE:81\nRULE:unused_import|SEVERITY:warn|FILE:ion.py|LINE:91\n

@@ -1,1 +1,0 @@
-RULE:unused_import|SEVERITY:warn|FILE:beacon.py|LINE:50\nRULE:unsafe_eval|SEVERITY:error|FILE:harbor.py|LINE:60\nRULE:line_too_long|SEVERITY:info|FILE:beacon.py|LINE:70\nRULE:unused_import|SEVERITY:warn|FILE:harbor.py|LINE:80\n

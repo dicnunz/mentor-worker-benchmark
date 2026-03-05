@@ -55,7 +55,7 @@ def _sample_results_payload() -> dict[str, object]:
             "git": {"commit": "de5a929", "dirty": False},
             "task_pack": {
                 "id": "task_pack_v2",
-                "version": "2.0.0",
+                "version": "2.1.0",
                 "source": "registry",
                 "hash": "b" * 64,
                 "manifest_path": "mentor_worker_benchmark/tasks/task_pack_v2/metadata.json",
@@ -161,7 +161,7 @@ def test_verify_rejects_manifest_with_missing_commit(tmp_path: Path) -> None:
                 {
                     "bundle_version": "1",
                     "task_pack": "task_pack_v2",
-                    "task_pack_version": "2.0.0",
+                    "task_pack_version": "2.1.0",
                     "git_commit_hash": "",
                     "cli_command": "",
                 },
@@ -218,7 +218,7 @@ def test_verify_requires_analysis_for_multi_replicate_results(tmp_path: Path) ->
     payload = json.loads(fixture.read_text(encoding="utf-8"))
 
     out_path = tmp_path / "missing_analysis_multi.zip"
-    task_pack_version = resolve_task_pack_version("task_pack_v2") or "2.0.0"
+    task_pack_version = resolve_task_pack_version("task_pack_v2") or "2.1.0"
     with zipfile.ZipFile(out_path, "w", compression=zipfile.ZIP_DEFLATED) as archive:
         archive.writestr("results.json", json.dumps(payload, indent=2))
         archive.writestr("environment.json", json.dumps(payload["environment"], indent=2))
@@ -244,7 +244,7 @@ def test_verify_requires_analysis_for_multi_replicate_results(tmp_path: Path) ->
 def test_verify_backfills_analysis_for_single_replicate_when_missing(tmp_path: Path) -> None:
     payload = _sample_results_payload()
     out_path = tmp_path / "missing_analysis_single.zip"
-    task_pack_version = resolve_task_pack_version("task_pack_v2") or "2.0.0"
+    task_pack_version = resolve_task_pack_version("task_pack_v2") or "2.1.0"
 
     with zipfile.ZipFile(out_path, "w", compression=zipfile.ZIP_DEFLATED) as archive:
         archive.writestr("results.json", json.dumps(payload, indent=2))
@@ -274,7 +274,7 @@ def test_verify_rejects_new_official_headline_bundle_without_required_multiseed(
     payload = _sample_results_payload()
     payload["config"]["suite"] = "dev50"
     out_path = tmp_path / "official_dev50_protocol-v0.3.0_seeds-1337.zip"
-    task_pack_version = resolve_task_pack_version("task_pack_v2") or "2.0.0"
+    task_pack_version = resolve_task_pack_version("task_pack_v2") or "2.1.0"
 
     with zipfile.ZipFile(out_path, "w", compression=zipfile.ZIP_DEFLATED) as archive:
         archive.writestr("results.json", json.dumps(payload, indent=2))
@@ -315,7 +315,7 @@ def test_verify_rejects_new_official_headline_bundle_without_required_multiseed(
 def test_verify_allows_legacy_official_bundle_without_protocol_fields(tmp_path: Path) -> None:
     payload = _sample_results_payload()
     out_path = tmp_path / "official_legacy_bundle.zip"
-    task_pack_version = resolve_task_pack_version("task_pack_v2") or "2.0.0"
+    task_pack_version = resolve_task_pack_version("task_pack_v2") or "2.1.0"
     with zipfile.ZipFile(out_path, "w", compression=zipfile.ZIP_DEFLATED) as archive:
         archive.writestr("results.json", json.dumps(payload, indent=2))
         archive.writestr("environment.json", json.dumps(payload["environment"], indent=2))

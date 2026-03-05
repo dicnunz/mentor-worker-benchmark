@@ -1,1 +1,0 @@
-RULE:unused_import|SEVERITY:warn|FILE:xylem.py|LINE:59\nRULE:unsafe_eval|SEVERITY:error|FILE:mosaic.py|LINE:69\nRULE:line_too_long|SEVERITY:info|FILE:xylem.py|LINE:79\nRULE:unused_import|SEVERITY:warn|FILE:mosaic.py|LINE:89\n

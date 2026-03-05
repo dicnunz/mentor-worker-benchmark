@@ -1,1 +1,0 @@
-RULE:unused_import|SEVERITY:warn|FILE:timber.py|LINE:86\nRULE:unsafe_eval|SEVERITY:error|FILE:onyx.py|LINE:96\nRULE:line_too_long|SEVERITY:info|FILE:timber.py|LINE:106\nRULE:unused_import|SEVERITY:warn|FILE:onyx.py|LINE:116\n

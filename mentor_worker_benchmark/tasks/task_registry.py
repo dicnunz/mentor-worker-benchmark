@@ -311,6 +311,7 @@ def _load_external_pack(
                 task_id=task_id,
                 title=str(item["title"]),
                 category=str(item["category"]),
+                family_id=str(item.get("family_id", "")) or None,
                 difficulty=str(item["difficulty"]),
                 split=str(item["split"]),
                 pack_name=pack_name,

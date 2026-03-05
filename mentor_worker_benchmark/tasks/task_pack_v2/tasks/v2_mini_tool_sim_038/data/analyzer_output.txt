@@ -1,1 +1,0 @@
-RULE:unused_import|SEVERITY:warn|FILE:nova.py|LINE:48\nRULE:unsafe_eval|SEVERITY:error|FILE:willow.py|LINE:58\nRULE:line_too_long|SEVERITY:info|FILE:nova.py|LINE:68\nRULE:unused_import|SEVERITY:warn|FILE:willow.py|LINE:78\n

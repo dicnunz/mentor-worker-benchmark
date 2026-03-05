@@ -1,1 +1,0 @@
-RULE:unused_import|SEVERITY:warn|FILE:onyx.py|LINE:51\nRULE:unsafe_eval|SEVERITY:error|FILE:vector.py|LINE:61\nRULE:line_too_long|SEVERITY:info|FILE:onyx.py|LINE:71\nRULE:unused_import|SEVERITY:warn|FILE:vector.py|LINE:81\n

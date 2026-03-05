@@ -977,8 +977,8 @@ def _render_index_html(summary: dict[str, Any], output_path: Path) -> None:
     <section class="card intro">
       <h2>What This Measures</h2>
       <p>This benchmark asks one question: does mentor guidance help a worker model solve objective coding tasks scored by tests?</p>
-      <p><strong>Baseline</strong> and <strong>Mentored</strong> are means across replicates with task-level bootstrap confidence intervals.</p>
-      <p><strong>Lift</strong> is mentored minus baseline, with a paired bootstrap CI and a <code>sig</code> marker when CI excludes 0.</p>
+      <p><strong>Baseline</strong> and <strong>Mentored</strong> are means across replicates with task-family bootstrap confidence intervals.</p>
+      <p><strong>Lift</strong> is mentored minus baseline, with a paired task-family bootstrap CI and a <code>sig</code> marker when CI excludes 0.</p>
       <p><strong>Errors</strong> and <strong>Timeouts</strong> count model-call failures; sanity runs focus on harness health and are not headline performance claims.</p>
       <p class="subtle">Hover glossary chips for plain-English definitions.</p>
       <div class="glossary">

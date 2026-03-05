@@ -32,10 +32,10 @@
     },
     {
       "pack_id": "task_pack_v2",
-      "version": "2.0.0",
-      "task_count": 652,
+      "version": "2.1.0",
+      "task_count": 473,
       "splits": {
-        "train": 444,
+        "train": 265,
         "dev": 104,
         "test": 104,
         "quick": 30
@@ -52,12 +52,12 @@
         "mini_repo_cli",
         "mini_repo_tool_sim"
       ],
-      "generator_commit": "27d365efeda54f740e5f5feec232e9a7a783afef",
+      "generator_commit": "final_scientific_hardening",
       "license": "MIT",
       "intended_use": "Primary default benchmark pack for official and community comparisons.",
-      "limitations": "Task scope remains bounded and intentionally excludes long-horizon repository maintenance.",
-      "contamination_risks": "Synthetic generation reduces direct copying risk but cannot eliminate learned pattern overlap.",
-      "evaluation_recommendations": "For headline claims use dev/dev50/test with multi-seed protocol and CI-aware analysis.",
+      "limitations": "Task scope remains bounded and intentionally excludes long-horizon repository maintenance; the benchmark measures test-driven repair ability under a visible pytest oracle.",
+      "contamination_risks": "Synthetic generation reduces direct copying risk but cannot eliminate learned pattern overlap; raw source generation included duplicate templates that are deduplicated in the active release pack.",
+      "evaluation_recommendations": "For headline claims use dev/dev50/test with multi-seed protocol, task-family bootstrap analysis, and the exact-family-independent active release pack.",
       "loader": "builtin_v2",
       "module_aliases": [
         "mentor_worker_benchmark.tasks.task_pack_v2",

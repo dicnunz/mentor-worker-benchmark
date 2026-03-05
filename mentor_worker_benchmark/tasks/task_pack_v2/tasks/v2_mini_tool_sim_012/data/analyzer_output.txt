@@ -1,1 +1,0 @@
-RULE:unused_import|SEVERITY:warn|FILE:jade.py|LINE:22\nRULE:unsafe_eval|SEVERITY:error|FILE:quartz.py|LINE:32\nRULE:line_too_long|SEVERITY:info|FILE:jade.py|LINE:42\nRULE:unused_import|SEVERITY:warn|FILE:quartz.py|LINE:52\n

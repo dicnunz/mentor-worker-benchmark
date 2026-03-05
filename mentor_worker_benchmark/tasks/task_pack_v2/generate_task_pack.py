@@ -4,19 +4,25 @@ import argparse
 import json
 import random
 import shutil
+from collections import Counter, defaultdict
 from dataclasses import dataclass
 from pathlib import Path
 from textwrap import dedent
 
+from mentor_worker_benchmark.tasks.task_pack_v2.exact_families import (
+    compute_exact_family_hash_for_file_map,
+)
 from mentor_worker_benchmark.tasks.task_pack_v2.provenance import write_provenance_artifacts
 
 PACK_NAME = "task_pack_v2"
-PACK_VERSION = "2.0.0"
+PACK_VERSION = "2.1.0"
 DEFAULT_SEED = 1337
 MINI_TASKS_PER_CATEGORY = 88
 
-EXPECTED_COUNTS = {"total": 652, "train": 444, "dev": 104, "test": 104, "quick": 30}
-EXPECTED_DIFFICULTY_COUNTS = {"easy": 228, "medium": 293, "hard": 131}
+SOURCE_EXPECTED_COUNTS = {"total": 652, "train": 444, "dev": 104, "test": 104}
+EXPECTED_COUNTS = {"total": 473, "train": 265, "dev": 104, "test": 104, "quick": 30}
+EXPECTED_DIFFICULTY_COUNTS = {"easy": 167, "medium": 205, "hard": 101}
+MIN_EVAL_TASKS_PER_CATEGORY = 3
 
 V1_CATEGORIES = [
     "string_regex_parsing",
@@ -75,6 +81,13 @@ class GeneratedTask:
     files: dict[str, str]
 
 
+@dataclass(slots=True)
+class ActiveTask:
+    task: GeneratedTask
+    family_id: str
+    family_size: int
+
+
 def _task_seed(seed: int, category_index: int, task_index: int) -> int:
     global_index = category_index * 1000 + task_index
     return seed * 1009 + global_index * 9173 + 17
@@ -87,10 +100,13 @@ def _pick_words(rng: random.Random, count: int) -> list[str]:
 def _read_task_dir_files(task_dir: Path) -> dict[str, str]:
     files: dict[str, str] = {}
     for path in sorted(task_dir.rglob("*")):
-        if not path.is_file():
+        if not path.is_file() or "__pycache__" in path.parts:
             continue
         rel = path.relative_to(task_dir).as_posix()
-        files[rel] = path.read_text(encoding="utf-8")
+        try:
+            files[rel] = path.read_text(encoding="utf-8")
+        except UnicodeDecodeError:
+            continue
     return files
 
 
@@ -744,13 +760,13 @@ def _build_mini_tasks(seed: int) -> list[GeneratedTask]:
     return generated
 
 
-def _assign_splits(task_ids: list[str], seed: int) -> dict[str, str]:
+def _legacy_source_split_map(task_ids: list[str], seed: int) -> dict[str, str]:
     shuffled = list(task_ids)
     random.Random(seed).shuffle(shuffled)
 
     split_map: dict[str, str] = {}
-    train_cutoff = EXPECTED_COUNTS["train"]
-    dev_cutoff = train_cutoff + EXPECTED_COUNTS["dev"]
+    train_cutoff = SOURCE_EXPECTED_COUNTS["train"]
+    dev_cutoff = train_cutoff + SOURCE_EXPECTED_COUNTS["dev"]
     for idx, task_id in enumerate(shuffled):
         if idx < train_cutoff:
             split_map[task_id] = "train"
@@ -761,21 +777,207 @@ def _assign_splits(task_ids: list[str], seed: int) -> dict[str, str]:
     return split_map
 
 
-def _assign_quick_ids(tasks: list[GeneratedTask], split_map: dict[str, str], seed: int) -> set[str]:
+def _group_tasks_by_exact_family(tasks: list[GeneratedTask]) -> dict[str, list[GeneratedTask]]:
+    families: dict[str, list[GeneratedTask]] = defaultdict(list)
+    for task in tasks:
+        family_id = compute_exact_family_hash_for_file_map(task.files)
+        families[family_id].append(task)
+    return {
+        family_id: sorted(members, key=lambda item: item.task_id)
+        for family_id, members in families.items()
+    }
+
+
+def _family_size_distribution(families: dict[str, list[GeneratedTask]]) -> dict[str, int]:
+    distribution = Counter(len(members) for members in families.values() if len(members) > 1)
+    return {str(size): int(count) for size, count in sorted(distribution.items())}
+
+
+def _build_source_audit(tasks: list[GeneratedTask], seed: int) -> dict[str, object]:
+    families = _group_tasks_by_exact_family(tasks)
+    duplicate_families = {
+        family_id: members for family_id, members in families.items() if len(members) > 1
+    }
+    legacy_split_map = _legacy_source_split_map([task.task_id for task in tasks], seed=seed)
+    split_pattern_counts: Counter[str] = Counter()
+    cross_split_family_count = 0
+    cross_split_task_count = 0
+
+    for members in duplicate_families.values():
+        splits = sorted({legacy_split_map[task.task_id] for task in members})
+        if len(splits) <= 1:
+            continue
+        cross_split_family_count += 1
+        cross_split_task_count += len(members)
+        split_pattern_counts["+".join(splits)] += 1
+
+    return {
+        "total_tasks": len(tasks),
+        "exact_family_count": len(families),
+        "duplicate_families_detected": len(duplicate_families),
+        "family_size_distribution": _family_size_distribution(families),
+        "duplicate_tasks_removed": len(tasks) - len(families),
+        "cross_split_overlap": {
+            "family_count": cross_split_family_count,
+            "task_count": cross_split_task_count,
+            "split_pattern_counts": {
+                pattern: int(count) for pattern, count in sorted(split_pattern_counts.items())
+            },
+        },
+    }
+
+
+def _select_active_tasks(tasks: list[GeneratedTask]) -> list[ActiveTask]:
+    families = _group_tasks_by_exact_family(tasks)
+    active_tasks = [
+        ActiveTask(
+            task=members[0],
+            family_id=family_id,
+            family_size=len(members),
+        )
+        for family_id, members in families.items()
+    ]
+    active_tasks.sort(key=lambda item: item.task.task_id)
+    if len(active_tasks) != EXPECTED_COUNTS["total"]:
+        raise RuntimeError(
+            f"Expected {EXPECTED_COUNTS['total']} active tasks after exact-family hardening, "
+            f"found {len(active_tasks)}."
+        )
+    return active_tasks
+
+
+def _eval_targets_by_category(tasks: list[ActiveTask]) -> dict[str, int]:
+    total_eval = EXPECTED_COUNTS["dev"] + EXPECTED_COUNTS["test"]
+    counts = Counter(item.task.category for item in tasks)
+    targets = {
+        category: min(MIN_EVAL_TASKS_PER_CATEGORY, counts.get(category, 0))
+        for category in CATEGORY_ORDER
+    }
+    allocated = sum(targets.values())
+    if allocated > total_eval:
+        raise RuntimeError("Initial category eval allocation exceeded total eval capacity.")
+
+    remaining = total_eval - allocated
+    residual_capacity = {
+        category: counts.get(category, 0) - targets[category] for category in CATEGORY_ORDER
+    }
+    residual_total = sum(residual_capacity.values())
+    fractions: dict[str, float] = {category: 0.0 for category in CATEGORY_ORDER}
+
+    if residual_total > 0 and remaining > 0:
+        for category in CATEGORY_ORDER:
+            raw_extra = (residual_capacity[category] * remaining) / residual_total
+            whole = int(raw_extra)
+            targets[category] += whole
+            fractions[category] = raw_extra - whole
+
+    leftovers = total_eval - sum(targets.values())
+    ranked = sorted(
+        CATEGORY_ORDER,
+        key=lambda category: (fractions[category], counts.get(category, 0), category),
+        reverse=True,
+    )
+    for category in ranked[:leftovers]:
+        targets[category] += 1
+
+    if sum(targets.values()) != total_eval:
+        raise RuntimeError("Category eval allocation did not match total eval target.")
+    return targets
+
+
+def _dev_targets_by_category(eval_targets: dict[str, int], seed: int) -> dict[str, int]:
+    targets = {category: eval_targets.get(category, 0) // 2 for category in CATEGORY_ORDER}
+    remaining = EXPECTED_COUNTS["dev"] - sum(targets.values())
+    odd_categories = [category for category in CATEGORY_ORDER if eval_targets.get(category, 0) % 2 == 1]
+    rng = random.Random(seed + 17001)
+    rng.shuffle(odd_categories)
+    for category in odd_categories[:remaining]:
+        targets[category] += 1
+    if sum(targets.values()) != EXPECTED_COUNTS["dev"]:
+        raise RuntimeError("Category dev allocation did not match dev target.")
+    return targets
+
+
+def _assign_splits(tasks: list[ActiveTask], seed: int) -> dict[str, str]:
+    eval_targets = _eval_targets_by_category(tasks)
+    dev_targets = _dev_targets_by_category(eval_targets, seed=seed)
+    split_map: dict[str, str] = {}
+
+    for category_index, category in enumerate(CATEGORY_ORDER):
+        category_tasks = sorted(
+            [item for item in tasks if item.task.category == category],
+            key=lambda item: item.task.task_id,
+        )
+        rng = random.Random(seed + 11000 + category_index * 41)
+        rng.shuffle(category_tasks)
+
+        eval_count = eval_targets.get(category, 0)
+        dev_count = dev_targets.get(category, 0)
+        selected_eval = category_tasks[:eval_count]
+        if dev_count > len(selected_eval):
+            raise RuntimeError(
+                f"Dev allocation for `{category}` exceeded selected eval tasks: {dev_count}>{len(selected_eval)}"
+            )
+
+        for item in selected_eval[:dev_count]:
+            split_map[item.task.task_id] = "dev"
+        for item in selected_eval[dev_count:]:
+            split_map[item.task.task_id] = "test"
+        for item in category_tasks[eval_count:]:
+            split_map[item.task.task_id] = "train"
+
+    counts = Counter(split_map.values())
+    expected = {key: EXPECTED_COUNTS[key] for key in ("train", "dev", "test")}
+    actual = {key: int(counts.get(key, 0)) for key in ("train", "dev", "test")}
+    if actual != expected:
+        raise RuntimeError(f"Unexpected split counts after exact-family hardening: {actual}")
+    return split_map
+
+
+def _assign_quick_ids(tasks: list[ActiveTask], split_map: dict[str, str], seed: int) -> set[str]:
     quick_ids: set[str] = set()
     for category_index, category in enumerate(CATEGORY_ORDER):
         candidates = [
-            task.task_id
-            for task in tasks
-            if task.category == category and split_map[task.task_id] in {"dev", "test"}
+            item.task.task_id
+            for item in tasks
+            if item.task.category == category and split_map[item.task.task_id] in {"dev", "test"}
         ]
         candidates = sorted(candidates)
-        if len(candidates) < 3:
+        if len(candidates) < MIN_EVAL_TASKS_PER_CATEGORY:
             raise RuntimeError(f"Not enough dev/test candidates for quick suite in category `{category}`.")
         category_rng = random.Random(seed + 7000 + category_index * 41)
         category_rng.shuffle(candidates)
-        quick_ids.update(candidates[:3])
+        quick_ids.update(candidates[:MIN_EVAL_TASKS_PER_CATEGORY])
     return quick_ids
+
+
+def _validate_source_audit(source_audit: dict[str, object]) -> None:
+    if int(source_audit["total_tasks"]) != SOURCE_EXPECTED_COUNTS["total"]:
+        raise RuntimeError(f"Unexpected source task count: {source_audit['total_tasks']}")
+    if int(source_audit["exact_family_count"]) != EXPECTED_COUNTS["total"]:
+        raise RuntimeError(f"Unexpected exact family count: {source_audit['exact_family_count']}")
+    if int(source_audit["duplicate_families_detected"]) <= 0:
+        raise RuntimeError("Source audit did not detect any duplicate families.")
+
+
+def _validate_counts(metadata_tasks: list[dict[str, object]]) -> None:
+    counts = {
+        "total": len(metadata_tasks),
+        "train": sum(1 for row in metadata_tasks if row["split"] == "train"),
+        "dev": sum(1 for row in metadata_tasks if row["split"] == "dev"),
+        "test": sum(1 for row in metadata_tasks if row["split"] == "test"),
+        "quick": sum(1 for row in metadata_tasks if row["quick"]),
+    }
+    if counts != EXPECTED_COUNTS:
+        raise RuntimeError(f"Unexpected split counts: {counts}")
+
+    difficulty_counts = {
+        "easy": sum(1 for row in metadata_tasks if row["difficulty"] == "easy"),
+        "medium": sum(1 for row in metadata_tasks if row["difficulty"] == "medium"),
+        "hard": sum(1 for row in metadata_tasks if row["difficulty"] == "hard"),
+    }
+    if difficulty_counts != EXPECTED_DIFFICULTY_COUNTS:
+        raise RuntimeError(f"Unexpected difficulty counts: {difficulty_counts}")
 
 
 def _write_task_files(base: Path, task: GeneratedTask) -> None:
@@ -804,15 +1006,21 @@ def generate_task_pack(seed: int = DEFAULT_SEED) -> dict[str, object]:
         shutil.rmtree(tasks_root)
     tasks_root.mkdir(parents=True, exist_ok=True)
 
-    tasks = _load_v1_tasks() + _build_mini_tasks(seed=seed)
-    if len(tasks) != EXPECTED_COUNTS["total"]:
-        raise RuntimeError(f"Expected {EXPECTED_COUNTS['total']} total tasks, found {len(tasks)}.")
+    source_tasks = _load_v1_tasks() + _build_mini_tasks(seed=seed)
+    if len(source_tasks) != SOURCE_EXPECTED_COUNTS["total"]:
+        raise RuntimeError(
+            f"Expected {SOURCE_EXPECTED_COUNTS['total']} source tasks, found {len(source_tasks)}."
+        )
 
-    split_map = _assign_splits([task.task_id for task in tasks], seed=seed)
-    quick_ids = _assign_quick_ids(tasks, split_map=split_map, seed=seed)
+    source_audit = _build_source_audit(source_tasks, seed=seed)
+    _validate_source_audit(source_audit)
+    active_tasks = _select_active_tasks(source_tasks)
+    split_map = _assign_splits(active_tasks, seed=seed)
+    quick_ids = _assign_quick_ids(active_tasks, split_map=split_map, seed=seed)
 
     metadata_tasks: list[dict[str, object]] = []
-    for task in tasks:
+    for item in active_tasks:
+        task = item.task
         _validate_task_shape(task)
         _write_task_files(root, task)
         metadata_tasks.append(
@@ -821,6 +1029,7 @@ def generate_task_pack(seed: int = DEFAULT_SEED) -> dict[str, object]:
                 "title": task.title,
                 "category": task.category,
                 "difficulty": task.difficulty,
+                "family_id": item.family_id,
                 "split": split_map[task.task_id],
                 "quick": task.task_id in quick_ids,
                 "path": f"tasks/{task.task_id}",
@@ -828,6 +1037,7 @@ def generate_task_pack(seed: int = DEFAULT_SEED) -> dict[str, object]:
         )
 
     metadata_tasks.sort(key=lambda row: str(row["task_id"]))
+    _validate_counts(metadata_tasks)
     counts = {
         "total": len(metadata_tasks),
         "train": sum(1 for row in metadata_tasks if row["split"] == "train"),
@@ -835,17 +1045,6 @@ def generate_task_pack(seed: int = DEFAULT_SEED) -> dict[str, object]:
         "test": sum(1 for row in metadata_tasks if row["split"] == "test"),
         "quick": sum(1 for row in metadata_tasks if row["quick"]),
     }
-    expected_counts = EXPECTED_COUNTS
-    if counts != expected_counts:
-        raise RuntimeError(f"Unexpected split counts: {counts}")
-
-    difficulty_counts = {
-        "easy": sum(1 for row in metadata_tasks if row["difficulty"] == "easy"),
-        "medium": sum(1 for row in metadata_tasks if row["difficulty"] == "medium"),
-        "hard": sum(1 for row in metadata_tasks if row["difficulty"] == "hard"),
-    }
-    if difficulty_counts != EXPECTED_DIFFICULTY_COUNTS:
-        raise RuntimeError(f"Unexpected difficulty counts: {difficulty_counts}")
 
     category_counts: dict[str, int] = {}
     for row in metadata_tasks:
@@ -859,6 +1058,7 @@ def generate_task_pack(seed: int = DEFAULT_SEED) -> dict[str, object]:
         "categories": CATEGORY_ORDER,
         "counts": counts,
         "category_counts": category_counts,
+        "source_audit": source_audit,
         "tasks": metadata_tasks,
     }
     (root / "metadata.json").write_text(json.dumps(metadata, indent=2), encoding="utf-8")
