@@ -6,7 +6,9 @@ import json
 import re
 import subprocess
 import sys
+from collections import Counter, defaultdict
 from pathlib import Path
+from statistics import mean, pvariance
 
 from mentor_worker_benchmark.analysis import DEFAULT_BOOTSTRAP_SAMPLES, generate_analysis_payload
 from mentor_worker_benchmark.ollama_client import OllamaClient
@@ -119,6 +121,163 @@ def _iter_runs(payload: dict[str, object]) -> list[dict[str, object]]:
     if not isinstance(runs, list):
         return []
     return [run for run in runs if isinstance(run, dict)]
+
+
+def _safe_pass_value(value: object) -> float | None:
+    if isinstance(value, bool):
+        return 1.0 if value else 0.0
+    return None
+
+
+def _task_difficulty_lookup(
+    payload: dict[str, object],
+    runs: list[dict[str, object]],
+) -> dict[str, str]:
+    lookup: dict[str, str] = {}
+    task_ids: set[str] = set()
+    for run in runs:
+        task_id = run.get("task_id")
+        if isinstance(task_id, str) and task_id:
+            task_ids.add(task_id)
+            difficulty = run.get("task_difficulty")
+            if isinstance(difficulty, str) and difficulty:
+                lookup[task_id] = difficulty
+
+    unresolved = {task_id for task_id in task_ids if task_id not in lookup}
+    if not unresolved:
+        return lookup
+
+    environment = payload.get("environment", {})
+    if not isinstance(environment, dict):
+        return lookup
+    task_pack = environment.get("task_pack", {})
+    if not isinstance(task_pack, dict):
+        return lookup
+
+    manifest_path_value = task_pack.get("manifest_path")
+    if not isinstance(manifest_path_value, str) or not manifest_path_value.strip():
+        return lookup
+
+    manifest_path = Path(manifest_path_value)
+    if not manifest_path.is_absolute():
+        manifest_path = (Path.cwd() / manifest_path).resolve()
+    if not manifest_path.exists():
+        return lookup
+
+    try:
+        metadata = json.loads(manifest_path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return lookup
+    tasks = metadata.get("tasks", [])
+    if not isinstance(tasks, list):
+        return lookup
+
+    for task in tasks:
+        if not isinstance(task, dict):
+            continue
+        task_id = task.get("task_id")
+        difficulty = task.get("difficulty")
+        if not isinstance(task_id, str) or not task_id:
+            continue
+        if not isinstance(difficulty, str) or not difficulty:
+            continue
+        if task_id in unresolved:
+            lookup[task_id] = difficulty
+
+    return lookup
+
+
+def _per_task_pass_rates(runs: list[dict[str, object]]) -> list[float]:
+    by_task: dict[str, list[float]] = defaultdict(list)
+    for run in runs:
+        task_id = run.get("task_id")
+        pass_value = _safe_pass_value(run.get("pass"))
+        if not isinstance(task_id, str) or not task_id:
+            continue
+        if pass_value is None:
+            continue
+        by_task[task_id].append(pass_value)
+    rates = [mean(values) for _, values in sorted(by_task.items()) if values]
+    return rates
+
+
+def _percent_histogram(values: list[float]) -> dict[str, int]:
+    labels = [f"{start:02d}-{start + 9:02d}%" for start in range(0, 100, 10)]
+    labels[-1] = "90-100%"
+    histogram = {label: 0 for label in labels}
+    for value in values:
+        pct = min(100.0, max(0.0, float(value) * 100.0))
+        bucket_index = min(9, int(pct // 10))
+        histogram[labels[bucket_index]] += 1
+    return histogram
+
+
+def _baseline_seed_stats(runs: list[dict[str, object]]) -> tuple[dict[int, float], float]:
+    by_seed: dict[int, list[float]] = defaultdict(list)
+    for run in runs:
+        seed_raw = run.get("seed")
+        pass_value = _safe_pass_value(run.get("pass"))
+        if isinstance(seed_raw, bool) or not isinstance(seed_raw, (int, float)):
+            continue
+        if pass_value is None:
+            continue
+        by_seed[int(seed_raw)].append(pass_value)
+
+    means_by_seed = {
+        seed: mean(values)
+        for seed, values in sorted(by_seed.items())
+        if values
+    }
+    variance = pvariance(list(means_by_seed.values())) if len(means_by_seed) > 1 else 0.0
+    return means_by_seed, variance
+
+
+def _mentor_lifts(runs: list[dict[str, object]]) -> list[float]:
+    baseline_map: dict[tuple[int, str, str], float] = {}
+    for run in runs:
+        if str(run.get("mode")) != "worker_only":
+            continue
+        seed_raw = run.get("seed")
+        task_id = run.get("task_id")
+        worker_model = run.get("worker_model")
+        pass_value = _safe_pass_value(run.get("pass"))
+        if isinstance(seed_raw, bool) or not isinstance(seed_raw, (int, float)):
+            continue
+        if not isinstance(task_id, str) or not task_id:
+            continue
+        if not isinstance(worker_model, str) or not worker_model:
+            continue
+        if pass_value is None:
+            continue
+        baseline_map[(int(seed_raw), worker_model, task_id)] = pass_value
+
+    lifts: list[float] = []
+    for run in runs:
+        if str(run.get("mode")) != "mentor_worker":
+            continue
+        seed_raw = run.get("seed")
+        task_id = run.get("task_id")
+        worker_model = run.get("worker_model")
+        mentored_pass = _safe_pass_value(run.get("pass"))
+        if isinstance(seed_raw, bool) or not isinstance(seed_raw, (int, float)):
+            continue
+        if not isinstance(task_id, str) or not task_id:
+            continue
+        if not isinstance(worker_model, str) or not worker_model:
+            continue
+        if mentored_pass is None:
+            continue
+
+        key = (int(seed_raw), worker_model, task_id)
+        if key in baseline_map:
+            baseline_pass = baseline_map[key]
+        else:
+            baseline_raw = run.get("baseline_pass")
+            baseline_pass = _safe_pass_value(baseline_raw)
+            if baseline_pass is None:
+                continue
+        lifts.append(mentored_pass - baseline_pass)
+    return lifts
 
 
 def _detect_baseline_reuse_groups(runs: list[dict[str, object]]) -> list[str]:
@@ -682,6 +841,108 @@ def cmd_audit(args: argparse.Namespace) -> int:
     return 0 if all_ok else 1
 
 
+def cmd_healthcheck(args: argparse.Namespace) -> int:
+    results_path = Path(args.results)
+    if not results_path.exists():
+        print(f"Results file not found: {results_path}")
+        return 1
+
+    try:
+        payload = json.loads(results_path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as exc:
+        print(f"Invalid JSON at {results_path}: {exc}")
+        return 1
+
+    if not isinstance(payload, dict):
+        print("Results payload must be a JSON object.")
+        return 1
+
+    runs = _iter_runs(payload)
+    if not runs:
+        print("Results payload contains no runs.")
+        return 1
+
+    baseline_runs = [run for run in runs if str(run.get("mode")) == "worker_only"]
+    analyzed_runs = baseline_runs if baseline_runs else runs
+    analyzed_label = "baseline worker_only" if baseline_runs else "all modes (fallback)"
+
+    difficulty_lookup = _task_difficulty_lookup(payload, runs)
+    task_ids = sorted(
+        {
+            str(run.get("task_id"))
+            for run in runs
+            if isinstance(run.get("task_id"), str) and str(run.get("task_id"))
+        }
+    )
+    difficulty_counts: Counter[str] = Counter(
+        difficulty_lookup.get(task_id, "unknown") for task_id in task_ids
+    )
+
+    pass_rates = _per_task_pass_rates(analyzed_runs)
+    pass_histogram = _percent_histogram(pass_rates)
+    solved_rate = mean(pass_rates) if pass_rates else 0.0
+
+    seed_means, seed_variance = _baseline_seed_stats(baseline_runs)
+
+    lifts = _mentor_lifts(runs)
+    lift_mean = mean(lifts) if lifts else 0.0
+    lift_variance = pvariance(lifts) if len(lifts) > 1 else 0.0
+    lift_sign_counts = {
+        "negative": sum(1 for value in lifts if value < 0.0),
+        "zero": sum(1 for value in lifts if value == 0.0),
+        "positive": sum(1 for value in lifts if value > 0.0),
+    }
+
+    print("Benchmark Healthcheck")
+    print(f"Results: {results_path}")
+    print(f"Runs analyzed: {len(runs)}")
+    print(f"Pass-rate basis: {analyzed_label}")
+
+    print("\nTask difficulty distribution:")
+    for difficulty, count in sorted(difficulty_counts.items()):
+        print(f"- {difficulty}: {count}")
+
+    print("\nPass-rate histogram (per-task):")
+    for bucket, count in pass_histogram.items():
+        print(f"- {bucket}: {count}")
+    print(f"- solved_rate_mean: {solved_rate:.4f}")
+
+    print("\nBaseline variance across seeds:")
+    if seed_means:
+        for seed, rate in seed_means.items():
+            print(f"- seed {seed}: {rate:.4f}")
+        print(f"- variance: {seed_variance:.8f}")
+    else:
+        print("- no baseline worker_only runs found")
+
+    print("\nMentor lift distribution:")
+    print(f"- sample_count: {len(lifts)}")
+    print(f"- mean: {lift_mean:.4f}")
+    print(f"- variance: {lift_variance:.8f}")
+    print(f"- negative: {lift_sign_counts['negative']}")
+    print(f"- zero: {lift_sign_counts['zero']}")
+    print(f"- positive: {lift_sign_counts['positive']}")
+
+    warnings: list[str] = []
+    if solved_rate > 0.80:
+        warnings.append(
+            f"Benchmark may be too easy: solved_rate_mean={solved_rate:.2%} (>80%)."
+        )
+    if solved_rate < 0.05:
+        warnings.append(
+            f"Benchmark may be too hard: solved_rate_mean={solved_rate:.2%} (<5%)."
+        )
+
+    if warnings:
+        print("\nWarnings:")
+        for warning in warnings:
+            print(f"- WARNING: {warning}")
+    else:
+        print("\nWarnings:\n- none")
+
+    return 0
+
+
 def cmd_export(args: argparse.Namespace) -> int:
     try:
         manifest = export_submission_bundle(
@@ -962,6 +1223,13 @@ def build_parser() -> argparse.ArgumentParser:
     )
     audit.add_argument("results", help="Path to benchmark results JSON.")
     audit.set_defaults(func=cmd_audit)
+
+    healthcheck = subparsers.add_parser(
+        "healthcheck",
+        help="Compute benchmark health diagnostics from a results JSON artifact.",
+    )
+    healthcheck.add_argument("--results", default="results/results.json")
+    healthcheck.set_defaults(func=cmd_healthcheck)
 
     export = subparsers.add_parser("export", help="Export a standardized submission zip from results.json.")
     export.add_argument("--results", default="results/results.json")

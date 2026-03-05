@@ -270,3 +270,68 @@ def test_cmd_run_rejects_conflicting_replicates_and_seeds(tmp_path: Path) -> Non
         ]
     )
     assert cli_module.cmd_run(args) == 1
+
+
+def test_cmd_healthcheck_reports_metrics(tmp_path: Path, capsys: Any) -> None:
+    fixture = Path(__file__).resolve().parent / "fixtures" / "results_two_replicates.json"
+    payload = json.loads(fixture.read_text(encoding="utf-8"))
+    results_path = tmp_path / "results.json"
+    results_path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
+
+    parser = cli_module.build_parser()
+    args = parser.parse_args(["healthcheck", "--results", str(results_path)])
+    assert cli_module.cmd_healthcheck(args) == 0
+    output = capsys.readouterr().out
+    assert "Benchmark Healthcheck" in output
+    assert "Task difficulty distribution" in output
+    assert "Pass-rate histogram" in output
+    assert "Baseline variance across seeds" in output
+    assert "Mentor lift distribution" in output
+
+
+def test_cmd_healthcheck_warns_when_benchmark_is_too_easy(tmp_path: Path, capsys: Any) -> None:
+    payload = {
+        "runs": [
+            {
+                "mode": "worker_only",
+                "seed": 1337,
+                "worker_model": "worker-a",
+                "task_id": f"task_{index:03d}",
+                "task_difficulty": "easy",
+                "pass": True,
+            }
+            for index in range(10)
+        ]
+    }
+    results_path = tmp_path / "too_easy.json"
+    results_path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
+
+    parser = cli_module.build_parser()
+    args = parser.parse_args(["healthcheck", "--results", str(results_path)])
+    assert cli_module.cmd_healthcheck(args) == 0
+    output = capsys.readouterr().out
+    assert "WARNING: Benchmark may be too easy" in output
+
+
+def test_cmd_healthcheck_warns_when_benchmark_is_too_hard(tmp_path: Path, capsys: Any) -> None:
+    payload = {
+        "runs": [
+            {
+                "mode": "worker_only",
+                "seed": 1337,
+                "worker_model": "worker-a",
+                "task_id": f"task_{index:03d}",
+                "task_difficulty": "hard",
+                "pass": False,
+            }
+            for index in range(10)
+        ]
+    }
+    results_path = tmp_path / "too_hard.json"
+    results_path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
+
+    parser = cli_module.build_parser()
+    args = parser.parse_args(["healthcheck", "--results", str(results_path)])
+    assert cli_module.cmd_healthcheck(args) == 0
+    output = capsys.readouterr().out
+    assert "WARNING: Benchmark may be too hard" in output
