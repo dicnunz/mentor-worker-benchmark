@@ -335,3 +335,45 @@ def test_cmd_healthcheck_warns_when_benchmark_is_too_hard(tmp_path: Path, capsys
     assert cli_module.cmd_healthcheck(args) == 0
     output = capsys.readouterr().out
     assert "WARNING: Benchmark may be too hard" in output
+
+
+def test_audit_baseline_reuse_ignores_tiny_groups() -> None:
+    runs = [
+        {
+            "mode": "worker_only",
+            "seed": 1337,
+            "worker_model": "worker-a",
+            "task_id": "task_001",
+            "pass": False,
+            "patch_hash": "",
+        },
+        {
+            "mode": "worker_only",
+            "seed": 2026,
+            "worker_model": "worker-a",
+            "task_id": "task_001",
+            "pass": False,
+            "patch_hash": "",
+        },
+    ]
+    ok, _ = cli_module._audit_baseline_reuse(runs)
+    assert ok is True
+
+
+def test_audit_baseline_reuse_flags_large_identical_vectors() -> None:
+    runs: list[dict[str, Any]] = []
+    for seed in (1337, 2026):
+        for index in range(5):
+            runs.append(
+                {
+                    "mode": "worker_only",
+                    "seed": seed,
+                    "worker_model": "worker-a",
+                    "task_id": f"task_{index:03d}",
+                    "pass": bool(index % 2),
+                    "patch_hash": f"hash_{index}",
+                }
+            )
+    ok, detail = cli_module._audit_baseline_reuse(runs)
+    assert ok is False
+    assert "Potential artifact reuse detected" in detail

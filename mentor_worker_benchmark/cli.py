@@ -291,6 +291,10 @@ def _detect_baseline_reuse_groups(runs: list[dict[str, object]]) -> list[str]:
 
     signatures: dict[tuple[tuple[int, ...], tuple[str, ...]], list[tuple[str, int]]] = {}
     for key, items in grouped.items():
+        # Small samples can naturally share identical outcome/patch vectors.
+        # Require enough task coverage before treating it as suspicious reuse.
+        if len(items) < 5:
+            continue
         ordered = sorted(items, key=lambda item: str(item.get("task_id", "")))
         baseline_vector = tuple(1 if bool(item.get("pass")) else 0 for item in ordered)
         patch_vector = tuple(str(item.get("patch_hash") or "") for item in ordered)
