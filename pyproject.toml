@@ -42,6 +42,7 @@ mentor_worker_benchmark = [
   "tasks/task_pack_v2/PROVENANCE.md",
   "tasks/task_pack_v2/tasks/*/prompt.md",
   "tasks/task_pack_v2/tasks/*/README.md",
+  "tasks/task_pack_v2/tasks/*/starter_code.py",
   "tasks/task_pack_v2/tasks/*/src/*.py",
   "tasks/task_pack_v2/tasks/*/tests/*.py",
   "tasks/task_pack_v2/tasks/*/tools/*.py",

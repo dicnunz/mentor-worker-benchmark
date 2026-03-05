@@ -6,10 +6,10 @@ def test_task_pack_v2_counts() -> None:
     metadata = read_pack_metadata()
     counts = metadata["counts"]
 
-    assert counts["total"] == 500
-    assert counts["train"] == 340
-    assert counts["dev"] == 80
-    assert counts["test"] == 80
+    assert counts["total"] == 652
+    assert counts["train"] == 444
+    assert counts["dev"] == 104
+    assert counts["test"] == 104
     assert counts["quick"] == 30
 
 
@@ -36,7 +36,7 @@ def test_task_pack_v2_difficulty_distribution() -> None:
     counts = {"easy": 0, "medium": 0, "hard": 0}
     for row in tasks:
         counts[row["difficulty"]] += 1
-    assert counts == {"easy": 175, "medium": 225, "hard": 100}
+    assert counts == {"easy": 228, "medium": 293, "hard": 131}
 
 
 def test_task_pack_v2_schema_validation() -> None:

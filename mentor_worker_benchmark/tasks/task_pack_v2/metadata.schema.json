@@ -57,19 +57,19 @@
       "properties": {
         "total": {
           "type": "integer",
-          "const": 500
+          "const": 652
         },
         "train": {
           "type": "integer",
-          "const": 340
+          "const": 444
         },
         "dev": {
           "type": "integer",
-          "const": 80
+          "const": 104
         },
         "test": {
           "type": "integer",
-          "const": 80
+          "const": 104
         },
         "quick": {
           "type": "integer",
@@ -82,8 +82,8 @@
     },
     "tasks": {
       "type": "array",
-      "minItems": 500,
-      "maxItems": 500,
+      "minItems": 652,
+      "maxItems": 652,
       "items": {
         "type": "object",
         "additionalProperties": false,

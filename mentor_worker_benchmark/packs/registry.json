@@ -33,11 +33,11 @@
     {
       "pack_id": "task_pack_v2",
       "version": "2.0.0",
-      "task_count": 500,
+      "task_count": 652,
       "splits": {
-        "train": 340,
-        "dev": 80,
-        "test": 80,
+        "train": 444,
+        "dev": 104,
+        "test": 104,
         "quick": 30
       },
       "categories": [

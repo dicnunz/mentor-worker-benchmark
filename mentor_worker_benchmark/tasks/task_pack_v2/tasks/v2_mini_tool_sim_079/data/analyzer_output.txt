@@ -1,0 +1,1 @@
+RULE:unused_import|SEVERITY:warn|FILE:ember.py|LINE:89\nRULE:unsafe_eval|SEVERITY:error|FILE:umbra.py|LINE:99\nRULE:line_too_long|SEVERITY:info|FILE:ember.py|LINE:109\nRULE:unused_import|SEVERITY:warn|FILE:umbra.py|LINE:119\n

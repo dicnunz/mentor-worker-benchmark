@@ -13,7 +13,10 @@ from mentor_worker_benchmark.tasks.task_pack_v2.provenance import write_provenan
 PACK_NAME = "task_pack_v2"
 PACK_VERSION = "2.0.0"
 DEFAULT_SEED = 1337
-MINI_TASKS_PER_CATEGORY = 50
+MINI_TASKS_PER_CATEGORY = 88
+
+EXPECTED_COUNTS = {"total": 652, "train": 444, "dev": 104, "test": 104, "quick": 30}
+EXPECTED_DIFFICULTY_COUNTS = {"easy": 228, "medium": 293, "hard": 131}
 
 V1_CATEGORIES = [
     "string_regex_parsing",
@@ -154,6 +157,17 @@ def _mini_bugfix_task(task_id: str, idx: int, rng: random.Random, difficulty: st
         ).strip()
         + "\n",
         "README.md": "Mini repo bugfix task.\n",
+        "starter_code.py": dedent(
+            """
+            def build_report(raw: str, threshold: int = 0) -> dict[str, object]:
+                \"\"\"Reference entrypoint for this task.
+
+                The benchmark harness executes tests against src/pipeline.py.
+                \"\"\"
+                raise NotImplementedError("Implement in src/pipeline.py and related src modules.")
+            """
+        ).strip()
+        + "\n",
         "src/__init__.py": "from .pipeline import build_report\n\n__all__ = ['build_report']\n",
         "src/constants.py": f"DELIMITER = {delimiter!r}\nDEFAULT_THRESHOLD = {threshold}\n",
         "src/loader.py": dedent(
@@ -271,6 +285,23 @@ def _mini_feature_task(task_id: str, idx: int, rng: random.Random, difficulty: s
         ).strip()
         + "\n",
         "src/__init__.py": "from .service import generate_plan\n\n__all__ = ['generate_plan']\n",
+        "starter_code.py": dedent(
+            """
+            def generate_plan(
+                raw: str,
+                *,
+                min_points: int = 0,
+                include_deferred: bool = False,
+                include_status_breakdown: bool = False,
+            ) -> dict[str, object]:
+                \"\"\"Reference entrypoint for this task.
+
+                The benchmark harness executes tests against src/service.py.
+                \"\"\"
+                raise NotImplementedError("Implement in src/service.py and related src modules.")
+            """
+        ).strip()
+        + "\n",
         "src/parser.py": dedent(
             f"""
             DELIMITER = {delimiter!r}
@@ -417,6 +448,17 @@ def _mini_cli_task(task_id: str, idx: int, rng: random.Random, difficulty: str) 
         ).strip()
         + "\n",
         "README.md": "CLI task with argparse behavior.\n",
+        "starter_code.py": dedent(
+            """
+            def main(argv: list[str] | None = None) -> int:
+                \"\"\"Reference entrypoint for this task.
+
+                The benchmark harness executes tests against src/cli.py.
+                \"\"\"
+                raise NotImplementedError("Implement in src/cli.py and related src modules.")
+            """
+        ).strip()
+        + "\n",
         "src/__init__.py": "from .cli import main\n\n__all__ = ['main']\n",
         "src/parsing.py": dedent(
             """
@@ -540,6 +582,17 @@ def _mini_tool_sim_task(task_id: str, idx: int, rng: random.Random, difficulty: 
         ).strip()
         + "\n",
         "README.md": "Offline tool-use simulation task.\n",
+        "starter_code.py": dedent(
+            """
+            def summarize_from_report(path: str, min_severity: str = "info") -> dict[str, object]:
+                \"\"\"Reference entrypoint for this task.
+
+                The benchmark harness executes tests against src/pipeline.py.
+                \"\"\"
+                raise NotImplementedError("Implement in src/pipeline.py and related src modules.")
+            """
+        ).strip()
+        + "\n",
         "tools/local_analyzer.py": dedent(
             """
             #!/usr/bin/env python3
@@ -645,17 +698,29 @@ def _difficulty_sequence(easy: int, medium: int, hard: int, seed: int) -> list[s
 
 
 def _mini_task_specs(seed: int) -> dict[str, list[str]]:
-    # Added difficulties so combined corpus hits 35/45/20 exactly (175/225/100 over 500 tasks).
-    plans = {
+    # Keep the original 50-task difficulty assignments stable, then append
+    # an additional 38 per category for the expanded corpus.
+    base_plans = {
         "mini_repo_bugfix": (18, 22, 10),
         "mini_repo_feature": (18, 22, 10),
         "mini_repo_cli": (17, 23, 10),
         "mini_repo_tool_sim": (17, 23, 10),
     }
-    return {
-        category: _difficulty_sequence(easy, medium, hard, seed + idx * 211)
-        for idx, (category, (easy, medium, hard)) in enumerate(plans.items())
+    extra_plans = {
+        "mini_repo_bugfix": (13, 17, 8),
+        "mini_repo_feature": (13, 17, 8),
+        "mini_repo_cli": (13, 17, 8),
+        "mini_repo_tool_sim": (14, 17, 7),
     }
+
+    specs: dict[str, list[str]] = {}
+    for idx, category in enumerate(MINI_CATEGORIES):
+        base_easy, base_medium, base_hard = base_plans[category]
+        extra_easy, extra_medium, extra_hard = extra_plans[category]
+        base = _difficulty_sequence(base_easy, base_medium, base_hard, seed + idx * 211)
+        extra = _difficulty_sequence(extra_easy, extra_medium, extra_hard, seed + 9000 + idx * 211)
+        specs[category] = base + extra
+    return specs
 
 
 def _build_mini_tasks(seed: int) -> list[GeneratedTask]:
@@ -684,10 +749,12 @@ def _assign_splits(task_ids: list[str], seed: int) -> dict[str, str]:
     random.Random(seed).shuffle(shuffled)
 
     split_map: dict[str, str] = {}
+    train_cutoff = EXPECTED_COUNTS["train"]
+    dev_cutoff = train_cutoff + EXPECTED_COUNTS["dev"]
     for idx, task_id in enumerate(shuffled):
-        if idx < 340:
+        if idx < train_cutoff:
             split_map[task_id] = "train"
-        elif idx < 420:
+        elif idx < dev_cutoff:
             split_map[task_id] = "dev"
         else:
             split_map[task_id] = "test"
@@ -726,6 +793,8 @@ def _validate_task_shape(task: GeneratedTask) -> None:
     if missing:
         missing_label = ", ".join(sorted(missing))
         raise ValueError(f"Task `{task.task_id}` missing required file(s): {missing_label}")
+    if task.task_id.startswith("v2_mini_") and "starter_code.py" not in present:
+        raise ValueError(f"Task `{task.task_id}` missing required file: starter_code.py")
 
 
 def generate_task_pack(seed: int = DEFAULT_SEED) -> dict[str, object]:
@@ -736,8 +805,8 @@ def generate_task_pack(seed: int = DEFAULT_SEED) -> dict[str, object]:
     tasks_root.mkdir(parents=True, exist_ok=True)
 
     tasks = _load_v1_tasks() + _build_mini_tasks(seed=seed)
-    if len(tasks) != 500:
-        raise RuntimeError(f"Expected 500 total tasks, found {len(tasks)}.")
+    if len(tasks) != EXPECTED_COUNTS["total"]:
+        raise RuntimeError(f"Expected {EXPECTED_COUNTS['total']} total tasks, found {len(tasks)}.")
 
     split_map = _assign_splits([task.task_id for task in tasks], seed=seed)
     quick_ids = _assign_quick_ids(tasks, split_map=split_map, seed=seed)
@@ -766,7 +835,7 @@ def generate_task_pack(seed: int = DEFAULT_SEED) -> dict[str, object]:
         "test": sum(1 for row in metadata_tasks if row["split"] == "test"),
         "quick": sum(1 for row in metadata_tasks if row["quick"]),
     }
-    expected_counts = {"total": 500, "train": 340, "dev": 80, "test": 80, "quick": 30}
+    expected_counts = EXPECTED_COUNTS
     if counts != expected_counts:
         raise RuntimeError(f"Unexpected split counts: {counts}")
 
@@ -775,7 +844,7 @@ def generate_task_pack(seed: int = DEFAULT_SEED) -> dict[str, object]:
         "medium": sum(1 for row in metadata_tasks if row["difficulty"] == "medium"),
         "hard": sum(1 for row in metadata_tasks if row["difficulty"] == "hard"),
     }
-    if difficulty_counts != {"easy": 175, "medium": 225, "hard": 100}:
+    if difficulty_counts != EXPECTED_DIFFICULTY_COUNTS:
         raise RuntimeError(f"Unexpected difficulty counts: {difficulty_counts}")
 
     category_counts: dict[str, int] = {}

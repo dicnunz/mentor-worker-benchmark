@@ -1,0 +1,1 @@
+RULE:unused_import|SEVERITY:warn|FILE:umbra.py|LINE:73\nRULE:unsafe_eval|SEVERITY:error|FILE:pioneer.py|LINE:83\nRULE:line_too_long|SEVERITY:info|FILE:umbra.py|LINE:93\nRULE:unused_import|SEVERITY:warn|FILE:pioneer.py|LINE:103\n

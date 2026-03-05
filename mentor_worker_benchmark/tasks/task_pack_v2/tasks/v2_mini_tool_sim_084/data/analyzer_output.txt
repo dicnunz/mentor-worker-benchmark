@@ -1,0 +1,1 @@
+RULE:unused_import|SEVERITY:warn|FILE:ion.py|LINE:94\nRULE:unsafe_eval|SEVERITY:error|FILE:atlas.py|LINE:104\nRULE:line_too_long|SEVERITY:info|FILE:ion.py|LINE:114\nRULE:unused_import|SEVERITY:warn|FILE:atlas.py|LINE:124\n

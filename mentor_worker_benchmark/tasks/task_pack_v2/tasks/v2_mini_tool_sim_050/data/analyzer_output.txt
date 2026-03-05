@@ -1,0 +1,1 @@
+RULE:unused_import|SEVERITY:warn|FILE:quartz.py|LINE:60\nRULE:unsafe_eval|SEVERITY:error|FILE:zenith.py|LINE:70\nRULE:line_too_long|SEVERITY:info|FILE:quartz.py|LINE:80\nRULE:unused_import|SEVERITY:warn|FILE:zenith.py|LINE:90\n

@@ -69,10 +69,10 @@ PACK_EXPECTATIONS: dict[str, dict[str, Any]] = {
         },
     },
     "task_pack_v2": {
-        "total": 500,
-        "splits": {"train": 340, "dev": 80, "test": 80},
+        "total": 652,
+        "splits": {"train": 444, "dev": 104, "test": 104},
         "quick": 30,
-        "difficulty": {"easy": 175, "medium": 225, "hard": 100},
+        "difficulty": {"easy": 228, "medium": 293, "hard": 131},
         "strength_policy": {
             "min_strength_score": 22,
             "max_low_strength_fraction": 0.20,

@@ -1,0 +1,1 @@
+RULE:unused_import|SEVERITY:warn|FILE:pioneer.py|LINE:96\nRULE:unsafe_eval|SEVERITY:error|FILE:kepler.py|LINE:106\nRULE:line_too_long|SEVERITY:info|FILE:pioneer.py|LINE:116\nRULE:unused_import|SEVERITY:warn|FILE:kepler.py|LINE:126\n

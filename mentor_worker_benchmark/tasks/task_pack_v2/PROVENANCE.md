@@ -5,10 +5,10 @@
 - Pack: `task_pack_v2`
 - Pack version: `2.0.0`
 - Generator version: `2.0.0`
-- Git commit: `5900651362e4cbe632b9bb1381ef119ca6c6a542`
+- Git commit: `ec95b11e5fb20bfa5e8d14219f7591158d4af27c`
 - Git dirty state at generation: `True`
 - Seed: `1337`
-- Manifest generated at: `2026-03-03T00:49:06.816372+00:00`
+- Manifest generated at: `2026-03-05T15:06:51.407588+00:00`
 
 ## Synthetic Data Statement
 
@@ -35,28 +35,28 @@
 
 - Method: `hashed token/char n-gram cosine similarity over prompt+tests`
 - Threshold: `0.985`
-- Task count scanned: `500`
+- Task count scanned: `652`
 - Duplicate clusters flagged: `18`
-- Largest cluster size: `50`
+- Largest cluster size: `88`
 
 Top clusters:
-- Cluster 1: size=50, avg_similarity=0.996, members=v2_mini_tool_sim_000, v2_mini_tool_sim_001, v2_mini_tool_sim_002, v2_mini_tool_sim_003, v2_mini_tool_sim_004, v2_mini_tool_sim_005, v2_mini_tool_sim_006, v2_mini_tool_sim_007, v2_mini_tool_sim_008, v2_mini_tool_sim_009, v2_mini_tool_sim_010, v2_mini_tool_sim_011, v2_mini_tool_sim_012, v2_mini_tool_sim_013, v2_mini_tool_sim_014, v2_mini_tool_sim_015, v2_mini_tool_sim_016, v2_mini_tool_sim_017, v2_mini_tool_sim_018, v2_mini_tool_sim_019, v2_mini_tool_sim_020, v2_mini_tool_sim_021, v2_mini_tool_sim_022, v2_mini_tool_sim_023, v2_mini_tool_sim_024, v2_mini_tool_sim_025, v2_mini_tool_sim_026, v2_mini_tool_sim_027, v2_mini_tool_sim_028, v2_mini_tool_sim_029, v2_mini_tool_sim_030, v2_mini_tool_sim_031, v2_mini_tool_sim_032, v2_mini_tool_sim_033, v2_mini_tool_sim_034, v2_mini_tool_sim_035, v2_mini_tool_sim_036, v2_mini_tool_sim_037, v2_mini_tool_sim_038, v2_mini_tool_sim_039, v2_mini_tool_sim_040, v2_mini_tool_sim_041, v2_mini_tool_sim_042, v2_mini_tool_sim_043, v2_mini_tool_sim_044, v2_mini_tool_sim_045, v2_mini_tool_sim_046, v2_mini_tool_sim_047, v2_mini_tool_sim_048, v2_mini_tool_sim_049
+- Cluster 1: size=88, avg_similarity=0.996, members=v2_mini_tool_sim_000, v2_mini_tool_sim_001, v2_mini_tool_sim_002, v2_mini_tool_sim_003, v2_mini_tool_sim_004, v2_mini_tool_sim_005, v2_mini_tool_sim_006, v2_mini_tool_sim_007, v2_mini_tool_sim_008, v2_mini_tool_sim_009, v2_mini_tool_sim_010, v2_mini_tool_sim_011, v2_mini_tool_sim_012, v2_mini_tool_sim_013, v2_mini_tool_sim_014, v2_mini_tool_sim_015, v2_mini_tool_sim_016, v2_mini_tool_sim_017, v2_mini_tool_sim_018, v2_mini_tool_sim_019, v2_mini_tool_sim_020, v2_mini_tool_sim_021, v2_mini_tool_sim_022, v2_mini_tool_sim_023, v2_mini_tool_sim_024, v2_mini_tool_sim_025, v2_mini_tool_sim_026, v2_mini_tool_sim_027, v2_mini_tool_sim_028, v2_mini_tool_sim_029, v2_mini_tool_sim_030, v2_mini_tool_sim_031, v2_mini_tool_sim_032, v2_mini_tool_sim_033, v2_mini_tool_sim_034, v2_mini_tool_sim_035, v2_mini_tool_sim_036, v2_mini_tool_sim_037, v2_mini_tool_sim_038, v2_mini_tool_sim_039, v2_mini_tool_sim_040, v2_mini_tool_sim_041, v2_mini_tool_sim_042, v2_mini_tool_sim_043, v2_mini_tool_sim_044, v2_mini_tool_sim_045, v2_mini_tool_sim_046, v2_mini_tool_sim_047, v2_mini_tool_sim_048, v2_mini_tool_sim_049, v2_mini_tool_sim_050, v2_mini_tool_sim_051, v2_mini_tool_sim_052, v2_mini_tool_sim_053, v2_mini_tool_sim_054, v2_mini_tool_sim_055, v2_mini_tool_sim_056, v2_mini_tool_sim_057, v2_mini_tool_sim_058, v2_mini_tool_sim_059, v2_mini_tool_sim_060, v2_mini_tool_sim_061, v2_mini_tool_sim_062, v2_mini_tool_sim_063, v2_mini_tool_sim_064, v2_mini_tool_sim_065, v2_mini_tool_sim_066, v2_mini_tool_sim_067, v2_mini_tool_sim_068, v2_mini_tool_sim_069, v2_mini_tool_sim_070, v2_mini_tool_sim_071, v2_mini_tool_sim_072, v2_mini_tool_sim_073, v2_mini_tool_sim_074, v2_mini_tool_sim_075, v2_mini_tool_sim_076, v2_mini_tool_sim_077, v2_mini_tool_sim_078, v2_mini_tool_sim_079, v2_mini_tool_sim_080, v2_mini_tool_sim_081, v2_mini_tool_sim_082, v2_mini_tool_sim_083, v2_mini_tool_sim_084, v2_mini_tool_sim_085, v2_mini_tool_sim_086, v2_mini_tool_sim_087
 - Cluster 2: size=16, avg_similarity=0.9972, members=v1_concurrency_basics_002, v1_concurrency_basics_005, v1_concurrency_basics_008, v1_concurrency_basics_011, v1_concurrency_basics_014, v1_concurrency_basics_017, v1_concurrency_basics_020, v1_concurrency_basics_023, v1_concurrency_basics_026, v1_concurrency_basics_029, v1_concurrency_basics_032, v1_concurrency_basics_035, v1_concurrency_basics_038, v1_concurrency_basics_041, v1_concurrency_basics_044, v1_concurrency_basics_047
 - Cluster 3: size=14, avg_similarity=0.9975, members=v1_concurrency_basics_003, v1_concurrency_basics_009, v1_concurrency_basics_012, v1_concurrency_basics_015, v1_concurrency_basics_021, v1_concurrency_basics_024, v1_concurrency_basics_027, v1_concurrency_basics_030, v1_concurrency_basics_033, v1_concurrency_basics_036, v1_concurrency_basics_039, v1_concurrency_basics_042, v1_concurrency_basics_045, v1_concurrency_basics_048
 - Cluster 4: size=13, avg_similarity=0.9974, members=v1_concurrency_basics_001, v1_concurrency_basics_004, v1_concurrency_basics_007, v1_concurrency_basics_010, v1_concurrency_basics_016, v1_concurrency_basics_019, v1_concurrency_basics_022, v1_concurrency_basics_025, v1_concurrency_basics_028, v1_concurrency_basics_037, v1_concurrency_basics_040, v1_concurrency_basics_043, v1_concurrency_basics_049
-- Cluster 5: size=5, avg_similarity=0.9957, members=v2_mini_cli_000, v2_mini_cli_012, v2_mini_cli_024, v2_mini_cli_036, v2_mini_cli_048
-- Cluster 6: size=5, avg_similarity=0.9944, members=v2_mini_cli_001, v2_mini_cli_013, v2_mini_cli_025, v2_mini_cli_037, v2_mini_cli_049
-- Cluster 7: size=4, avg_similarity=1.0, members=v1_concurrency_basics_013, v1_concurrency_basics_031, v1_concurrency_basics_034, v1_concurrency_basics_046
-- Cluster 8: size=4, avg_similarity=1.0, members=v2_mini_cli_002, v2_mini_cli_014, v2_mini_cli_026, v2_mini_cli_038
-- Cluster 9: size=4, avg_similarity=0.9955, members=v2_mini_cli_003, v2_mini_cli_015, v2_mini_cli_027, v2_mini_cli_039
-- Cluster 10: size=4, avg_similarity=0.9941, members=v2_mini_cli_004, v2_mini_cli_016, v2_mini_cli_028, v2_mini_cli_040
-- Cluster 11: size=4, avg_similarity=0.9941, members=v2_mini_cli_005, v2_mini_cli_017, v2_mini_cli_029, v2_mini_cli_041
-- Cluster 12: size=4, avg_similarity=0.9953, members=v2_mini_cli_006, v2_mini_cli_018, v2_mini_cli_030, v2_mini_cli_042
+- Cluster 5: size=8, avg_similarity=0.9962, members=v2_mini_cli_000, v2_mini_cli_012, v2_mini_cli_024, v2_mini_cli_036, v2_mini_cli_048, v2_mini_cli_060, v2_mini_cli_072, v2_mini_cli_084
+- Cluster 6: size=8, avg_similarity=0.9947, members=v2_mini_cli_001, v2_mini_cli_013, v2_mini_cli_025, v2_mini_cli_037, v2_mini_cli_049, v2_mini_cli_061, v2_mini_cli_073, v2_mini_cli_085
+- Cluster 7: size=8, avg_similarity=0.9967, members=v2_mini_cli_002, v2_mini_cli_014, v2_mini_cli_026, v2_mini_cli_038, v2_mini_cli_050, v2_mini_cli_062, v2_mini_cli_074, v2_mini_cli_086
+- Cluster 8: size=8, avg_similarity=0.9951, members=v2_mini_cli_003, v2_mini_cli_015, v2_mini_cli_027, v2_mini_cli_039, v2_mini_cli_051, v2_mini_cli_063, v2_mini_cli_075, v2_mini_cli_087
+- Cluster 9: size=7, avg_similarity=0.9946, members=v2_mini_cli_004, v2_mini_cli_016, v2_mini_cli_028, v2_mini_cli_040, v2_mini_cli_052, v2_mini_cli_064, v2_mini_cli_076
+- Cluster 10: size=7, avg_similarity=0.995, members=v2_mini_cli_005, v2_mini_cli_017, v2_mini_cli_029, v2_mini_cli_041, v2_mini_cli_053, v2_mini_cli_065, v2_mini_cli_077
+- Cluster 11: size=7, avg_similarity=0.9959, members=v2_mini_cli_006, v2_mini_cli_018, v2_mini_cli_030, v2_mini_cli_042, v2_mini_cli_054, v2_mini_cli_066, v2_mini_cli_078
+- Cluster 12: size=7, avg_similarity=0.9953, members=v2_mini_cli_007, v2_mini_cli_019, v2_mini_cli_031, v2_mini_cli_043, v2_mini_cli_055, v2_mini_cli_067, v2_mini_cli_079
 
 ## Originality Marker Scan
 
 - Method: `pattern scan for external-source markers in task files`
-- Task files scanned: `2800`
+- Task files scanned: `4292`
 - Flagged files: `0`
 
 - No external-source markers detected in task files.
@@ -64,8 +64,8 @@ Top clusters:
 ## Test Strength Snapshot
 
 - Method: `task validation strength heuristics (assertion count, edge keywords, negative tests, multi-file interaction) without mutation execution`
-- Mean strength score: `45.14`
+- Mean strength score: `45.8`
 - Median strength score: `49.0`
-- P10 / P90: `33.0` / `53.3`
+- P10 / P90: `33.0` / `56.0`
 - Policy min_strength_score: `22`
 - Low-strength non-allowlisted tasks: `0`

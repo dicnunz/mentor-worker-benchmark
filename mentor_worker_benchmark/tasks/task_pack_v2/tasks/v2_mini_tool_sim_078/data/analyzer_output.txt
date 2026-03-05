@@ -1,0 +1,1 @@
+RULE:unused_import|SEVERITY:warn|FILE:delta.py|LINE:88\nRULE:unsafe_eval|SEVERITY:error|FILE:quartz.py|LINE:98\nRULE:line_too_long|SEVERITY:info|FILE:delta.py|LINE:108\nRULE:unused_import|SEVERITY:warn|FILE:quartz.py|LINE:118\n

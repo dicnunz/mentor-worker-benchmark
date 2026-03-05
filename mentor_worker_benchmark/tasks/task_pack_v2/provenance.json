@@ -2,11 +2,11 @@
   "pack_name": "task_pack_v2",
   "pack_version": "2.0.0",
   "seed": 1337,
-  "generated_at": "2026-03-03T00:49:06.816372+00:00",
+  "generated_at": "2026-03-05T15:06:51.407588+00:00",
   "generator": {
     "script": "mentor_worker_benchmark/tasks/task_pack_v2/generate_task_pack.py",
     "version": "2.0.0",
-    "git_commit": "5900651362e4cbe632b9bb1381ef119ca6c6a542",
+    "git_commit": "ec95b11e5fb20bfa5e8d14219f7591158d4af27c",
     "git_dirty": true
   },
   "statement": {
@@ -33,13 +33,13 @@
     "similarity_scan": {
       "method": "hashed token/char n-gram cosine similarity over prompt+tests",
       "threshold": 0.985,
-      "task_count": 500,
+      "task_count": 652,
       "cluster_count": 18,
-      "largest_cluster_size": 50,
+      "largest_cluster_size": 88,
       "top_clusters": [
         {
           "cluster_id": 1,
-          "size": 50,
+          "size": 88,
           "average_similarity": 0.996,
           "members": [
             "v2_mini_tool_sim_000",
@@ -91,7 +91,45 @@
             "v2_mini_tool_sim_046",
             "v2_mini_tool_sim_047",
             "v2_mini_tool_sim_048",
-            "v2_mini_tool_sim_049"
+            "v2_mini_tool_sim_049",
+            "v2_mini_tool_sim_050",
+            "v2_mini_tool_sim_051",
+            "v2_mini_tool_sim_052",
+            "v2_mini_tool_sim_053",
+            "v2_mini_tool_sim_054",
+            "v2_mini_tool_sim_055",
+            "v2_mini_tool_sim_056",
+            "v2_mini_tool_sim_057",
+            "v2_mini_tool_sim_058",
+            "v2_mini_tool_sim_059",
+            "v2_mini_tool_sim_060",
+            "v2_mini_tool_sim_061",
+            "v2_mini_tool_sim_062",
+            "v2_mini_tool_sim_063",
+            "v2_mini_tool_sim_064",
+            "v2_mini_tool_sim_065",
+            "v2_mini_tool_sim_066",
+            "v2_mini_tool_sim_067",
+            "v2_mini_tool_sim_068",
+            "v2_mini_tool_sim_069",
+            "v2_mini_tool_sim_070",
+            "v2_mini_tool_sim_071",
+            "v2_mini_tool_sim_072",
+            "v2_mini_tool_sim_073",
+            "v2_mini_tool_sim_074",
+            "v2_mini_tool_sim_075",
+            "v2_mini_tool_sim_076",
+            "v2_mini_tool_sim_077",
+            "v2_mini_tool_sim_078",
+            "v2_mini_tool_sim_079",
+            "v2_mini_tool_sim_080",
+            "v2_mini_tool_sim_081",
+            "v2_mini_tool_sim_082",
+            "v2_mini_tool_sim_083",
+            "v2_mini_tool_sim_084",
+            "v2_mini_tool_sim_085",
+            "v2_mini_tool_sim_086",
+            "v2_mini_tool_sim_087"
           ]
         },
         {
@@ -160,99 +198,125 @@
         },
         {
           "cluster_id": 5,
-          "size": 5,
-          "average_similarity": 0.9957,
+          "size": 8,
+          "average_similarity": 0.9962,
           "members": [
             "v2_mini_cli_000",
             "v2_mini_cli_012",
             "v2_mini_cli_024",
             "v2_mini_cli_036",
-            "v2_mini_cli_048"
+            "v2_mini_cli_048",
+            "v2_mini_cli_060",
+            "v2_mini_cli_072",
+            "v2_mini_cli_084"
           ]
         },
         {
           "cluster_id": 6,
-          "size": 5,
-          "average_similarity": 0.9944,
+          "size": 8,
+          "average_similarity": 0.9947,
           "members": [
             "v2_mini_cli_001",
             "v2_mini_cli_013",
             "v2_mini_cli_025",
             "v2_mini_cli_037",
-            "v2_mini_cli_049"
+            "v2_mini_cli_049",
+            "v2_mini_cli_061",
+            "v2_mini_cli_073",
+            "v2_mini_cli_085"
           ]
         },
         {
           "cluster_id": 7,
-          "size": 4,
-          "average_similarity": 1.0,
-          "members": [
-            "v1_concurrency_basics_013",
-            "v1_concurrency_basics_031",
-            "v1_concurrency_basics_034",
-            "v1_concurrency_basics_046"
-          ]
-        },
-        {
-          "cluster_id": 8,
-          "size": 4,
-          "average_similarity": 1.0,
+          "size": 8,
+          "average_similarity": 0.9967,
           "members": [
             "v2_mini_cli_002",
             "v2_mini_cli_014",
             "v2_mini_cli_026",
-            "v2_mini_cli_038"
+            "v2_mini_cli_038",
+            "v2_mini_cli_050",
+            "v2_mini_cli_062",
+            "v2_mini_cli_074",
+            "v2_mini_cli_086"
           ]
         },
         {
-          "cluster_id": 9,
-          "size": 4,
-          "average_similarity": 0.9955,
+          "cluster_id": 8,
+          "size": 8,
+          "average_similarity": 0.9951,
           "members": [
             "v2_mini_cli_003",
             "v2_mini_cli_015",
             "v2_mini_cli_027",
-            "v2_mini_cli_039"
+            "v2_mini_cli_039",
+            "v2_mini_cli_051",
+            "v2_mini_cli_063",
+            "v2_mini_cli_075",
+            "v2_mini_cli_087"
           ]
         },
         {
-          "cluster_id": 10,
-          "size": 4,
-          "average_similarity": 0.9941,
+          "cluster_id": 9,
+          "size": 7,
+          "average_similarity": 0.9946,
           "members": [
             "v2_mini_cli_004",
             "v2_mini_cli_016",
             "v2_mini_cli_028",
-            "v2_mini_cli_040"
+            "v2_mini_cli_040",
+            "v2_mini_cli_052",
+            "v2_mini_cli_064",
+            "v2_mini_cli_076"
           ]
         },
         {
-          "cluster_id": 11,
-          "size": 4,
-          "average_similarity": 0.9941,
+          "cluster_id": 10,
+          "size": 7,
+          "average_similarity": 0.995,
           "members": [
             "v2_mini_cli_005",
             "v2_mini_cli_017",
             "v2_mini_cli_029",
-            "v2_mini_cli_041"
+            "v2_mini_cli_041",
+            "v2_mini_cli_053",
+            "v2_mini_cli_065",
+            "v2_mini_cli_077"
           ]
         },
         {
-          "cluster_id": 12,
-          "size": 4,
-          "average_similarity": 0.9953,
+          "cluster_id": 11,
+          "size": 7,
+          "average_similarity": 0.9959,
           "members": [
             "v2_mini_cli_006",
             "v2_mini_cli_018",
             "v2_mini_cli_030",
-            "v2_mini_cli_042"
+            "v2_mini_cli_042",
+            "v2_mini_cli_054",
+            "v2_mini_cli_066",
+            "v2_mini_cli_078"
+          ]
+        },
+        {
+          "cluster_id": 12,
+          "size": 7,
+          "average_similarity": 0.9953,
+          "members": [
+            "v2_mini_cli_007",
+            "v2_mini_cli_019",
+            "v2_mini_cli_031",
+            "v2_mini_cli_043",
+            "v2_mini_cli_055",
+            "v2_mini_cli_067",
+            "v2_mini_cli_079"
           ]
         }
       ]
     },
     "originality_scan": {
       "method": "pattern scan for external-source markers in task files",
-      "task_file_count": 2800,
+      "task_file_count": 4292,
       "pattern_keys": [
         "benchmark_dataset_reference",
         "copyright_notice",
@@ -266,17 +330,17 @@
     "test_strength_snapshot": {
       "method": "task validation strength heuristics (assertion count, edge keywords, negative tests, multi-file interaction) without mutation execution",
       "distribution": {
-        "count": 500,
+        "count": 652,
         "min": 32,
         "max": 56,
-        "mean": 45.14,
+        "mean": 45.8,
         "median": 49.0,
         "p10": 33.0,
-        "p90": 53.3,
+        "p90": 56.0,
         "deciles": {
-          "30-39": 151,
-          "40-49": 102,
-          "50-59": 247
+          "30-39": 189,
+          "40-49": 140,
+          "50-59": 323
         }
       },
       "policy": {

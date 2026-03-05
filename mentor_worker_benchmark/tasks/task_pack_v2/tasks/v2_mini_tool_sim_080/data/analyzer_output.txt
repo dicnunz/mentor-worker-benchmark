@@ -1,0 +1,1 @@
+RULE:unused_import|SEVERITY:warn|FILE:fable.py|LINE:90\nRULE:unsafe_eval|SEVERITY:error|FILE:quartz.py|LINE:100\nRULE:line_too_long|SEVERITY:info|FILE:fable.py|LINE:110\nRULE:unused_import|SEVERITY:warn|FILE:quartz.py|LINE:120\n

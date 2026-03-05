@@ -1,0 +1,1 @@
+RULE:unused_import|SEVERITY:warn|FILE:jade.py|LINE:79\nRULE:unsafe_eval|SEVERITY:error|FILE:onyx.py|LINE:89\nRULE:line_too_long|SEVERITY:info|FILE:jade.py|LINE:99\nRULE:unused_import|SEVERITY:warn|FILE:onyx.py|LINE:109\n

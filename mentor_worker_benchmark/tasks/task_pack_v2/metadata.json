@@ -15,10 +15,10 @@
     "mini_repo_tool_sim"
   ],
   "counts": {
-    "total": 500,
-    "train": 340,
-    "dev": 80,
-    "test": 80,
+    "total": 652,
+    "train": 444,
+    "dev": 104,
+    "test": 104,
     "quick": 30
   },
   "category_counts": {
@@ -28,10 +28,10 @@
     "multi_file_mini_module": 50,
     "numerical_edge_cases": 50,
     "string_regex_parsing": 50,
-    "mini_repo_bugfix": 50,
-    "mini_repo_cli": 50,
-    "mini_repo_feature": 50,
-    "mini_repo_tool_sim": 50
+    "mini_repo_bugfix": 88,
+    "mini_repo_cli": 88,
+    "mini_repo_feature": 88,
+    "mini_repo_tool_sim": 88
   },
   "tasks": [
     {
@@ -57,8 +57,8 @@
       "title": "Concurrent jobs 002",
       "category": "concurrency_basics",
       "difficulty": "medium",
-      "split": "train",
-      "quick": false,
+      "split": "dev",
+      "quick": true,
       "path": "tasks/v1_concurrency_basics_002"
     },
     {
@@ -93,8 +93,8 @@
       "title": "Concurrent jobs 006",
       "category": "concurrency_basics",
       "difficulty": "hard",
-      "split": "dev",
-      "quick": true,
+      "split": "train",
+      "quick": false,
       "path": "tasks/v1_concurrency_basics_006"
     },
     {
@@ -111,7 +111,7 @@
       "title": "Concurrent jobs 008",
       "category": "concurrency_basics",
       "difficulty": "hard",
-      "split": "test",
+      "split": "dev",
       "quick": false,
       "path": "tasks/v1_concurrency_basics_008"
     },
@@ -120,7 +120,7 @@
       "title": "Concurrent jobs 009",
       "category": "concurrency_basics",
       "difficulty": "easy",
-      "split": "test",
+      "split": "train",
       "quick": false,
       "path": "tasks/v1_concurrency_basics_009"
     },
@@ -129,7 +129,7 @@
       "title": "Concurrent jobs 010",
       "category": "concurrency_basics",
       "difficulty": "easy",
-      "split": "train",
+      "split": "dev",
       "quick": false,
       "path": "tasks/v1_concurrency_basics_010"
     },
@@ -147,7 +147,7 @@
       "title": "Concurrent jobs 012",
       "category": "concurrency_basics",
       "difficulty": "easy",
-      "split": "dev",
+      "split": "test",
       "quick": false,
       "path": "tasks/v1_concurrency_basics_012"
     },
@@ -192,7 +192,7 @@
       "title": "Concurrent jobs 017",
       "category": "concurrency_basics",
       "difficulty": "medium",
-      "split": "train",
+      "split": "test",
       "quick": false,
       "path": "tasks/v1_concurrency_basics_017"
     },
@@ -201,8 +201,8 @@
       "title": "Concurrent jobs 018",
       "category": "concurrency_basics",
       "difficulty": "hard",
-      "split": "train",
-      "quick": false,
+      "split": "test",
+      "quick": true,
       "path": "tasks/v1_concurrency_basics_018"
     },
     {
@@ -210,7 +210,7 @@
       "title": "Concurrent jobs 019",
       "category": "concurrency_basics",
       "difficulty": "easy",
-      "split": "train",
+      "split": "dev",
       "quick": false,
       "path": "tasks/v1_concurrency_basics_019"
     },
@@ -228,7 +228,7 @@
       "title": "Concurrent jobs 021",
       "category": "concurrency_basics",
       "difficulty": "easy",
-      "split": "dev",
+      "split": "train",
       "quick": false,
       "path": "tasks/v1_concurrency_basics_021"
     },
@@ -237,8 +237,8 @@
       "title": "Concurrent jobs 022",
       "category": "concurrency_basics",
       "difficulty": "medium",
-      "split": "test",
-      "quick": true,
+      "split": "dev",
+      "quick": false,
       "path": "tasks/v1_concurrency_basics_022"
     },
     {
@@ -246,7 +246,7 @@
       "title": "Concurrent jobs 023",
       "category": "concurrency_basics",
       "difficulty": "medium",
-      "split": "dev",
+      "split": "train",
       "quick": false,
       "path": "tasks/v1_concurrency_basics_023"
     },
@@ -264,7 +264,7 @@
       "title": "Concurrent jobs 025",
       "category": "concurrency_basics",
       "difficulty": "medium",
-      "split": "dev",
+      "split": "test",
       "quick": false,
       "path": "tasks/v1_concurrency_basics_025"
     },
@@ -273,7 +273,7 @@
       "title": "Concurrent jobs 026",
       "category": "concurrency_basics",
       "difficulty": "medium",
-      "split": "train",
+      "split": "dev",
       "quick": false,
       "path": "tasks/v1_concurrency_basics_026"
     },
@@ -282,7 +282,7 @@
       "title": "Concurrent jobs 027",
       "category": "concurrency_basics",
       "difficulty": "medium",
-      "split": "test",
+      "split": "train",
       "quick": false,
       "path": "tasks/v1_concurrency_basics_027"
     },
@@ -291,7 +291,7 @@
       "title": "Concurrent jobs 028",
       "category": "concurrency_basics",
       "difficulty": "easy",
-      "split": "dev",
+      "split": "train",
       "quick": false,
       "path": "tasks/v1_concurrency_basics_028"
     },
@@ -336,7 +336,7 @@
       "title": "Concurrent jobs 033",
       "category": "concurrency_basics",
       "difficulty": "medium",
-      "split": "test",
+      "split": "train",
       "quick": false,
       "path": "tasks/v1_concurrency_basics_033"
     },
@@ -345,7 +345,7 @@
       "title": "Concurrent jobs 034",
       "category": "concurrency_basics",
       "difficulty": "hard",
-      "split": "test",
+      "split": "train",
       "quick": false,
       "path": "tasks/v1_concurrency_basics_034"
     },
@@ -354,7 +354,7 @@
       "title": "Concurrent jobs 035",
       "category": "concurrency_basics",
       "difficulty": "easy",
-      "split": "dev",
+      "split": "train",
       "quick": false,
       "path": "tasks/v1_concurrency_basics_035"
     },
@@ -363,7 +363,7 @@
       "title": "Concurrent jobs 036",
       "category": "concurrency_basics",
       "difficulty": "medium",
-      "split": "test",
+      "split": "train",
       "quick": false,
       "path": "tasks/v1_concurrency_basics_036"
     },
@@ -408,7 +408,7 @@
       "title": "Concurrent jobs 041",
       "category": "concurrency_basics",
       "difficulty": "easy",
-      "split": "train",
+      "split": "dev",
       "quick": false,
       "path": "tasks/v1_concurrency_basics_041"
     },
@@ -426,7 +426,7 @@
       "title": "Concurrent jobs 043",
       "category": "concurrency_basics",
       "difficulty": "easy",
-      "split": "train",
+      "split": "test",
       "quick": false,
       "path": "tasks/v1_concurrency_basics_043"
     },
@@ -435,7 +435,7 @@
       "title": "Concurrent jobs 044",
       "category": "concurrency_basics",
       "difficulty": "medium",
-      "split": "train",
+      "split": "test",
       "quick": false,
       "path": "tasks/v1_concurrency_basics_044"
     },
@@ -453,7 +453,7 @@
       "title": "Concurrent jobs 046",
       "category": "concurrency_basics",
       "difficulty": "hard",
-      "split": "train",
+      "split": "test",
       "quick": false,
       "path": "tasks/v1_concurrency_basics_046"
     },
@@ -498,8 +498,8 @@
       "title": "Rank products 001",
       "category": "ds_algo",
       "difficulty": "medium",
-      "split": "train",
-      "quick": false,
+      "split": "test",
+      "quick": true,
       "path": "tasks/v1_ds_algo_001"
     },
     {
@@ -507,8 +507,8 @@
       "title": "Rank products 002",
       "category": "ds_algo",
       "difficulty": "easy",
-      "split": "train",
-      "quick": false,
+      "split": "dev",
+      "quick": true,
       "path": "tasks/v1_ds_algo_002"
     },
     {
@@ -516,8 +516,8 @@
       "title": "Rank products 003",
       "category": "ds_algo",
       "difficulty": "medium",
-      "split": "dev",
-      "quick": true,
+      "split": "train",
+      "quick": false,
       "path": "tasks/v1_ds_algo_003"
     },
     {
@@ -525,7 +525,7 @@
       "title": "Rank products 004",
       "category": "ds_algo",
       "difficulty": "easy",
-      "split": "train",
+      "split": "test",
       "quick": false,
       "path": "tasks/v1_ds_algo_004"
     },
@@ -552,7 +552,7 @@
       "title": "Rank products 007",
       "category": "ds_algo",
       "difficulty": "medium",
-      "split": "train",
+      "split": "test",
       "quick": false,
       "path": "tasks/v1_ds_algo_007"
     },
@@ -561,8 +561,8 @@
       "title": "Rank products 008",
       "category": "ds_algo",
       "difficulty": "hard",
-      "split": "train",
-      "quick": false,
+      "split": "dev",
+      "quick": true,
       "path": "tasks/v1_ds_algo_008"
     },
     {
@@ -580,7 +580,7 @@
       "category": "ds_algo",
       "difficulty": "medium",
       "split": "test",
-      "quick": true,
+      "quick": false,
       "path": "tasks/v1_ds_algo_010"
     },
     {
@@ -633,7 +633,7 @@
       "title": "Rank products 016",
       "category": "ds_algo",
       "difficulty": "hard",
-      "split": "dev",
+      "split": "test",
       "quick": false,
       "path": "tasks/v1_ds_algo_016"
     },
@@ -651,7 +651,7 @@
       "title": "Rank products 018",
       "category": "ds_algo",
       "difficulty": "hard",
-      "split": "train",
+      "split": "test",
       "quick": false,
       "path": "tasks/v1_ds_algo_018"
     },
@@ -669,7 +669,7 @@
       "title": "Rank products 020",
       "category": "ds_algo",
       "difficulty": "hard",
-      "split": "train",
+      "split": "test",
       "quick": false,
       "path": "tasks/v1_ds_algo_020"
     },
@@ -678,7 +678,7 @@
       "title": "Rank products 021",
       "category": "ds_algo",
       "difficulty": "hard",
-      "split": "train",
+      "split": "dev",
       "quick": false,
       "path": "tasks/v1_ds_algo_021"
     },
@@ -696,7 +696,7 @@
       "title": "Rank products 023",
       "category": "ds_algo",
       "difficulty": "medium",
-      "split": "train",
+      "split": "test",
       "quick": false,
       "path": "tasks/v1_ds_algo_023"
     },
@@ -714,7 +714,7 @@
       "title": "Rank products 025",
       "category": "ds_algo",
       "difficulty": "easy",
-      "split": "train",
+      "split": "dev",
       "quick": false,
       "path": "tasks/v1_ds_algo_025"
     },
@@ -741,7 +741,7 @@
       "title": "Rank products 028",
       "category": "ds_algo",
       "difficulty": "hard",
-      "split": "train",
+      "split": "dev",
       "quick": false,
       "path": "tasks/v1_ds_algo_028"
     },
@@ -750,7 +750,7 @@
       "title": "Rank products 029",
       "category": "ds_algo",
       "difficulty": "easy",
-      "split": "dev",
+      "split": "train",
       "quick": false,
       "path": "tasks/v1_ds_algo_029"
     },
@@ -759,7 +759,7 @@
       "title": "Rank products 030",
       "category": "ds_algo",
       "difficulty": "medium",
-      "split": "train",
+      "split": "test",
       "quick": false,
       "path": "tasks/v1_ds_algo_030"
     },
@@ -795,7 +795,7 @@
       "title": "Rank products 034",
       "category": "ds_algo",
       "difficulty": "easy",
-      "split": "test",
+      "split": "train",
       "quick": false,
       "path": "tasks/v1_ds_algo_034"
     },
@@ -822,7 +822,7 @@
       "title": "Rank products 037",
       "category": "ds_algo",
       "difficulty": "easy",
-      "split": "test",
+      "split": "dev",
       "quick": false,
       "path": "tasks/v1_ds_algo_037"
     },
@@ -840,7 +840,7 @@
       "title": "Rank products 039",
       "category": "ds_algo",
       "difficulty": "easy",
-      "split": "train",
+      "split": "dev",
       "quick": false,
       "path": "tasks/v1_ds_algo_039"
     },
@@ -867,7 +867,7 @@
       "title": "Rank products 042",
       "category": "ds_algo",
       "difficulty": "hard",
-      "split": "dev",
+      "split": "train",
       "quick": false,
       "path": "tasks/v1_ds_algo_042"
     },
@@ -885,8 +885,8 @@
       "title": "Rank products 044",
       "category": "ds_algo",
       "difficulty": "easy",
-      "split": "dev",
-      "quick": true,
+      "split": "train",
+      "quick": false,
       "path": "tasks/v1_ds_algo_044"
     },
     {
@@ -940,7 +940,7 @@
       "category": "file_io_serialization",
       "difficulty": "hard",
       "split": "dev",
-      "quick": true,
+      "quick": false,
       "path": "tasks/v1_file_io_serialization_000"
     },
     {
@@ -957,7 +957,7 @@
       "title": "CSV summary 002",
       "category": "file_io_serialization",
       "difficulty": "hard",
-      "split": "test",
+      "split": "train",
       "quick": false,
       "path": "tasks/v1_file_io_serialization_002"
     },
@@ -975,7 +975,7 @@
       "title": "CSV summary 004",
       "category": "file_io_serialization",
       "difficulty": "easy",
-      "split": "test",
+      "split": "train",
       "quick": false,
       "path": "tasks/v1_file_io_serialization_004"
     },
@@ -993,7 +993,7 @@
       "title": "CSV summary 006",
       "category": "file_io_serialization",
       "difficulty": "easy",
-      "split": "dev",
+      "split": "train",
       "quick": false,
       "path": "tasks/v1_file_io_serialization_006"
     },
@@ -1002,8 +1002,8 @@
       "title": "CSV summary 007",
       "category": "file_io_serialization",
       "difficulty": "easy",
-      "split": "train",
-      "quick": false,
+      "split": "test",
+      "quick": true,
       "path": "tasks/v1_file_io_serialization_007"
     },
     {
@@ -1011,7 +1011,7 @@
       "title": "CSV summary 008",
       "category": "file_io_serialization",
       "difficulty": "medium",
-      "split": "train",
+      "split": "dev",
       "quick": false,
       "path": "tasks/v1_file_io_serialization_008"
     },
@@ -1020,7 +1020,7 @@
       "title": "CSV summary 009",
       "category": "file_io_serialization",
       "difficulty": "hard",
-      "split": "dev",
+      "split": "train",
       "quick": false,
       "path": "tasks/v1_file_io_serialization_009"
     },
@@ -1038,7 +1038,7 @@
       "title": "CSV summary 011",
       "category": "file_io_serialization",
       "difficulty": "hard",
-      "split": "train",
+      "split": "test",
       "quick": false,
       "path": "tasks/v1_file_io_serialization_011"
     },
@@ -1092,7 +1092,7 @@
       "title": "CSV summary 017",
       "category": "file_io_serialization",
       "difficulty": "easy",
-      "split": "dev",
+      "split": "train",
       "quick": false,
       "path": "tasks/v1_file_io_serialization_017"
     },
@@ -1128,7 +1128,7 @@
       "title": "CSV summary 021",
       "category": "file_io_serialization",
       "difficulty": "medium",
-      "split": "train",
+      "split": "test",
       "quick": false,
       "path": "tasks/v1_file_io_serialization_021"
     },
@@ -1155,7 +1155,7 @@
       "title": "CSV summary 024",
       "category": "file_io_serialization",
       "difficulty": "easy",
-      "split": "train",
+      "split": "dev",
       "quick": false,
       "path": "tasks/v1_file_io_serialization_024"
     },
@@ -1173,7 +1173,7 @@
       "title": "CSV summary 026",
       "category": "file_io_serialization",
       "difficulty": "medium",
-      "split": "test",
+      "split": "train",
       "quick": false,
       "path": "tasks/v1_file_io_serialization_026"
     },
@@ -1200,8 +1200,8 @@
       "title": "CSV summary 029",
       "category": "file_io_serialization",
       "difficulty": "easy",
-      "split": "dev",
-      "quick": true,
+      "split": "train",
+      "quick": false,
       "path": "tasks/v1_file_io_serialization_029"
     },
     {
@@ -1218,7 +1218,7 @@
       "title": "CSV summary 031",
       "category": "file_io_serialization",
       "difficulty": "hard",
-      "split": "dev",
+      "split": "train",
       "quick": false,
       "path": "tasks/v1_file_io_serialization_031"
     },
@@ -1236,7 +1236,7 @@
       "title": "CSV summary 033",
       "category": "file_io_serialization",
       "difficulty": "hard",
-      "split": "train",
+      "split": "test",
       "quick": false,
       "path": "tasks/v1_file_io_serialization_033"
     },
@@ -1245,7 +1245,7 @@
       "title": "CSV summary 034",
       "category": "file_io_serialization",
       "difficulty": "medium",
-      "split": "dev",
+      "split": "train",
       "quick": false,
       "path": "tasks/v1_file_io_serialization_034"
     },
@@ -1254,7 +1254,7 @@
       "title": "CSV summary 035",
       "category": "file_io_serialization",
       "difficulty": "easy",
-      "split": "test",
+      "split": "train",
       "quick": false,
       "path": "tasks/v1_file_io_serialization_035"
     },
@@ -1290,8 +1290,8 @@
       "title": "CSV summary 039",
       "category": "file_io_serialization",
       "difficulty": "medium",
-      "split": "train",
-      "quick": false,
+      "split": "dev",
+      "quick": true,
       "path": "tasks/v1_file_io_serialization_039"
     },
     {
@@ -1299,7 +1299,7 @@
       "title": "CSV summary 040",
       "category": "file_io_serialization",
       "difficulty": "medium",
-      "split": "train",
+      "split": "dev",
       "quick": false,
       "path": "tasks/v1_file_io_serialization_040"
     },
@@ -1308,8 +1308,8 @@
       "title": "CSV summary 041",
       "category": "file_io_serialization",
       "difficulty": "medium",
-      "split": "train",
-      "quick": false,
+      "split": "dev",
+      "quick": true,
       "path": "tasks/v1_file_io_serialization_041"
     },
     {
@@ -1344,8 +1344,8 @@
       "title": "CSV summary 045",
       "category": "file_io_serialization",
       "difficulty": "easy",
-      "split": "dev",
-      "quick": true,
+      "split": "train",
+      "quick": false,
       "path": "tasks/v1_file_io_serialization_045"
     },
     {
@@ -1398,7 +1398,7 @@
       "title": "Mini module pipeline 001",
       "category": "multi_file_mini_module",
       "difficulty": "hard",
-      "split": "train",
+      "split": "dev",
       "quick": false,
       "path": "tasks/v1_multi_file_mini_module_001"
     },
@@ -1416,7 +1416,7 @@
       "title": "Mini module pipeline 003",
       "category": "multi_file_mini_module",
       "difficulty": "medium",
-      "split": "train",
+      "split": "test",
       "quick": false,
       "path": "tasks/v1_multi_file_mini_module_003"
     },
@@ -1425,7 +1425,7 @@
       "title": "Mini module pipeline 004",
       "category": "multi_file_mini_module",
       "difficulty": "hard",
-      "split": "train",
+      "split": "dev",
       "quick": false,
       "path": "tasks/v1_multi_file_mini_module_004"
     },
@@ -1452,7 +1452,7 @@
       "title": "Mini module pipeline 007",
       "category": "multi_file_mini_module",
       "difficulty": "easy",
-      "split": "test",
+      "split": "train",
       "quick": false,
       "path": "tasks/v1_multi_file_mini_module_007"
     },
@@ -1479,7 +1479,7 @@
       "title": "Mini module pipeline 010",
       "category": "multi_file_mini_module",
       "difficulty": "hard",
-      "split": "test",
+      "split": "train",
       "quick": false,
       "path": "tasks/v1_multi_file_mini_module_010"
     },
@@ -1488,7 +1488,7 @@
       "title": "Mini module pipeline 011",
       "category": "multi_file_mini_module",
       "difficulty": "medium",
-      "split": "dev",
+      "split": "train",
       "quick": false,
       "path": "tasks/v1_multi_file_mini_module_011"
     },
@@ -1497,7 +1497,7 @@
       "title": "Mini module pipeline 012",
       "category": "multi_file_mini_module",
       "difficulty": "easy",
-      "split": "train",
+      "split": "dev",
       "quick": false,
       "path": "tasks/v1_multi_file_mini_module_012"
     },
@@ -1506,7 +1506,7 @@
       "title": "Mini module pipeline 013",
       "category": "multi_file_mini_module",
       "difficulty": "medium",
-      "split": "train",
+      "split": "dev",
       "quick": false,
       "path": "tasks/v1_multi_file_mini_module_013"
     },
@@ -1551,7 +1551,7 @@
       "title": "Mini module pipeline 018",
       "category": "multi_file_mini_module",
       "difficulty": "medium",
-      "split": "train",
+      "split": "dev",
       "quick": false,
       "path": "tasks/v1_multi_file_mini_module_018"
     },
@@ -1560,8 +1560,8 @@
       "title": "Mini module pipeline 019",
       "category": "multi_file_mini_module",
       "difficulty": "medium",
-      "split": "train",
-      "quick": false,
+      "split": "test",
+      "quick": true,
       "path": "tasks/v1_multi_file_mini_module_019"
     },
     {
@@ -1569,8 +1569,8 @@
       "title": "Mini module pipeline 020",
       "category": "multi_file_mini_module",
       "difficulty": "easy",
-      "split": "test",
-      "quick": true,
+      "split": "train",
+      "quick": false,
       "path": "tasks/v1_multi_file_mini_module_020"
     },
     {
@@ -1605,7 +1605,7 @@
       "title": "Mini module pipeline 024",
       "category": "multi_file_mini_module",
       "difficulty": "medium",
-      "split": "train",
+      "split": "test",
       "quick": false,
       "path": "tasks/v1_multi_file_mini_module_024"
     },
@@ -1614,7 +1614,7 @@
       "title": "Mini module pipeline 025",
       "category": "multi_file_mini_module",
       "difficulty": "medium",
-      "split": "train",
+      "split": "test",
       "quick": false,
       "path": "tasks/v1_multi_file_mini_module_025"
     },
@@ -1632,7 +1632,7 @@
       "title": "Mini module pipeline 027",
       "category": "multi_file_mini_module",
       "difficulty": "hard",
-      "split": "dev",
+      "split": "train",
       "quick": false,
       "path": "tasks/v1_multi_file_mini_module_027"
     },
@@ -1641,7 +1641,7 @@
       "title": "Mini module pipeline 028",
       "category": "multi_file_mini_module",
       "difficulty": "medium",
-      "split": "test",
+      "split": "train",
       "quick": false,
       "path": "tasks/v1_multi_file_mini_module_028"
     },
@@ -1659,7 +1659,7 @@
       "title": "Mini module pipeline 030",
       "category": "multi_file_mini_module",
       "difficulty": "easy",
-      "split": "test",
+      "split": "train",
       "quick": false,
       "path": "tasks/v1_multi_file_mini_module_030"
     },
@@ -1677,7 +1677,7 @@
       "title": "Mini module pipeline 032",
       "category": "multi_file_mini_module",
       "difficulty": "medium",
-      "split": "train",
+      "split": "dev",
       "quick": false,
       "path": "tasks/v1_multi_file_mini_module_032"
     },
@@ -1695,7 +1695,7 @@
       "title": "Mini module pipeline 034",
       "category": "multi_file_mini_module",
       "difficulty": "medium",
-      "split": "test",
+      "split": "train",
       "quick": false,
       "path": "tasks/v1_multi_file_mini_module_034"
     },
@@ -1704,7 +1704,7 @@
       "title": "Mini module pipeline 035",
       "category": "multi_file_mini_module",
       "difficulty": "easy",
-      "split": "train",
+      "split": "test",
       "quick": false,
       "path": "tasks/v1_multi_file_mini_module_035"
     },
@@ -1713,8 +1713,8 @@
       "title": "Mini module pipeline 036",
       "category": "multi_file_mini_module",
       "difficulty": "medium",
-      "split": "test",
-      "quick": true,
+      "split": "train",
+      "quick": false,
       "path": "tasks/v1_multi_file_mini_module_036"
     },
     {
@@ -1722,8 +1722,8 @@
       "title": "Mini module pipeline 037",
       "category": "multi_file_mini_module",
       "difficulty": "easy",
-      "split": "test",
-      "quick": true,
+      "split": "train",
+      "quick": false,
       "path": "tasks/v1_multi_file_mini_module_037"
     },
     {
@@ -1740,8 +1740,8 @@
       "title": "Mini module pipeline 039",
       "category": "multi_file_mini_module",
       "difficulty": "easy",
-      "split": "train",
-      "quick": false,
+      "split": "test",
+      "quick": true,
       "path": "tasks/v1_multi_file_mini_module_039"
     },
     {
@@ -1776,8 +1776,8 @@
       "title": "Mini module pipeline 043",
       "category": "multi_file_mini_module",
       "difficulty": "medium",
-      "split": "train",
-      "quick": false,
+      "split": "dev",
+      "quick": true,
       "path": "tasks/v1_multi_file_mini_module_043"
     },
     {
@@ -1785,7 +1785,7 @@
       "title": "Mini module pipeline 044",
       "category": "multi_file_mini_module",
       "difficulty": "easy",
-      "split": "dev",
+      "split": "train",
       "quick": false,
       "path": "tasks/v1_multi_file_mini_module_044"
     },
@@ -1830,7 +1830,7 @@
       "title": "Mini module pipeline 049",
       "category": "multi_file_mini_module",
       "difficulty": "hard",
-      "split": "train",
+      "split": "dev",
       "quick": false,
       "path": "tasks/v1_multi_file_mini_module_049"
     },
@@ -1839,8 +1839,8 @@
       "title": "Trimmed mean 000",
       "category": "numerical_edge_cases",
       "difficulty": "easy",
-      "split": "test",
-      "quick": true,
+      "split": "train",
+      "quick": false,
       "path": "tasks/v1_numerical_edge_cases_000"
     },
     {
@@ -1848,8 +1848,8 @@
       "title": "Trimmed mean 001",
       "category": "numerical_edge_cases",
       "difficulty": "medium",
-      "split": "train",
-      "quick": false,
+      "split": "test",
+      "quick": true,
       "path": "tasks/v1_numerical_edge_cases_001"
     },
     {
@@ -1875,7 +1875,7 @@
       "title": "Trimmed mean 004",
       "category": "numerical_edge_cases",
       "difficulty": "hard",
-      "split": "test",
+      "split": "train",
       "quick": false,
       "path": "tasks/v1_numerical_edge_cases_004"
     },
@@ -1884,7 +1884,7 @@
       "title": "Trimmed mean 005",
       "category": "numerical_edge_cases",
       "difficulty": "hard",
-      "split": "train",
+      "split": "test",
       "quick": false,
       "path": "tasks/v1_numerical_edge_cases_005"
     },
@@ -1893,7 +1893,7 @@
       "title": "Trimmed mean 006",
       "category": "numerical_edge_cases",
       "difficulty": "hard",
-      "split": "test",
+      "split": "train",
       "quick": false,
       "path": "tasks/v1_numerical_edge_cases_006"
     },
@@ -1911,7 +1911,7 @@
       "title": "Trimmed mean 008",
       "category": "numerical_edge_cases",
       "difficulty": "medium",
-      "split": "test",
+      "split": "train",
       "quick": false,
       "path": "tasks/v1_numerical_edge_cases_008"
     },
@@ -1920,7 +1920,7 @@
       "title": "Trimmed mean 009",
       "category": "numerical_edge_cases",
       "difficulty": "easy",
-      "split": "train",
+      "split": "test",
       "quick": false,
       "path": "tasks/v1_numerical_edge_cases_009"
     },
@@ -1956,7 +1956,7 @@
       "title": "Trimmed mean 013",
       "category": "numerical_edge_cases",
       "difficulty": "medium",
-      "split": "train",
+      "split": "test",
       "quick": false,
       "path": "tasks/v1_numerical_edge_cases_013"
     },
@@ -1992,7 +1992,7 @@
       "title": "Trimmed mean 017",
       "category": "numerical_edge_cases",
       "difficulty": "hard",
-      "split": "test",
+      "split": "train",
       "quick": false,
       "path": "tasks/v1_numerical_edge_cases_017"
     },
@@ -2001,8 +2001,8 @@
       "title": "Trimmed mean 018",
       "category": "numerical_edge_cases",
       "difficulty": "medium",
-      "split": "dev",
-      "quick": true,
+      "split": "test",
+      "quick": false,
       "path": "tasks/v1_numerical_edge_cases_018"
     },
     {
@@ -2019,7 +2019,7 @@
       "title": "Trimmed mean 020",
       "category": "numerical_edge_cases",
       "difficulty": "hard",
-      "split": "dev",
+      "split": "train",
       "quick": false,
       "path": "tasks/v1_numerical_edge_cases_020"
     },
@@ -2028,7 +2028,7 @@
       "title": "Trimmed mean 021",
       "category": "numerical_edge_cases",
       "difficulty": "medium",
-      "split": "dev",
+      "split": "train",
       "quick": false,
       "path": "tasks/v1_numerical_edge_cases_021"
     },
@@ -2064,7 +2064,7 @@
       "title": "Trimmed mean 025",
       "category": "numerical_edge_cases",
       "difficulty": "hard",
-      "split": "dev",
+      "split": "train",
       "quick": false,
       "path": "tasks/v1_numerical_edge_cases_025"
     },
@@ -2073,7 +2073,7 @@
       "title": "Trimmed mean 026",
       "category": "numerical_edge_cases",
       "difficulty": "medium",
-      "split": "train",
+      "split": "dev",
       "quick": false,
       "path": "tasks/v1_numerical_edge_cases_026"
     },
@@ -2082,7 +2082,7 @@
       "title": "Trimmed mean 027",
       "category": "numerical_edge_cases",
       "difficulty": "medium",
-      "split": "train",
+      "split": "dev",
       "quick": false,
       "path": "tasks/v1_numerical_edge_cases_027"
     },
@@ -2109,8 +2109,8 @@
       "title": "Trimmed mean 030",
       "category": "numerical_edge_cases",
       "difficulty": "hard",
-      "split": "train",
-      "quick": false,
+      "split": "dev",
+      "quick": true,
       "path": "tasks/v1_numerical_edge_cases_030"
     },
     {
@@ -2118,7 +2118,7 @@
       "title": "Trimmed mean 031",
       "category": "numerical_edge_cases",
       "difficulty": "medium",
-      "split": "dev",
+      "split": "train",
       "quick": false,
       "path": "tasks/v1_numerical_edge_cases_031"
     },
@@ -2136,7 +2136,7 @@
       "title": "Trimmed mean 033",
       "category": "numerical_edge_cases",
       "difficulty": "medium",
-      "split": "dev",
+      "split": "train",
       "quick": false,
       "path": "tasks/v1_numerical_edge_cases_033"
     },
@@ -2154,7 +2154,7 @@
       "title": "Trimmed mean 035",
       "category": "numerical_edge_cases",
       "difficulty": "easy",
-      "split": "test",
+      "split": "train",
       "quick": false,
       "path": "tasks/v1_numerical_edge_cases_035"
     },
@@ -2163,8 +2163,8 @@
       "title": "Trimmed mean 036",
       "category": "numerical_edge_cases",
       "difficulty": "medium",
-      "split": "dev",
-      "quick": true,
+      "split": "train",
+      "quick": false,
       "path": "tasks/v1_numerical_edge_cases_036"
     },
     {
@@ -2181,7 +2181,7 @@
       "title": "Trimmed mean 038",
       "category": "numerical_edge_cases",
       "difficulty": "medium",
-      "split": "train",
+      "split": "dev",
       "quick": false,
       "path": "tasks/v1_numerical_edge_cases_038"
     },
@@ -2217,8 +2217,8 @@
       "title": "Trimmed mean 042",
       "category": "numerical_edge_cases",
       "difficulty": "medium",
-      "split": "train",
-      "quick": false,
+      "split": "dev",
+      "quick": true,
       "path": "tasks/v1_numerical_edge_cases_042"
     },
     {
@@ -2280,7 +2280,7 @@
       "title": "Trimmed mean 049",
       "category": "numerical_edge_cases",
       "difficulty": "easy",
-      "split": "dev",
+      "split": "train",
       "quick": false,
       "path": "tasks/v1_numerical_edge_cases_049"
     },
@@ -2289,7 +2289,7 @@
       "title": "Extract markers 000",
       "category": "string_regex_parsing",
       "difficulty": "easy",
-      "split": "train",
+      "split": "dev",
       "quick": false,
       "path": "tasks/v1_string_regex_parsing_000"
     },
@@ -2298,7 +2298,7 @@
       "title": "Extract markers 001",
       "category": "string_regex_parsing",
       "difficulty": "easy",
-      "split": "train",
+      "split": "dev",
       "quick": false,
       "path": "tasks/v1_string_regex_parsing_001"
     },
@@ -2307,7 +2307,7 @@
       "title": "Extract markers 002",
       "category": "string_regex_parsing",
       "difficulty": "medium",
-      "split": "train",
+      "split": "test",
       "quick": false,
       "path": "tasks/v1_string_regex_parsing_002"
     },
@@ -2316,7 +2316,7 @@
       "title": "Extract markers 003",
       "category": "string_regex_parsing",
       "difficulty": "medium",
-      "split": "dev",
+      "split": "train",
       "quick": false,
       "path": "tasks/v1_string_regex_parsing_003"
     },
@@ -2325,7 +2325,7 @@
       "title": "Extract markers 004",
       "category": "string_regex_parsing",
       "difficulty": "hard",
-      "split": "train",
+      "split": "dev",
       "quick": false,
       "path": "tasks/v1_string_regex_parsing_004"
     },
@@ -2361,7 +2361,7 @@
       "title": "Extract markers 008",
       "category": "string_regex_parsing",
       "difficulty": "medium",
-      "split": "test",
+      "split": "dev",
       "quick": false,
       "path": "tasks/v1_string_regex_parsing_008"
     },
@@ -2370,7 +2370,7 @@
       "title": "Extract markers 009",
       "category": "string_regex_parsing",
       "difficulty": "easy",
-      "split": "train",
+      "split": "test",
       "quick": false,
       "path": "tasks/v1_string_regex_parsing_009"
     },
@@ -2406,7 +2406,7 @@
       "title": "Extract markers 013",
       "category": "string_regex_parsing",
       "difficulty": "medium",
-      "split": "train",
+      "split": "test",
       "quick": false,
       "path": "tasks/v1_string_regex_parsing_013"
     },
@@ -2442,7 +2442,7 @@
       "title": "Extract markers 017",
       "category": "string_regex_parsing",
       "difficulty": "easy",
-      "split": "dev",
+      "split": "train",
       "quick": false,
       "path": "tasks/v1_string_regex_parsing_017"
     },
@@ -2451,7 +2451,7 @@
       "title": "Extract markers 018",
       "category": "string_regex_parsing",
       "difficulty": "hard",
-      "split": "train",
+      "split": "test",
       "quick": false,
       "path": "tasks/v1_string_regex_parsing_018"
     },
@@ -2469,7 +2469,7 @@
       "title": "Extract markers 020",
       "category": "string_regex_parsing",
       "difficulty": "easy",
-      "split": "dev",
+      "split": "train",
       "quick": false,
       "path": "tasks/v1_string_regex_parsing_020"
     },
@@ -2478,7 +2478,7 @@
       "title": "Extract markers 021",
       "category": "string_regex_parsing",
       "difficulty": "medium",
-      "split": "train",
+      "split": "test",
       "quick": false,
       "path": "tasks/v1_string_regex_parsing_021"
     },
@@ -2496,7 +2496,7 @@
       "title": "Extract markers 023",
       "category": "string_regex_parsing",
       "difficulty": "easy",
-      "split": "test",
+      "split": "dev",
       "quick": false,
       "path": "tasks/v1_string_regex_parsing_023"
     },
@@ -2523,8 +2523,8 @@
       "title": "Extract markers 026",
       "category": "string_regex_parsing",
       "difficulty": "easy",
-      "split": "dev",
-      "quick": true,
+      "split": "train",
+      "quick": false,
       "path": "tasks/v1_string_regex_parsing_026"
     },
     {
@@ -2532,7 +2532,7 @@
       "title": "Extract markers 027",
       "category": "string_regex_parsing",
       "difficulty": "easy",
-      "split": "dev",
+      "split": "train",
       "quick": false,
       "path": "tasks/v1_string_regex_parsing_027"
     },
@@ -2559,7 +2559,7 @@
       "title": "Extract markers 030",
       "category": "string_regex_parsing",
       "difficulty": "medium",
-      "split": "test",
+      "split": "train",
       "quick": false,
       "path": "tasks/v1_string_regex_parsing_030"
     },
@@ -2568,7 +2568,7 @@
       "title": "Extract markers 031",
       "category": "string_regex_parsing",
       "difficulty": "medium",
-      "split": "dev",
+      "split": "train",
       "quick": false,
       "path": "tasks/v1_string_regex_parsing_031"
     },
@@ -2577,8 +2577,8 @@
       "title": "Extract markers 032",
       "category": "string_regex_parsing",
       "difficulty": "medium",
-      "split": "train",
-      "quick": false,
+      "split": "dev",
+      "quick": true,
       "path": "tasks/v1_string_regex_parsing_032"
     },
     {
@@ -2586,8 +2586,8 @@
       "title": "Extract markers 033",
       "category": "string_regex_parsing",
       "difficulty": "medium",
-      "split": "dev",
-      "quick": true,
+      "split": "train",
+      "quick": false,
       "path": "tasks/v1_string_regex_parsing_033"
     },
     {
@@ -2595,7 +2595,7 @@
       "title": "Extract markers 034",
       "category": "string_regex_parsing",
       "difficulty": "hard",
-      "split": "dev",
+      "split": "train",
       "quick": false,
       "path": "tasks/v1_string_regex_parsing_034"
     },
@@ -2604,7 +2604,7 @@
       "title": "Extract markers 035",
       "category": "string_regex_parsing",
       "difficulty": "easy",
-      "split": "dev",
+      "split": "train",
       "quick": false,
       "path": "tasks/v1_string_regex_parsing_035"
     },
@@ -2613,7 +2613,7 @@
       "title": "Extract markers 036",
       "category": "string_regex_parsing",
       "difficulty": "hard",
-      "split": "train",
+      "split": "dev",
       "quick": false,
       "path": "tasks/v1_string_regex_parsing_036"
     },
@@ -2658,8 +2658,8 @@
       "title": "Extract markers 041",
       "category": "string_regex_parsing",
       "difficulty": "easy",
-      "split": "dev",
-      "quick": true,
+      "split": "test",
+      "quick": false,
       "path": "tasks/v1_string_regex_parsing_041"
     },
     {
@@ -2667,7 +2667,7 @@
       "title": "Extract markers 042",
       "category": "string_regex_parsing",
       "difficulty": "easy",
-      "split": "test",
+      "split": "train",
       "quick": false,
       "path": "tasks/v1_string_regex_parsing_042"
     },
@@ -2685,8 +2685,8 @@
       "title": "Extract markers 044",
       "category": "string_regex_parsing",
       "difficulty": "easy",
-      "split": "train",
-      "quick": false,
+      "split": "test",
+      "quick": true,
       "path": "tasks/v1_string_regex_parsing_044"
     },
     {
@@ -2694,7 +2694,7 @@
       "title": "Extract markers 045",
       "category": "string_regex_parsing",
       "difficulty": "medium",
-      "split": "test",
+      "split": "train",
       "quick": false,
       "path": "tasks/v1_string_regex_parsing_045"
     },
@@ -2703,8 +2703,8 @@
       "title": "Extract markers 046",
       "category": "string_regex_parsing",
       "difficulty": "hard",
-      "split": "train",
-      "quick": false,
+      "split": "dev",
+      "quick": true,
       "path": "tasks/v1_string_regex_parsing_046"
     },
     {
@@ -2712,7 +2712,7 @@
       "title": "Extract markers 047",
       "category": "string_regex_parsing",
       "difficulty": "easy",
-      "split": "train",
+      "split": "dev",
       "quick": false,
       "path": "tasks/v1_string_regex_parsing_047"
     },
@@ -2721,7 +2721,7 @@
       "title": "Extract markers 048",
       "category": "string_regex_parsing",
       "difficulty": "easy",
-      "split": "dev",
+      "split": "train",
       "quick": false,
       "path": "tasks/v1_string_regex_parsing_048"
     },
@@ -2730,7 +2730,7 @@
       "title": "Extract markers 049",
       "category": "string_regex_parsing",
       "difficulty": "medium",
-      "split": "test",
+      "split": "train",
       "quick": false,
       "path": "tasks/v1_string_regex_parsing_049"
     },
@@ -2757,7 +2757,7 @@
       "title": "Mini bugfix 002",
       "category": "mini_repo_bugfix",
       "difficulty": "medium",
-      "split": "train",
+      "split": "dev",
       "quick": false,
       "path": "tasks/v2_mini_bugfix_002"
     },
@@ -2775,7 +2775,7 @@
       "title": "Mini bugfix 004",
       "category": "mini_repo_bugfix",
       "difficulty": "hard",
-      "split": "test",
+      "split": "dev",
       "quick": false,
       "path": "tasks/v2_mini_bugfix_004"
     },
@@ -2811,7 +2811,7 @@
       "title": "Mini bugfix 008",
       "category": "mini_repo_bugfix",
       "difficulty": "medium",
-      "split": "test",
+      "split": "train",
       "quick": false,
       "path": "tasks/v2_mini_bugfix_008"
     },
@@ -2820,8 +2820,8 @@
       "title": "Mini bugfix 009",
       "category": "mini_repo_bugfix",
       "difficulty": "medium",
-      "split": "test",
-      "quick": true,
+      "split": "train",
+      "quick": false,
       "path": "tasks/v2_mini_bugfix_009"
     },
     {
@@ -2829,8 +2829,8 @@
       "title": "Mini bugfix 010",
       "category": "mini_repo_bugfix",
       "difficulty": "hard",
-      "split": "dev",
-      "quick": true,
+      "split": "train",
+      "quick": false,
       "path": "tasks/v2_mini_bugfix_010"
     },
     {
@@ -2856,7 +2856,7 @@
       "title": "Mini bugfix 013",
       "category": "mini_repo_bugfix",
       "difficulty": "hard",
-      "split": "dev",
+      "split": "train",
       "quick": false,
       "path": "tasks/v2_mini_bugfix_013"
     },
@@ -2865,7 +2865,7 @@
       "title": "Mini bugfix 014",
       "category": "mini_repo_bugfix",
       "difficulty": "medium",
-      "split": "train",
+      "split": "test",
       "quick": false,
       "path": "tasks/v2_mini_bugfix_014"
     },
@@ -2874,7 +2874,7 @@
       "title": "Mini bugfix 015",
       "category": "mini_repo_bugfix",
       "difficulty": "easy",
-      "split": "train",
+      "split": "test",
       "quick": false,
       "path": "tasks/v2_mini_bugfix_015"
     },
@@ -2883,7 +2883,7 @@
       "title": "Mini bugfix 016",
       "category": "mini_repo_bugfix",
       "difficulty": "easy",
-      "split": "test",
+      "split": "train",
       "quick": false,
       "path": "tasks/v2_mini_bugfix_016"
     },
@@ -2892,7 +2892,7 @@
       "title": "Mini bugfix 017",
       "category": "mini_repo_bugfix",
       "difficulty": "easy",
-      "split": "test",
+      "split": "train",
       "quick": false,
       "path": "tasks/v2_mini_bugfix_017"
     },
@@ -2901,7 +2901,7 @@
       "title": "Mini bugfix 018",
       "category": "mini_repo_bugfix",
       "difficulty": "easy",
-      "split": "train",
+      "split": "test",
       "quick": false,
       "path": "tasks/v2_mini_bugfix_018"
     },
@@ -2928,7 +2928,7 @@
       "title": "Mini bugfix 021",
       "category": "mini_repo_bugfix",
       "difficulty": "easy",
-      "split": "train",
+      "split": "test",
       "quick": false,
       "path": "tasks/v2_mini_bugfix_021"
     },
@@ -2937,7 +2937,7 @@
       "title": "Mini bugfix 022",
       "category": "mini_repo_bugfix",
       "difficulty": "medium",
-      "split": "train",
+      "split": "dev",
       "quick": false,
       "path": "tasks/v2_mini_bugfix_022"
     },
@@ -2946,8 +2946,8 @@
       "title": "Mini bugfix 023",
       "category": "mini_repo_bugfix",
       "difficulty": "easy",
-      "split": "train",
-      "quick": false,
+      "split": "test",
+      "quick": true,
       "path": "tasks/v2_mini_bugfix_023"
     },
     {
@@ -2955,7 +2955,7 @@
       "title": "Mini bugfix 024",
       "category": "mini_repo_bugfix",
       "difficulty": "medium",
-      "split": "dev",
+      "split": "train",
       "quick": false,
       "path": "tasks/v2_mini_bugfix_024"
     },
@@ -2964,7 +2964,7 @@
       "title": "Mini bugfix 025",
       "category": "mini_repo_bugfix",
       "difficulty": "medium",
-      "split": "test",
+      "split": "train",
       "quick": false,
       "path": "tasks/v2_mini_bugfix_025"
     },
@@ -2973,7 +2973,7 @@
       "title": "Mini bugfix 026",
       "category": "mini_repo_bugfix",
       "difficulty": "easy",
-      "split": "test",
+      "split": "train",
       "quick": false,
       "path": "tasks/v2_mini_bugfix_026"
     },
@@ -2982,7 +2982,7 @@
       "title": "Mini bugfix 027",
       "category": "mini_repo_bugfix",
       "difficulty": "easy",
-      "split": "train",
+      "split": "dev",
       "quick": false,
       "path": "tasks/v2_mini_bugfix_027"
     },
@@ -2991,8 +2991,8 @@
       "title": "Mini bugfix 028",
       "category": "mini_repo_bugfix",
       "difficulty": "hard",
-      "split": "train",
-      "quick": false,
+      "split": "dev",
+      "quick": true,
       "path": "tasks/v2_mini_bugfix_028"
     },
     {
@@ -3000,7 +3000,7 @@
       "title": "Mini bugfix 029",
       "category": "mini_repo_bugfix",
       "difficulty": "medium",
-      "split": "train",
+      "split": "dev",
       "quick": false,
       "path": "tasks/v2_mini_bugfix_029"
     },
@@ -3009,7 +3009,7 @@
       "title": "Mini bugfix 030",
       "category": "mini_repo_bugfix",
       "difficulty": "easy",
-      "split": "dev",
+      "split": "train",
       "quick": false,
       "path": "tasks/v2_mini_bugfix_030"
     },
@@ -3027,7 +3027,7 @@
       "title": "Mini bugfix 032",
       "category": "mini_repo_bugfix",
       "difficulty": "hard",
-      "split": "train",
+      "split": "dev",
       "quick": false,
       "path": "tasks/v2_mini_bugfix_032"
     },
@@ -3045,7 +3045,7 @@
       "title": "Mini bugfix 034",
       "category": "mini_repo_bugfix",
       "difficulty": "easy",
-      "split": "test",
+      "split": "train",
       "quick": false,
       "path": "tasks/v2_mini_bugfix_034"
     },
@@ -3063,7 +3063,7 @@
       "title": "Mini bugfix 036",
       "category": "mini_repo_bugfix",
       "difficulty": "easy",
-      "split": "test",
+      "split": "train",
       "quick": false,
       "path": "tasks/v2_mini_bugfix_036"
     },
@@ -3090,7 +3090,7 @@
       "title": "Mini bugfix 039",
       "category": "mini_repo_bugfix",
       "difficulty": "hard",
-      "split": "test",
+      "split": "train",
       "quick": false,
       "path": "tasks/v2_mini_bugfix_039"
     },
@@ -3099,8 +3099,8 @@
       "title": "Mini bugfix 040",
       "category": "mini_repo_bugfix",
       "difficulty": "hard",
-      "split": "train",
-      "quick": false,
+      "split": "test",
+      "quick": true,
       "path": "tasks/v2_mini_bugfix_040"
     },
     {
@@ -3108,7 +3108,7 @@
       "title": "Mini bugfix 041",
       "category": "mini_repo_bugfix",
       "difficulty": "medium",
-      "split": "train",
+      "split": "test",
       "quick": false,
       "path": "tasks/v2_mini_bugfix_041"
     },
@@ -3117,7 +3117,7 @@
       "title": "Mini bugfix 042",
       "category": "mini_repo_bugfix",
       "difficulty": "medium",
-      "split": "test",
+      "split": "train",
       "quick": false,
       "path": "tasks/v2_mini_bugfix_042"
     },
@@ -3126,7 +3126,7 @@
       "title": "Mini bugfix 043",
       "category": "mini_repo_bugfix",
       "difficulty": "easy",
-      "split": "train",
+      "split": "dev",
       "quick": false,
       "path": "tasks/v2_mini_bugfix_043"
     },
@@ -3135,7 +3135,7 @@
       "title": "Mini bugfix 044",
       "category": "mini_repo_bugfix",
       "difficulty": "medium",
-      "split": "train",
+      "split": "dev",
       "quick": false,
       "path": "tasks/v2_mini_bugfix_044"
     },
@@ -3144,7 +3144,7 @@
       "title": "Mini bugfix 045",
       "category": "mini_repo_bugfix",
       "difficulty": "medium",
-      "split": "test",
+      "split": "train",
       "quick": false,
       "path": "tasks/v2_mini_bugfix_045"
     },
@@ -3162,8 +3162,8 @@
       "title": "Mini bugfix 047",
       "category": "mini_repo_bugfix",
       "difficulty": "hard",
-      "split": "test",
-      "quick": true,
+      "split": "train",
+      "quick": false,
       "path": "tasks/v2_mini_bugfix_047"
     },
     {
@@ -3171,7 +3171,7 @@
       "title": "Mini bugfix 048",
       "category": "mini_repo_bugfix",
       "difficulty": "medium",
-      "split": "train",
+      "split": "dev",
       "quick": false,
       "path": "tasks/v2_mini_bugfix_048"
     },
@@ -3185,12 +3185,354 @@
       "path": "tasks/v2_mini_bugfix_049"
     },
     {
+      "task_id": "v2_mini_bugfix_050",
+      "title": "Mini bugfix 050",
+      "category": "mini_repo_bugfix",
+      "difficulty": "medium",
+      "split": "dev",
+      "quick": false,
+      "path": "tasks/v2_mini_bugfix_050"
+    },
+    {
+      "task_id": "v2_mini_bugfix_051",
+      "title": "Mini bugfix 051",
+      "category": "mini_repo_bugfix",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_bugfix_051"
+    },
+    {
+      "task_id": "v2_mini_bugfix_052",
+      "title": "Mini bugfix 052",
+      "category": "mini_repo_bugfix",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_bugfix_052"
+    },
+    {
+      "task_id": "v2_mini_bugfix_053",
+      "title": "Mini bugfix 053",
+      "category": "mini_repo_bugfix",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_bugfix_053"
+    },
+    {
+      "task_id": "v2_mini_bugfix_054",
+      "title": "Mini bugfix 054",
+      "category": "mini_repo_bugfix",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_bugfix_054"
+    },
+    {
+      "task_id": "v2_mini_bugfix_055",
+      "title": "Mini bugfix 055",
+      "category": "mini_repo_bugfix",
+      "difficulty": "medium",
+      "split": "test",
+      "quick": false,
+      "path": "tasks/v2_mini_bugfix_055"
+    },
+    {
+      "task_id": "v2_mini_bugfix_056",
+      "title": "Mini bugfix 056",
+      "category": "mini_repo_bugfix",
+      "difficulty": "hard",
+      "split": "test",
+      "quick": false,
+      "path": "tasks/v2_mini_bugfix_056"
+    },
+    {
+      "task_id": "v2_mini_bugfix_057",
+      "title": "Mini bugfix 057",
+      "category": "mini_repo_bugfix",
+      "difficulty": "hard",
+      "split": "test",
+      "quick": false,
+      "path": "tasks/v2_mini_bugfix_057"
+    },
+    {
+      "task_id": "v2_mini_bugfix_058",
+      "title": "Mini bugfix 058",
+      "category": "mini_repo_bugfix",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_bugfix_058"
+    },
+    {
+      "task_id": "v2_mini_bugfix_059",
+      "title": "Mini bugfix 059",
+      "category": "mini_repo_bugfix",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_bugfix_059"
+    },
+    {
+      "task_id": "v2_mini_bugfix_060",
+      "title": "Mini bugfix 060",
+      "category": "mini_repo_bugfix",
+      "difficulty": "hard",
+      "split": "test",
+      "quick": false,
+      "path": "tasks/v2_mini_bugfix_060"
+    },
+    {
+      "task_id": "v2_mini_bugfix_061",
+      "title": "Mini bugfix 061",
+      "category": "mini_repo_bugfix",
+      "difficulty": "medium",
+      "split": "test",
+      "quick": false,
+      "path": "tasks/v2_mini_bugfix_061"
+    },
+    {
+      "task_id": "v2_mini_bugfix_062",
+      "title": "Mini bugfix 062",
+      "category": "mini_repo_bugfix",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_bugfix_062"
+    },
+    {
+      "task_id": "v2_mini_bugfix_063",
+      "title": "Mini bugfix 063",
+      "category": "mini_repo_bugfix",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_bugfix_063"
+    },
+    {
+      "task_id": "v2_mini_bugfix_064",
+      "title": "Mini bugfix 064",
+      "category": "mini_repo_bugfix",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_bugfix_064"
+    },
+    {
+      "task_id": "v2_mini_bugfix_065",
+      "title": "Mini bugfix 065",
+      "category": "mini_repo_bugfix",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_bugfix_065"
+    },
+    {
+      "task_id": "v2_mini_bugfix_066",
+      "title": "Mini bugfix 066",
+      "category": "mini_repo_bugfix",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_bugfix_066"
+    },
+    {
+      "task_id": "v2_mini_bugfix_067",
+      "title": "Mini bugfix 067",
+      "category": "mini_repo_bugfix",
+      "difficulty": "easy",
+      "split": "dev",
+      "quick": false,
+      "path": "tasks/v2_mini_bugfix_067"
+    },
+    {
+      "task_id": "v2_mini_bugfix_068",
+      "title": "Mini bugfix 068",
+      "category": "mini_repo_bugfix",
+      "difficulty": "hard",
+      "split": "test",
+      "quick": false,
+      "path": "tasks/v2_mini_bugfix_068"
+    },
+    {
+      "task_id": "v2_mini_bugfix_069",
+      "title": "Mini bugfix 069",
+      "category": "mini_repo_bugfix",
+      "difficulty": "hard",
+      "split": "dev",
+      "quick": false,
+      "path": "tasks/v2_mini_bugfix_069"
+    },
+    {
+      "task_id": "v2_mini_bugfix_070",
+      "title": "Mini bugfix 070",
+      "category": "mini_repo_bugfix",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_bugfix_070"
+    },
+    {
+      "task_id": "v2_mini_bugfix_071",
+      "title": "Mini bugfix 071",
+      "category": "mini_repo_bugfix",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_bugfix_071"
+    },
+    {
+      "task_id": "v2_mini_bugfix_072",
+      "title": "Mini bugfix 072",
+      "category": "mini_repo_bugfix",
+      "difficulty": "hard",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_bugfix_072"
+    },
+    {
+      "task_id": "v2_mini_bugfix_073",
+      "title": "Mini bugfix 073",
+      "category": "mini_repo_bugfix",
+      "difficulty": "easy",
+      "split": "test",
+      "quick": false,
+      "path": "tasks/v2_mini_bugfix_073"
+    },
+    {
+      "task_id": "v2_mini_bugfix_074",
+      "title": "Mini bugfix 074",
+      "category": "mini_repo_bugfix",
+      "difficulty": "medium",
+      "split": "test",
+      "quick": false,
+      "path": "tasks/v2_mini_bugfix_074"
+    },
+    {
+      "task_id": "v2_mini_bugfix_075",
+      "title": "Mini bugfix 075",
+      "category": "mini_repo_bugfix",
+      "difficulty": "easy",
+      "split": "dev",
+      "quick": false,
+      "path": "tasks/v2_mini_bugfix_075"
+    },
+    {
+      "task_id": "v2_mini_bugfix_076",
+      "title": "Mini bugfix 076",
+      "category": "mini_repo_bugfix",
+      "difficulty": "medium",
+      "split": "dev",
+      "quick": false,
+      "path": "tasks/v2_mini_bugfix_076"
+    },
+    {
+      "task_id": "v2_mini_bugfix_077",
+      "title": "Mini bugfix 077",
+      "category": "mini_repo_bugfix",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_bugfix_077"
+    },
+    {
+      "task_id": "v2_mini_bugfix_078",
+      "title": "Mini bugfix 078",
+      "category": "mini_repo_bugfix",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_bugfix_078"
+    },
+    {
+      "task_id": "v2_mini_bugfix_079",
+      "title": "Mini bugfix 079",
+      "category": "mini_repo_bugfix",
+      "difficulty": "hard",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_bugfix_079"
+    },
+    {
+      "task_id": "v2_mini_bugfix_080",
+      "title": "Mini bugfix 080",
+      "category": "mini_repo_bugfix",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_bugfix_080"
+    },
+    {
+      "task_id": "v2_mini_bugfix_081",
+      "title": "Mini bugfix 081",
+      "category": "mini_repo_bugfix",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_bugfix_081"
+    },
+    {
+      "task_id": "v2_mini_bugfix_082",
+      "title": "Mini bugfix 082",
+      "category": "mini_repo_bugfix",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_bugfix_082"
+    },
+    {
+      "task_id": "v2_mini_bugfix_083",
+      "title": "Mini bugfix 083",
+      "category": "mini_repo_bugfix",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_bugfix_083"
+    },
+    {
+      "task_id": "v2_mini_bugfix_084",
+      "title": "Mini bugfix 084",
+      "category": "mini_repo_bugfix",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_bugfix_084"
+    },
+    {
+      "task_id": "v2_mini_bugfix_085",
+      "title": "Mini bugfix 085",
+      "category": "mini_repo_bugfix",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_bugfix_085"
+    },
+    {
+      "task_id": "v2_mini_bugfix_086",
+      "title": "Mini bugfix 086",
+      "category": "mini_repo_bugfix",
+      "difficulty": "hard",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_bugfix_086"
+    },
+    {
+      "task_id": "v2_mini_bugfix_087",
+      "title": "Mini bugfix 087",
+      "category": "mini_repo_bugfix",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_bugfix_087"
+    },
+    {
       "task_id": "v2_mini_cli_000",
       "title": "Mini cli 000",
       "category": "mini_repo_cli",
       "difficulty": "easy",
-      "split": "dev",
-      "quick": true,
+      "split": "train",
+      "quick": false,
       "path": "tasks/v2_mini_cli_000"
     },
     {
@@ -3198,8 +3540,8 @@
       "title": "Mini cli 001",
       "category": "mini_repo_cli",
       "difficulty": "medium",
-      "split": "train",
-      "quick": false,
+      "split": "dev",
+      "quick": true,
       "path": "tasks/v2_mini_cli_001"
     },
     {
@@ -3225,8 +3567,8 @@
       "title": "Mini cli 004",
       "category": "mini_repo_cli",
       "difficulty": "easy",
-      "split": "test",
-      "quick": true,
+      "split": "dev",
+      "quick": false,
       "path": "tasks/v2_mini_cli_004"
     },
     {
@@ -3243,7 +3585,7 @@
       "title": "Mini cli 006",
       "category": "mini_repo_cli",
       "difficulty": "medium",
-      "split": "train",
+      "split": "dev",
       "quick": false,
       "path": "tasks/v2_mini_cli_006"
     },
@@ -3252,7 +3594,7 @@
       "title": "Mini cli 007",
       "category": "mini_repo_cli",
       "difficulty": "easy",
-      "split": "test",
+      "split": "train",
       "quick": false,
       "path": "tasks/v2_mini_cli_007"
     },
@@ -3262,7 +3604,7 @@
       "category": "mini_repo_cli",
       "difficulty": "medium",
       "split": "dev",
-      "quick": true,
+      "quick": false,
       "path": "tasks/v2_mini_cli_008"
     },
     {
@@ -3270,7 +3612,7 @@
       "title": "Mini cli 009",
       "category": "mini_repo_cli",
       "difficulty": "medium",
-      "split": "test",
+      "split": "train",
       "quick": false,
       "path": "tasks/v2_mini_cli_009"
     },
@@ -3279,7 +3621,7 @@
       "title": "Mini cli 010",
       "category": "mini_repo_cli",
       "difficulty": "easy",
-      "split": "test",
+      "split": "train",
       "quick": false,
       "path": "tasks/v2_mini_cli_010"
     },
@@ -3288,7 +3630,7 @@
       "title": "Mini cli 011",
       "category": "mini_repo_cli",
       "difficulty": "medium",
-      "split": "test",
+      "split": "train",
       "quick": false,
       "path": "tasks/v2_mini_cli_011"
     },
@@ -3351,7 +3693,7 @@
       "title": "Mini cli 018",
       "category": "mini_repo_cli",
       "difficulty": "medium",
-      "split": "dev",
+      "split": "train",
       "quick": false,
       "path": "tasks/v2_mini_cli_018"
     },
@@ -3369,7 +3711,7 @@
       "title": "Mini cli 020",
       "category": "mini_repo_cli",
       "difficulty": "hard",
-      "split": "test",
+      "split": "dev",
       "quick": false,
       "path": "tasks/v2_mini_cli_020"
     },
@@ -3387,7 +3729,7 @@
       "title": "Mini cli 022",
       "category": "mini_repo_cli",
       "difficulty": "medium",
-      "split": "test",
+      "split": "train",
       "quick": false,
       "path": "tasks/v2_mini_cli_022"
     },
@@ -3396,7 +3738,7 @@
       "title": "Mini cli 023",
       "category": "mini_repo_cli",
       "difficulty": "easy",
-      "split": "dev",
+      "split": "test",
       "quick": false,
       "path": "tasks/v2_mini_cli_023"
     },
@@ -3414,7 +3756,7 @@
       "title": "Mini cli 025",
       "category": "mini_repo_cli",
       "difficulty": "easy",
-      "split": "dev",
+      "split": "train",
       "quick": false,
       "path": "tasks/v2_mini_cli_025"
     },
@@ -3423,7 +3765,7 @@
       "title": "Mini cli 026",
       "category": "mini_repo_cli",
       "difficulty": "medium",
-      "split": "test",
+      "split": "train",
       "quick": false,
       "path": "tasks/v2_mini_cli_026"
     },
@@ -3459,7 +3801,7 @@
       "title": "Mini cli 030",
       "category": "mini_repo_cli",
       "difficulty": "easy",
-      "split": "train",
+      "split": "test",
       "quick": false,
       "path": "tasks/v2_mini_cli_030"
     },
@@ -3477,7 +3819,7 @@
       "title": "Mini cli 032",
       "category": "mini_repo_cli",
       "difficulty": "medium",
-      "split": "dev",
+      "split": "train",
       "quick": false,
       "path": "tasks/v2_mini_cli_032"
     },
@@ -3495,7 +3837,7 @@
       "title": "Mini cli 034",
       "category": "mini_repo_cli",
       "difficulty": "easy",
-      "split": "dev",
+      "split": "train",
       "quick": false,
       "path": "tasks/v2_mini_cli_034"
     },
@@ -3513,7 +3855,7 @@
       "title": "Mini cli 036",
       "category": "mini_repo_cli",
       "difficulty": "medium",
-      "split": "test",
+      "split": "train",
       "quick": false,
       "path": "tasks/v2_mini_cli_036"
     },
@@ -3522,7 +3864,7 @@
       "title": "Mini cli 037",
       "category": "mini_repo_cli",
       "difficulty": "hard",
-      "split": "dev",
+      "split": "train",
       "quick": false,
       "path": "tasks/v2_mini_cli_037"
     },
@@ -3540,7 +3882,7 @@
       "title": "Mini cli 039",
       "category": "mini_repo_cli",
       "difficulty": "hard",
-      "split": "train",
+      "split": "dev",
       "quick": false,
       "path": "tasks/v2_mini_cli_039"
     },
@@ -3558,7 +3900,7 @@
       "title": "Mini cli 041",
       "category": "mini_repo_cli",
       "difficulty": "easy",
-      "split": "train",
+      "split": "test",
       "quick": false,
       "path": "tasks/v2_mini_cli_041"
     },
@@ -3567,7 +3909,7 @@
       "title": "Mini cli 042",
       "category": "mini_repo_cli",
       "difficulty": "easy",
-      "split": "test",
+      "split": "train",
       "quick": false,
       "path": "tasks/v2_mini_cli_042"
     },
@@ -3585,7 +3927,7 @@
       "title": "Mini cli 044",
       "category": "mini_repo_cli",
       "difficulty": "medium",
-      "split": "dev",
+      "split": "train",
       "quick": false,
       "path": "tasks/v2_mini_cli_044"
     },
@@ -3603,7 +3945,7 @@
       "title": "Mini cli 046",
       "category": "mini_repo_cli",
       "difficulty": "medium",
-      "split": "dev",
+      "split": "train",
       "quick": false,
       "path": "tasks/v2_mini_cli_046"
     },
@@ -3612,7 +3954,7 @@
       "title": "Mini cli 047",
       "category": "mini_repo_cli",
       "difficulty": "easy",
-      "split": "dev",
+      "split": "train",
       "quick": false,
       "path": "tasks/v2_mini_cli_047"
     },
@@ -3621,7 +3963,7 @@
       "title": "Mini cli 048",
       "category": "mini_repo_cli",
       "difficulty": "medium",
-      "split": "train",
+      "split": "dev",
       "quick": false,
       "path": "tasks/v2_mini_cli_048"
     },
@@ -3635,11 +3977,353 @@
       "path": "tasks/v2_mini_cli_049"
     },
     {
+      "task_id": "v2_mini_cli_050",
+      "title": "Mini cli 050",
+      "category": "mini_repo_cli",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_cli_050"
+    },
+    {
+      "task_id": "v2_mini_cli_051",
+      "title": "Mini cli 051",
+      "category": "mini_repo_cli",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_cli_051"
+    },
+    {
+      "task_id": "v2_mini_cli_052",
+      "title": "Mini cli 052",
+      "category": "mini_repo_cli",
+      "difficulty": "hard",
+      "split": "dev",
+      "quick": false,
+      "path": "tasks/v2_mini_cli_052"
+    },
+    {
+      "task_id": "v2_mini_cli_053",
+      "title": "Mini cli 053",
+      "category": "mini_repo_cli",
+      "difficulty": "hard",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_cli_053"
+    },
+    {
+      "task_id": "v2_mini_cli_054",
+      "title": "Mini cli 054",
+      "category": "mini_repo_cli",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_cli_054"
+    },
+    {
+      "task_id": "v2_mini_cli_055",
+      "title": "Mini cli 055",
+      "category": "mini_repo_cli",
+      "difficulty": "hard",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_cli_055"
+    },
+    {
+      "task_id": "v2_mini_cli_056",
+      "title": "Mini cli 056",
+      "category": "mini_repo_cli",
+      "difficulty": "easy",
+      "split": "dev",
+      "quick": false,
+      "path": "tasks/v2_mini_cli_056"
+    },
+    {
+      "task_id": "v2_mini_cli_057",
+      "title": "Mini cli 057",
+      "category": "mini_repo_cli",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_cli_057"
+    },
+    {
+      "task_id": "v2_mini_cli_058",
+      "title": "Mini cli 058",
+      "category": "mini_repo_cli",
+      "difficulty": "easy",
+      "split": "test",
+      "quick": true,
+      "path": "tasks/v2_mini_cli_058"
+    },
+    {
+      "task_id": "v2_mini_cli_059",
+      "title": "Mini cli 059",
+      "category": "mini_repo_cli",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_cli_059"
+    },
+    {
+      "task_id": "v2_mini_cli_060",
+      "title": "Mini cli 060",
+      "category": "mini_repo_cli",
+      "difficulty": "easy",
+      "split": "dev",
+      "quick": false,
+      "path": "tasks/v2_mini_cli_060"
+    },
+    {
+      "task_id": "v2_mini_cli_061",
+      "title": "Mini cli 061",
+      "category": "mini_repo_cli",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_cli_061"
+    },
+    {
+      "task_id": "v2_mini_cli_062",
+      "title": "Mini cli 062",
+      "category": "mini_repo_cli",
+      "difficulty": "hard",
+      "split": "test",
+      "quick": false,
+      "path": "tasks/v2_mini_cli_062"
+    },
+    {
+      "task_id": "v2_mini_cli_063",
+      "title": "Mini cli 063",
+      "category": "mini_repo_cli",
+      "difficulty": "medium",
+      "split": "test",
+      "quick": false,
+      "path": "tasks/v2_mini_cli_063"
+    },
+    {
+      "task_id": "v2_mini_cli_064",
+      "title": "Mini cli 064",
+      "category": "mini_repo_cli",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_cli_064"
+    },
+    {
+      "task_id": "v2_mini_cli_065",
+      "title": "Mini cli 065",
+      "category": "mini_repo_cli",
+      "difficulty": "hard",
+      "split": "test",
+      "quick": false,
+      "path": "tasks/v2_mini_cli_065"
+    },
+    {
+      "task_id": "v2_mini_cli_066",
+      "title": "Mini cli 066",
+      "category": "mini_repo_cli",
+      "difficulty": "medium",
+      "split": "dev",
+      "quick": false,
+      "path": "tasks/v2_mini_cli_066"
+    },
+    {
+      "task_id": "v2_mini_cli_067",
+      "title": "Mini cli 067",
+      "category": "mini_repo_cli",
+      "difficulty": "hard",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_cli_067"
+    },
+    {
+      "task_id": "v2_mini_cli_068",
+      "title": "Mini cli 068",
+      "category": "mini_repo_cli",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_cli_068"
+    },
+    {
+      "task_id": "v2_mini_cli_069",
+      "title": "Mini cli 069",
+      "category": "mini_repo_cli",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_cli_069"
+    },
+    {
+      "task_id": "v2_mini_cli_070",
+      "title": "Mini cli 070",
+      "category": "mini_repo_cli",
+      "difficulty": "easy",
+      "split": "test",
+      "quick": false,
+      "path": "tasks/v2_mini_cli_070"
+    },
+    {
+      "task_id": "v2_mini_cli_071",
+      "title": "Mini cli 071",
+      "category": "mini_repo_cli",
+      "difficulty": "hard",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_cli_071"
+    },
+    {
+      "task_id": "v2_mini_cli_072",
+      "title": "Mini cli 072",
+      "category": "mini_repo_cli",
+      "difficulty": "medium",
+      "split": "dev",
+      "quick": true,
+      "path": "tasks/v2_mini_cli_072"
+    },
+    {
+      "task_id": "v2_mini_cli_073",
+      "title": "Mini cli 073",
+      "category": "mini_repo_cli",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_cli_073"
+    },
+    {
+      "task_id": "v2_mini_cli_074",
+      "title": "Mini cli 074",
+      "category": "mini_repo_cli",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_cli_074"
+    },
+    {
+      "task_id": "v2_mini_cli_075",
+      "title": "Mini cli 075",
+      "category": "mini_repo_cli",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_cli_075"
+    },
+    {
+      "task_id": "v2_mini_cli_076",
+      "title": "Mini cli 076",
+      "category": "mini_repo_cli",
+      "difficulty": "easy",
+      "split": "dev",
+      "quick": false,
+      "path": "tasks/v2_mini_cli_076"
+    },
+    {
+      "task_id": "v2_mini_cli_077",
+      "title": "Mini cli 077",
+      "category": "mini_repo_cli",
+      "difficulty": "easy",
+      "split": "test",
+      "quick": false,
+      "path": "tasks/v2_mini_cli_077"
+    },
+    {
+      "task_id": "v2_mini_cli_078",
+      "title": "Mini cli 078",
+      "category": "mini_repo_cli",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_cli_078"
+    },
+    {
+      "task_id": "v2_mini_cli_079",
+      "title": "Mini cli 079",
+      "category": "mini_repo_cli",
+      "difficulty": "medium",
+      "split": "test",
+      "quick": false,
+      "path": "tasks/v2_mini_cli_079"
+    },
+    {
+      "task_id": "v2_mini_cli_080",
+      "title": "Mini cli 080",
+      "category": "mini_repo_cli",
+      "difficulty": "hard",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_cli_080"
+    },
+    {
+      "task_id": "v2_mini_cli_081",
+      "title": "Mini cli 081",
+      "category": "mini_repo_cli",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_cli_081"
+    },
+    {
+      "task_id": "v2_mini_cli_082",
+      "title": "Mini cli 082",
+      "category": "mini_repo_cli",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_cli_082"
+    },
+    {
+      "task_id": "v2_mini_cli_083",
+      "title": "Mini cli 083",
+      "category": "mini_repo_cli",
+      "difficulty": "medium",
+      "split": "dev",
+      "quick": false,
+      "path": "tasks/v2_mini_cli_083"
+    },
+    {
+      "task_id": "v2_mini_cli_084",
+      "title": "Mini cli 084",
+      "category": "mini_repo_cli",
+      "difficulty": "medium",
+      "split": "test",
+      "quick": false,
+      "path": "tasks/v2_mini_cli_084"
+    },
+    {
+      "task_id": "v2_mini_cli_085",
+      "title": "Mini cli 085",
+      "category": "mini_repo_cli",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_cli_085"
+    },
+    {
+      "task_id": "v2_mini_cli_086",
+      "title": "Mini cli 086",
+      "category": "mini_repo_cli",
+      "difficulty": "medium",
+      "split": "test",
+      "quick": false,
+      "path": "tasks/v2_mini_cli_086"
+    },
+    {
+      "task_id": "v2_mini_cli_087",
+      "title": "Mini cli 087",
+      "category": "mini_repo_cli",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_cli_087"
+    },
+    {
       "task_id": "v2_mini_feature_000",
       "title": "Mini feature 000",
       "category": "mini_repo_feature",
       "difficulty": "easy",
-      "split": "train",
+      "split": "dev",
       "quick": false,
       "path": "tasks/v2_mini_feature_000"
     },
@@ -3648,7 +4332,7 @@
       "title": "Mini feature 001",
       "category": "mini_repo_feature",
       "difficulty": "hard",
-      "split": "train",
+      "split": "test",
       "quick": false,
       "path": "tasks/v2_mini_feature_001"
     },
@@ -3666,7 +4350,7 @@
       "title": "Mini feature 003",
       "category": "mini_repo_feature",
       "difficulty": "hard",
-      "split": "test",
+      "split": "train",
       "quick": false,
       "path": "tasks/v2_mini_feature_003"
     },
@@ -3675,8 +4359,8 @@
       "title": "Mini feature 004",
       "category": "mini_repo_feature",
       "difficulty": "medium",
-      "split": "train",
-      "quick": false,
+      "split": "test",
+      "quick": true,
       "path": "tasks/v2_mini_feature_004"
     },
     {
@@ -3693,7 +4377,7 @@
       "title": "Mini feature 006",
       "category": "mini_repo_feature",
       "difficulty": "easy",
-      "split": "test",
+      "split": "dev",
       "quick": false,
       "path": "tasks/v2_mini_feature_006"
     },
@@ -3702,7 +4386,7 @@
       "title": "Mini feature 007",
       "category": "mini_repo_feature",
       "difficulty": "medium",
-      "split": "test",
+      "split": "train",
       "quick": false,
       "path": "tasks/v2_mini_feature_007"
     },
@@ -3729,7 +4413,7 @@
       "title": "Mini feature 010",
       "category": "mini_repo_feature",
       "difficulty": "medium",
-      "split": "dev",
+      "split": "train",
       "quick": false,
       "path": "tasks/v2_mini_feature_010"
     },
@@ -3747,7 +4431,7 @@
       "title": "Mini feature 012",
       "category": "mini_repo_feature",
       "difficulty": "medium",
-      "split": "dev",
+      "split": "test",
       "quick": false,
       "path": "tasks/v2_mini_feature_012"
     },
@@ -3756,8 +4440,8 @@
       "title": "Mini feature 013",
       "category": "mini_repo_feature",
       "difficulty": "easy",
-      "split": "test",
-      "quick": true,
+      "split": "dev",
+      "quick": false,
       "path": "tasks/v2_mini_feature_013"
     },
     {
@@ -3765,7 +4449,7 @@
       "title": "Mini feature 014",
       "category": "mini_repo_feature",
       "difficulty": "easy",
-      "split": "train",
+      "split": "dev",
       "quick": false,
       "path": "tasks/v2_mini_feature_014"
     },
@@ -3783,7 +4467,7 @@
       "title": "Mini feature 016",
       "category": "mini_repo_feature",
       "difficulty": "medium",
-      "split": "train",
+      "split": "dev",
       "quick": false,
       "path": "tasks/v2_mini_feature_016"
     },
@@ -3819,7 +4503,7 @@
       "title": "Mini feature 020",
       "category": "mini_repo_feature",
       "difficulty": "easy",
-      "split": "train",
+      "split": "test",
       "quick": false,
       "path": "tasks/v2_mini_feature_020"
     },
@@ -3828,7 +4512,7 @@
       "title": "Mini feature 021",
       "category": "mini_repo_feature",
       "difficulty": "easy",
-      "split": "dev",
+      "split": "train",
       "quick": false,
       "path": "tasks/v2_mini_feature_021"
     },
@@ -3846,8 +4530,8 @@
       "title": "Mini feature 023",
       "category": "mini_repo_feature",
       "difficulty": "easy",
-      "split": "dev",
-      "quick": true,
+      "split": "train",
+      "quick": false,
       "path": "tasks/v2_mini_feature_023"
     },
     {
@@ -3855,7 +4539,7 @@
       "title": "Mini feature 024",
       "category": "mini_repo_feature",
       "difficulty": "easy",
-      "split": "test",
+      "split": "dev",
       "quick": false,
       "path": "tasks/v2_mini_feature_024"
     },
@@ -3864,7 +4548,7 @@
       "title": "Mini feature 025",
       "category": "mini_repo_feature",
       "difficulty": "medium",
-      "split": "train",
+      "split": "test",
       "quick": false,
       "path": "tasks/v2_mini_feature_025"
     },
@@ -3882,7 +4566,7 @@
       "title": "Mini feature 027",
       "category": "mini_repo_feature",
       "difficulty": "easy",
-      "split": "test",
+      "split": "train",
       "quick": false,
       "path": "tasks/v2_mini_feature_027"
     },
@@ -3900,7 +4584,7 @@
       "title": "Mini feature 029",
       "category": "mini_repo_feature",
       "difficulty": "hard",
-      "split": "train",
+      "split": "test",
       "quick": false,
       "path": "tasks/v2_mini_feature_029"
     },
@@ -3918,8 +4602,8 @@
       "title": "Mini feature 031",
       "category": "mini_repo_feature",
       "difficulty": "medium",
-      "split": "train",
-      "quick": false,
+      "split": "dev",
+      "quick": true,
       "path": "tasks/v2_mini_feature_031"
     },
     {
@@ -3927,7 +4611,7 @@
       "title": "Mini feature 032",
       "category": "mini_repo_feature",
       "difficulty": "medium",
-      "split": "dev",
+      "split": "train",
       "quick": false,
       "path": "tasks/v2_mini_feature_032"
     },
@@ -3936,8 +4620,8 @@
       "title": "Mini feature 033",
       "category": "mini_repo_feature",
       "difficulty": "medium",
-      "split": "dev",
-      "quick": true,
+      "split": "train",
+      "quick": false,
       "path": "tasks/v2_mini_feature_033"
     },
     {
@@ -3990,7 +4674,7 @@
       "title": "Mini feature 039",
       "category": "mini_repo_feature",
       "difficulty": "easy",
-      "split": "test",
+      "split": "dev",
       "quick": false,
       "path": "tasks/v2_mini_feature_039"
     },
@@ -4053,7 +4737,7 @@
       "title": "Mini feature 046",
       "category": "mini_repo_feature",
       "difficulty": "medium",
-      "split": "test",
+      "split": "train",
       "quick": false,
       "path": "tasks/v2_mini_feature_046"
     },
@@ -4062,7 +4746,7 @@
       "title": "Mini feature 047",
       "category": "mini_repo_feature",
       "difficulty": "hard",
-      "split": "dev",
+      "split": "test",
       "quick": false,
       "path": "tasks/v2_mini_feature_047"
     },
@@ -4080,9 +4764,351 @@
       "title": "Mini feature 049",
       "category": "mini_repo_feature",
       "difficulty": "easy",
-      "split": "train",
+      "split": "test",
       "quick": false,
       "path": "tasks/v2_mini_feature_049"
+    },
+    {
+      "task_id": "v2_mini_feature_050",
+      "title": "Mini feature 050",
+      "category": "mini_repo_feature",
+      "difficulty": "medium",
+      "split": "dev",
+      "quick": false,
+      "path": "tasks/v2_mini_feature_050"
+    },
+    {
+      "task_id": "v2_mini_feature_051",
+      "title": "Mini feature 051",
+      "category": "mini_repo_feature",
+      "difficulty": "medium",
+      "split": "dev",
+      "quick": false,
+      "path": "tasks/v2_mini_feature_051"
+    },
+    {
+      "task_id": "v2_mini_feature_052",
+      "title": "Mini feature 052",
+      "category": "mini_repo_feature",
+      "difficulty": "easy",
+      "split": "test",
+      "quick": false,
+      "path": "tasks/v2_mini_feature_052"
+    },
+    {
+      "task_id": "v2_mini_feature_053",
+      "title": "Mini feature 053",
+      "category": "mini_repo_feature",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_feature_053"
+    },
+    {
+      "task_id": "v2_mini_feature_054",
+      "title": "Mini feature 054",
+      "category": "mini_repo_feature",
+      "difficulty": "hard",
+      "split": "test",
+      "quick": false,
+      "path": "tasks/v2_mini_feature_054"
+    },
+    {
+      "task_id": "v2_mini_feature_055",
+      "title": "Mini feature 055",
+      "category": "mini_repo_feature",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_feature_055"
+    },
+    {
+      "task_id": "v2_mini_feature_056",
+      "title": "Mini feature 056",
+      "category": "mini_repo_feature",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_feature_056"
+    },
+    {
+      "task_id": "v2_mini_feature_057",
+      "title": "Mini feature 057",
+      "category": "mini_repo_feature",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_feature_057"
+    },
+    {
+      "task_id": "v2_mini_feature_058",
+      "title": "Mini feature 058",
+      "category": "mini_repo_feature",
+      "difficulty": "hard",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_feature_058"
+    },
+    {
+      "task_id": "v2_mini_feature_059",
+      "title": "Mini feature 059",
+      "category": "mini_repo_feature",
+      "difficulty": "medium",
+      "split": "dev",
+      "quick": false,
+      "path": "tasks/v2_mini_feature_059"
+    },
+    {
+      "task_id": "v2_mini_feature_060",
+      "title": "Mini feature 060",
+      "category": "mini_repo_feature",
+      "difficulty": "hard",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_feature_060"
+    },
+    {
+      "task_id": "v2_mini_feature_061",
+      "title": "Mini feature 061",
+      "category": "mini_repo_feature",
+      "difficulty": "hard",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_feature_061"
+    },
+    {
+      "task_id": "v2_mini_feature_062",
+      "title": "Mini feature 062",
+      "category": "mini_repo_feature",
+      "difficulty": "medium",
+      "split": "test",
+      "quick": false,
+      "path": "tasks/v2_mini_feature_062"
+    },
+    {
+      "task_id": "v2_mini_feature_063",
+      "title": "Mini feature 063",
+      "category": "mini_repo_feature",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_feature_063"
+    },
+    {
+      "task_id": "v2_mini_feature_064",
+      "title": "Mini feature 064",
+      "category": "mini_repo_feature",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_feature_064"
+    },
+    {
+      "task_id": "v2_mini_feature_065",
+      "title": "Mini feature 065",
+      "category": "mini_repo_feature",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_feature_065"
+    },
+    {
+      "task_id": "v2_mini_feature_066",
+      "title": "Mini feature 066",
+      "category": "mini_repo_feature",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_feature_066"
+    },
+    {
+      "task_id": "v2_mini_feature_067",
+      "title": "Mini feature 067",
+      "category": "mini_repo_feature",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_feature_067"
+    },
+    {
+      "task_id": "v2_mini_feature_068",
+      "title": "Mini feature 068",
+      "category": "mini_repo_feature",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_feature_068"
+    },
+    {
+      "task_id": "v2_mini_feature_069",
+      "title": "Mini feature 069",
+      "category": "mini_repo_feature",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_feature_069"
+    },
+    {
+      "task_id": "v2_mini_feature_070",
+      "title": "Mini feature 070",
+      "category": "mini_repo_feature",
+      "difficulty": "hard",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_feature_070"
+    },
+    {
+      "task_id": "v2_mini_feature_071",
+      "title": "Mini feature 071",
+      "category": "mini_repo_feature",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_feature_071"
+    },
+    {
+      "task_id": "v2_mini_feature_072",
+      "title": "Mini feature 072",
+      "category": "mini_repo_feature",
+      "difficulty": "hard",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_feature_072"
+    },
+    {
+      "task_id": "v2_mini_feature_073",
+      "title": "Mini feature 073",
+      "category": "mini_repo_feature",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_feature_073"
+    },
+    {
+      "task_id": "v2_mini_feature_074",
+      "title": "Mini feature 074",
+      "category": "mini_repo_feature",
+      "difficulty": "hard",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_feature_074"
+    },
+    {
+      "task_id": "v2_mini_feature_075",
+      "title": "Mini feature 075",
+      "category": "mini_repo_feature",
+      "difficulty": "easy",
+      "split": "test",
+      "quick": true,
+      "path": "tasks/v2_mini_feature_075"
+    },
+    {
+      "task_id": "v2_mini_feature_076",
+      "title": "Mini feature 076",
+      "category": "mini_repo_feature",
+      "difficulty": "hard",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_feature_076"
+    },
+    {
+      "task_id": "v2_mini_feature_077",
+      "title": "Mini feature 077",
+      "category": "mini_repo_feature",
+      "difficulty": "medium",
+      "split": "dev",
+      "quick": false,
+      "path": "tasks/v2_mini_feature_077"
+    },
+    {
+      "task_id": "v2_mini_feature_078",
+      "title": "Mini feature 078",
+      "category": "mini_repo_feature",
+      "difficulty": "easy",
+      "split": "test",
+      "quick": false,
+      "path": "tasks/v2_mini_feature_078"
+    },
+    {
+      "task_id": "v2_mini_feature_079",
+      "title": "Mini feature 079",
+      "category": "mini_repo_feature",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_feature_079"
+    },
+    {
+      "task_id": "v2_mini_feature_080",
+      "title": "Mini feature 080",
+      "category": "mini_repo_feature",
+      "difficulty": "medium",
+      "split": "test",
+      "quick": false,
+      "path": "tasks/v2_mini_feature_080"
+    },
+    {
+      "task_id": "v2_mini_feature_081",
+      "title": "Mini feature 081",
+      "category": "mini_repo_feature",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_feature_081"
+    },
+    {
+      "task_id": "v2_mini_feature_082",
+      "title": "Mini feature 082",
+      "category": "mini_repo_feature",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_feature_082"
+    },
+    {
+      "task_id": "v2_mini_feature_083",
+      "title": "Mini feature 083",
+      "category": "mini_repo_feature",
+      "difficulty": "easy",
+      "split": "test",
+      "quick": false,
+      "path": "tasks/v2_mini_feature_083"
+    },
+    {
+      "task_id": "v2_mini_feature_084",
+      "title": "Mini feature 084",
+      "category": "mini_repo_feature",
+      "difficulty": "medium",
+      "split": "test",
+      "quick": false,
+      "path": "tasks/v2_mini_feature_084"
+    },
+    {
+      "task_id": "v2_mini_feature_085",
+      "title": "Mini feature 085",
+      "category": "mini_repo_feature",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_feature_085"
+    },
+    {
+      "task_id": "v2_mini_feature_086",
+      "title": "Mini feature 086",
+      "category": "mini_repo_feature",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_feature_086"
+    },
+    {
+      "task_id": "v2_mini_feature_087",
+      "title": "Mini feature 087",
+      "category": "mini_repo_feature",
+      "difficulty": "medium",
+      "split": "dev",
+      "quick": false,
+      "path": "tasks/v2_mini_feature_087"
     },
     {
       "task_id": "v2_mini_tool_sim_000",
@@ -4116,7 +5142,7 @@
       "title": "Mini tool sim 003",
       "category": "mini_repo_tool_sim",
       "difficulty": "medium",
-      "split": "train",
+      "split": "dev",
       "quick": false,
       "path": "tasks/v2_mini_tool_sim_003"
     },
@@ -4134,7 +5160,7 @@
       "title": "Mini tool sim 005",
       "category": "mini_repo_tool_sim",
       "difficulty": "easy",
-      "split": "dev",
+      "split": "train",
       "quick": false,
       "path": "tasks/v2_mini_tool_sim_005"
     },
@@ -4152,8 +5178,8 @@
       "title": "Mini tool sim 007",
       "category": "mini_repo_tool_sim",
       "difficulty": "medium",
-      "split": "train",
-      "quick": false,
+      "split": "test",
+      "quick": true,
       "path": "tasks/v2_mini_tool_sim_007"
     },
     {
@@ -4161,7 +5187,7 @@
       "title": "Mini tool sim 008",
       "category": "mini_repo_tool_sim",
       "difficulty": "medium",
-      "split": "dev",
+      "split": "train",
       "quick": false,
       "path": "tasks/v2_mini_tool_sim_008"
     },
@@ -4179,7 +5205,7 @@
       "title": "Mini tool sim 010",
       "category": "mini_repo_tool_sim",
       "difficulty": "hard",
-      "split": "test",
+      "split": "train",
       "quick": false,
       "path": "tasks/v2_mini_tool_sim_010"
     },
@@ -4188,7 +5214,7 @@
       "title": "Mini tool sim 011",
       "category": "mini_repo_tool_sim",
       "difficulty": "hard",
-      "split": "test",
+      "split": "train",
       "quick": false,
       "path": "tasks/v2_mini_tool_sim_011"
     },
@@ -4206,7 +5232,7 @@
       "title": "Mini tool sim 013",
       "category": "mini_repo_tool_sim",
       "difficulty": "hard",
-      "split": "dev",
+      "split": "train",
       "quick": false,
       "path": "tasks/v2_mini_tool_sim_013"
     },
@@ -4242,7 +5268,7 @@
       "title": "Mini tool sim 017",
       "category": "mini_repo_tool_sim",
       "difficulty": "hard",
-      "split": "test",
+      "split": "train",
       "quick": false,
       "path": "tasks/v2_mini_tool_sim_017"
     },
@@ -4251,7 +5277,7 @@
       "title": "Mini tool sim 018",
       "category": "mini_repo_tool_sim",
       "difficulty": "hard",
-      "split": "train",
+      "split": "test",
       "quick": false,
       "path": "tasks/v2_mini_tool_sim_018"
     },
@@ -4260,7 +5286,7 @@
       "title": "Mini tool sim 019",
       "category": "mini_repo_tool_sim",
       "difficulty": "medium",
-      "split": "train",
+      "split": "dev",
       "quick": false,
       "path": "tasks/v2_mini_tool_sim_019"
     },
@@ -4287,8 +5313,8 @@
       "title": "Mini tool sim 022",
       "category": "mini_repo_tool_sim",
       "difficulty": "medium",
-      "split": "train",
-      "quick": false,
+      "split": "dev",
+      "quick": true,
       "path": "tasks/v2_mini_tool_sim_022"
     },
     {
@@ -4296,8 +5322,8 @@
       "title": "Mini tool sim 023",
       "category": "mini_repo_tool_sim",
       "difficulty": "medium",
-      "split": "test",
-      "quick": true,
+      "split": "train",
+      "quick": false,
       "path": "tasks/v2_mini_tool_sim_023"
     },
     {
@@ -4305,7 +5331,7 @@
       "title": "Mini tool sim 024",
       "category": "mini_repo_tool_sim",
       "difficulty": "easy",
-      "split": "train",
+      "split": "test",
       "quick": false,
       "path": "tasks/v2_mini_tool_sim_024"
     },
@@ -4323,8 +5349,8 @@
       "title": "Mini tool sim 026",
       "category": "mini_repo_tool_sim",
       "difficulty": "easy",
-      "split": "train",
-      "quick": false,
+      "split": "dev",
+      "quick": true,
       "path": "tasks/v2_mini_tool_sim_026"
     },
     {
@@ -4332,7 +5358,7 @@
       "title": "Mini tool sim 027",
       "category": "mini_repo_tool_sim",
       "difficulty": "easy",
-      "split": "train",
+      "split": "test",
       "quick": false,
       "path": "tasks/v2_mini_tool_sim_027"
     },
@@ -4368,7 +5394,7 @@
       "title": "Mini tool sim 031",
       "category": "mini_repo_tool_sim",
       "difficulty": "medium",
-      "split": "train",
+      "split": "dev",
       "quick": false,
       "path": "tasks/v2_mini_tool_sim_031"
     },
@@ -4377,7 +5403,7 @@
       "title": "Mini tool sim 032",
       "category": "mini_repo_tool_sim",
       "difficulty": "medium",
-      "split": "dev",
+      "split": "train",
       "quick": false,
       "path": "tasks/v2_mini_tool_sim_032"
     },
@@ -4395,7 +5421,7 @@
       "title": "Mini tool sim 034",
       "category": "mini_repo_tool_sim",
       "difficulty": "hard",
-      "split": "train",
+      "split": "dev",
       "quick": false,
       "path": "tasks/v2_mini_tool_sim_034"
     },
@@ -4404,7 +5430,7 @@
       "title": "Mini tool sim 035",
       "category": "mini_repo_tool_sim",
       "difficulty": "medium",
-      "split": "train",
+      "split": "test",
       "quick": false,
       "path": "tasks/v2_mini_tool_sim_035"
     },
@@ -4413,7 +5439,7 @@
       "title": "Mini tool sim 036",
       "category": "mini_repo_tool_sim",
       "difficulty": "hard",
-      "split": "test",
+      "split": "train",
       "quick": false,
       "path": "tasks/v2_mini_tool_sim_036"
     },
@@ -4431,7 +5457,7 @@
       "title": "Mini tool sim 038",
       "category": "mini_repo_tool_sim",
       "difficulty": "easy",
-      "split": "dev",
+      "split": "train",
       "quick": false,
       "path": "tasks/v2_mini_tool_sim_038"
     },
@@ -4449,7 +5475,7 @@
       "title": "Mini tool sim 040",
       "category": "mini_repo_tool_sim",
       "difficulty": "easy",
-      "split": "test",
+      "split": "train",
       "quick": false,
       "path": "tasks/v2_mini_tool_sim_040"
     },
@@ -4467,8 +5493,8 @@
       "title": "Mini tool sim 042",
       "category": "mini_repo_tool_sim",
       "difficulty": "medium",
-      "split": "dev",
-      "quick": true,
+      "split": "test",
+      "quick": false,
       "path": "tasks/v2_mini_tool_sim_042"
     },
     {
@@ -4476,7 +5502,7 @@
       "title": "Mini tool sim 043",
       "category": "mini_repo_tool_sim",
       "difficulty": "easy",
-      "split": "train",
+      "split": "test",
       "quick": false,
       "path": "tasks/v2_mini_tool_sim_043"
     },
@@ -4485,8 +5511,8 @@
       "title": "Mini tool sim 044",
       "category": "mini_repo_tool_sim",
       "difficulty": "hard",
-      "split": "dev",
-      "quick": true,
+      "split": "test",
+      "quick": false,
       "path": "tasks/v2_mini_tool_sim_044"
     },
     {
@@ -4530,9 +5556,351 @@
       "title": "Mini tool sim 049",
       "category": "mini_repo_tool_sim",
       "difficulty": "easy",
-      "split": "test",
+      "split": "dev",
       "quick": false,
       "path": "tasks/v2_mini_tool_sim_049"
+    },
+    {
+      "task_id": "v2_mini_tool_sim_050",
+      "title": "Mini tool sim 050",
+      "category": "mini_repo_tool_sim",
+      "difficulty": "medium",
+      "split": "dev",
+      "quick": false,
+      "path": "tasks/v2_mini_tool_sim_050"
+    },
+    {
+      "task_id": "v2_mini_tool_sim_051",
+      "title": "Mini tool sim 051",
+      "category": "mini_repo_tool_sim",
+      "difficulty": "easy",
+      "split": "test",
+      "quick": false,
+      "path": "tasks/v2_mini_tool_sim_051"
+    },
+    {
+      "task_id": "v2_mini_tool_sim_052",
+      "title": "Mini tool sim 052",
+      "category": "mini_repo_tool_sim",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_tool_sim_052"
+    },
+    {
+      "task_id": "v2_mini_tool_sim_053",
+      "title": "Mini tool sim 053",
+      "category": "mini_repo_tool_sim",
+      "difficulty": "medium",
+      "split": "test",
+      "quick": false,
+      "path": "tasks/v2_mini_tool_sim_053"
+    },
+    {
+      "task_id": "v2_mini_tool_sim_054",
+      "title": "Mini tool sim 054",
+      "category": "mini_repo_tool_sim",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_tool_sim_054"
+    },
+    {
+      "task_id": "v2_mini_tool_sim_055",
+      "title": "Mini tool sim 055",
+      "category": "mini_repo_tool_sim",
+      "difficulty": "medium",
+      "split": "test",
+      "quick": false,
+      "path": "tasks/v2_mini_tool_sim_055"
+    },
+    {
+      "task_id": "v2_mini_tool_sim_056",
+      "title": "Mini tool sim 056",
+      "category": "mini_repo_tool_sim",
+      "difficulty": "hard",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_tool_sim_056"
+    },
+    {
+      "task_id": "v2_mini_tool_sim_057",
+      "title": "Mini tool sim 057",
+      "category": "mini_repo_tool_sim",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_tool_sim_057"
+    },
+    {
+      "task_id": "v2_mini_tool_sim_058",
+      "title": "Mini tool sim 058",
+      "category": "mini_repo_tool_sim",
+      "difficulty": "medium",
+      "split": "test",
+      "quick": false,
+      "path": "tasks/v2_mini_tool_sim_058"
+    },
+    {
+      "task_id": "v2_mini_tool_sim_059",
+      "title": "Mini tool sim 059",
+      "category": "mini_repo_tool_sim",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_tool_sim_059"
+    },
+    {
+      "task_id": "v2_mini_tool_sim_060",
+      "title": "Mini tool sim 060",
+      "category": "mini_repo_tool_sim",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_tool_sim_060"
+    },
+    {
+      "task_id": "v2_mini_tool_sim_061",
+      "title": "Mini tool sim 061",
+      "category": "mini_repo_tool_sim",
+      "difficulty": "medium",
+      "split": "dev",
+      "quick": false,
+      "path": "tasks/v2_mini_tool_sim_061"
+    },
+    {
+      "task_id": "v2_mini_tool_sim_062",
+      "title": "Mini tool sim 062",
+      "category": "mini_repo_tool_sim",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_tool_sim_062"
+    },
+    {
+      "task_id": "v2_mini_tool_sim_063",
+      "title": "Mini tool sim 063",
+      "category": "mini_repo_tool_sim",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_tool_sim_063"
+    },
+    {
+      "task_id": "v2_mini_tool_sim_064",
+      "title": "Mini tool sim 064",
+      "category": "mini_repo_tool_sim",
+      "difficulty": "medium",
+      "split": "test",
+      "quick": false,
+      "path": "tasks/v2_mini_tool_sim_064"
+    },
+    {
+      "task_id": "v2_mini_tool_sim_065",
+      "title": "Mini tool sim 065",
+      "category": "mini_repo_tool_sim",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_tool_sim_065"
+    },
+    {
+      "task_id": "v2_mini_tool_sim_066",
+      "title": "Mini tool sim 066",
+      "category": "mini_repo_tool_sim",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_tool_sim_066"
+    },
+    {
+      "task_id": "v2_mini_tool_sim_067",
+      "title": "Mini tool sim 067",
+      "category": "mini_repo_tool_sim",
+      "difficulty": "hard",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_tool_sim_067"
+    },
+    {
+      "task_id": "v2_mini_tool_sim_068",
+      "title": "Mini tool sim 068",
+      "category": "mini_repo_tool_sim",
+      "difficulty": "easy",
+      "split": "test",
+      "quick": false,
+      "path": "tasks/v2_mini_tool_sim_068"
+    },
+    {
+      "task_id": "v2_mini_tool_sim_069",
+      "title": "Mini tool sim 069",
+      "category": "mini_repo_tool_sim",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_tool_sim_069"
+    },
+    {
+      "task_id": "v2_mini_tool_sim_070",
+      "title": "Mini tool sim 070",
+      "category": "mini_repo_tool_sim",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_tool_sim_070"
+    },
+    {
+      "task_id": "v2_mini_tool_sim_071",
+      "title": "Mini tool sim 071",
+      "category": "mini_repo_tool_sim",
+      "difficulty": "hard",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_tool_sim_071"
+    },
+    {
+      "task_id": "v2_mini_tool_sim_072",
+      "title": "Mini tool sim 072",
+      "category": "mini_repo_tool_sim",
+      "difficulty": "hard",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_tool_sim_072"
+    },
+    {
+      "task_id": "v2_mini_tool_sim_073",
+      "title": "Mini tool sim 073",
+      "category": "mini_repo_tool_sim",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_tool_sim_073"
+    },
+    {
+      "task_id": "v2_mini_tool_sim_074",
+      "title": "Mini tool sim 074",
+      "category": "mini_repo_tool_sim",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_tool_sim_074"
+    },
+    {
+      "task_id": "v2_mini_tool_sim_075",
+      "title": "Mini tool sim 075",
+      "category": "mini_repo_tool_sim",
+      "difficulty": "hard",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_tool_sim_075"
+    },
+    {
+      "task_id": "v2_mini_tool_sim_076",
+      "title": "Mini tool sim 076",
+      "category": "mini_repo_tool_sim",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_tool_sim_076"
+    },
+    {
+      "task_id": "v2_mini_tool_sim_077",
+      "title": "Mini tool sim 077",
+      "category": "mini_repo_tool_sim",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_tool_sim_077"
+    },
+    {
+      "task_id": "v2_mini_tool_sim_078",
+      "title": "Mini tool sim 078",
+      "category": "mini_repo_tool_sim",
+      "difficulty": "easy",
+      "split": "dev",
+      "quick": false,
+      "path": "tasks/v2_mini_tool_sim_078"
+    },
+    {
+      "task_id": "v2_mini_tool_sim_079",
+      "title": "Mini tool sim 079",
+      "category": "mini_repo_tool_sim",
+      "difficulty": "hard",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_tool_sim_079"
+    },
+    {
+      "task_id": "v2_mini_tool_sim_080",
+      "title": "Mini tool sim 080",
+      "category": "mini_repo_tool_sim",
+      "difficulty": "easy",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_tool_sim_080"
+    },
+    {
+      "task_id": "v2_mini_tool_sim_081",
+      "title": "Mini tool sim 081",
+      "category": "mini_repo_tool_sim",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_tool_sim_081"
+    },
+    {
+      "task_id": "v2_mini_tool_sim_082",
+      "title": "Mini tool sim 082",
+      "category": "mini_repo_tool_sim",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_tool_sim_082"
+    },
+    {
+      "task_id": "v2_mini_tool_sim_083",
+      "title": "Mini tool sim 083",
+      "category": "mini_repo_tool_sim",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_tool_sim_083"
+    },
+    {
+      "task_id": "v2_mini_tool_sim_084",
+      "title": "Mini tool sim 084",
+      "category": "mini_repo_tool_sim",
+      "difficulty": "hard",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_tool_sim_084"
+    },
+    {
+      "task_id": "v2_mini_tool_sim_085",
+      "title": "Mini tool sim 085",
+      "category": "mini_repo_tool_sim",
+      "difficulty": "medium",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_tool_sim_085"
+    },
+    {
+      "task_id": "v2_mini_tool_sim_086",
+      "title": "Mini tool sim 086",
+      "category": "mini_repo_tool_sim",
+      "difficulty": "medium",
+      "split": "dev",
+      "quick": false,
+      "path": "tasks/v2_mini_tool_sim_086"
+    },
+    {
+      "task_id": "v2_mini_tool_sim_087",
+      "title": "Mini tool sim 087",
+      "category": "mini_repo_tool_sim",
+      "difficulty": "medium",
+      "split": "test",
+      "quick": false,
+      "path": "tasks/v2_mini_tool_sim_087"
     }
   ]
 }

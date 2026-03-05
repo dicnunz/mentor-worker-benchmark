@@ -1,0 +1,1 @@
+RULE:unused_import|SEVERITY:warn|FILE:umbra.py|LINE:71\nRULE:unsafe_eval|SEVERITY:error|FILE:willow.py|LINE:81\nRULE:line_too_long|SEVERITY:info|FILE:umbra.py|LINE:91\nRULE:unused_import|SEVERITY:warn|FILE:willow.py|LINE:101\n
