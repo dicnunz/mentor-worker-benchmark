@@ -1,7 +1,7 @@
 {
   "submission_id": "official_dev50_signal_qwen_llama",
   "submission_file": "official_dev50_signal_qwen_llama.zip",
-  "submission_path": "submissions/official_dev50_signal_qwen_llama.zip",
+  "submission_path": "submissions/archive/task_pack_v2_2.0.0/official_dev50_signal_qwen_llama.zip",
   "official_submission": true,
   "submission_label": "official",
   "official_role": "headline",
@@ -70,6 +70,7 @@
   "lift_ci_low": 0.0,
   "lift_ci_high": 0.0,
   "lift_significant": false,
+  "lift_p_value_gt_zero": 0.0,
   "best_worker": {
     "worker_model": "qwen2.5-coder:7b",
     "baseline_pass_rate": 0.0,

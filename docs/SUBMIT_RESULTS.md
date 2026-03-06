@@ -102,3 +102,5 @@ For submission PRs, CI also runs **Submissions PR Check** to:
 - verify changed bundles,
 - regenerate normalized leaderboard artifacts,
 - refresh `docs/index.html` and `docs/leaderboard.md`.
+
+Tracked historical/public bundles may live under `submissions/archive/...`; the leaderboard refresh scans `submissions/` recursively and ignores local scratch names such as `submissions/local_*` and `submissions/tmp_*`.

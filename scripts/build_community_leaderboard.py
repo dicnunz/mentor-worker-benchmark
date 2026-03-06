@@ -69,6 +69,17 @@ def _safe_int(value: Any) -> int | None:
     return None
 
 
+def _submission_zip_paths(submissions_dir: Path) -> list[Path]:
+    paths: list[Path] = []
+    for path in submissions_dir.rglob("*.zip"):
+        if not path.is_file():
+            continue
+        if path.name.startswith(("local_", "tmp_")):
+            continue
+        paths.append(path)
+    return sorted(paths, key=lambda item: item.as_posix())
+
+
 def _seed_list_from_results(results: dict[str, Any]) -> list[int]:
     seeds: list[int] = []
     replicates = results.get("replicates")
@@ -1444,7 +1455,11 @@ def _render_index_html(summary: dict[str, Any], output_path: Path) -> None:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Verify submissions and regenerate community leaderboard artifacts.")
-    parser.add_argument("--submissions-dir", default="submissions")
+    parser.add_argument(
+        "--submissions-dir",
+        default="submissions",
+        help="Root directory scanned recursively for tracked submission bundles.",
+    )
     parser.add_argument("--leaderboard-dir", default="leaderboard")
     parser.add_argument("--docs-html", default="docs/index.html")
     parser.add_argument("--docs-markdown", default="docs/leaderboard.md")
@@ -1465,11 +1480,7 @@ def main() -> None:
     normalized_dir = leaderboard_dir / "submissions"
     normalized_dir.mkdir(parents=True, exist_ok=True)
 
-    zip_paths = sorted(
-        path
-        for path in submissions_dir.glob("*.zip")
-        if path.is_file() and not path.name.startswith(("local_", "tmp_"))
-    )
+    zip_paths = _submission_zip_paths(submissions_dir)
     valid_entries: list[dict[str, Any]] = []
     failed_reports: list[dict[str, Any]] = []
 

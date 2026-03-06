@@ -196,7 +196,7 @@ Default headline seeds are:
 
 ## Deterministic Leaderboard/Docs Regeneration
 
-Regenerate from tracked submissions:
+Regenerate from tracked submission bundles under `submissions/` (recursive; includes `submissions/archive/...`; ignores `submissions/local_*` and `submissions/tmp_*`):
 
 ```bash
 "$PYTHON_BIN" scripts/build_community_leaderboard.py --strict
@@ -209,7 +209,7 @@ Then confirm no artifact drift:
 git status --short
 ```
 
-Expected: clean working tree after the second strict run.
+Expected: clean working tree after the second strict run when the tracked submission archive is unchanged.
 
 ## Verify a Submission Bundle
 

@@ -348,12 +348,13 @@ Pack registry/data-card guidance is documented in `docs/PACKS.md`.
 ## Community Leaderboard Automation
 
 Repository structure:
-- `submissions/`: tracked submission bundles (`.zip`).
+- `submissions/`: working area for exported bundles and archived publication bundles.
+- `submissions/archive/`: tracked historical/public submission bundles grouped by task-pack version.
 - `leaderboard/submissions/`: normalized per-submission JSON extracted from verified bundles.
 - `leaderboard/summary.json`: aggregated view used by docs.
 
 Automation:
-- PRs touching `submissions/` trigger `.github/workflows/submissions-pr.yml`.
+- PRs touching submission bundles under `submissions/` trigger `.github/workflows/submissions-pr.yml`.
 - CI verifies each changed submission zip.
 - CI regenerates `leaderboard/summary.json`, `docs/leaderboard.md`, and `docs/index.html`.
 - For same-repo PRs, CI auto-commits refreshed artifacts back to the PR branch.
@@ -366,11 +367,10 @@ Automation:
 
 ## Official Baselines
 
-Merged official baseline submissions:
-- [official_dev_v1_m3air_2026-03-01.zip](submissions/official_dev_v1_m3air_2026-03-01.zip) (dev50 headline baseline)
-- [official_dev_sanity_2026-03-01.zip](submissions/official_dev_sanity_2026-03-01.zip) (`dev10` sanity run; harness-health only, not headline)
-- [official_quick_m3air_2026-03-01.zip](submissions/official_quick_m3air_2026-03-01.zip) (from [PR #1](https://github.com/dicnunz/mentor-worker-benchmark/pull/1))
-- [official_quick_expanded_m3air_2026-03-01.zip](submissions/official_quick_expanded_m3air_2026-03-01.zip) (from [PR #2](https://github.com/dicnunz/mentor-worker-benchmark/pull/2))
+Currently tracked official publication archive on this branch:
+- [official_dev50_signal_qwen_llama.zip](submissions/archive/task_pack_v2_2.0.0/official_dev50_signal_qwen_llama.zip) (`dev50` headline baseline)
+
+Local health artifacts produced by `./scripts/run_local_verification.sh` are intentionally not treated as headline baselines and are ignored by the public leaderboard regeneration step.
 
 ## Lightweight Leaderboard Publishing
 
@@ -389,7 +389,7 @@ Enable GitHub Pages (repo settings):
 3. Select `main` branch and `/docs` folder.
 4. Save. GitHub publishes `docs/index.html` (community leaderboard).
 
-Regenerate community artifacts from tracked `submissions/*.zip`:
+Regenerate community artifacts from tracked submission bundles under `submissions/` (recursive, including `submissions/archive/...`; local scratch bundles such as `submissions/local_*` and `submissions/tmp_*` are ignored):
 
 ```bash
 python scripts/build_community_leaderboard.py --strict

@@ -758,6 +758,11 @@ def verify_submission_bundle(submission_path: Path) -> dict[str, Any]:
         task_pack_hash = str(manifest.get("task_pack_hash", "")).strip()
         commit_hash = str(manifest.get("git_commit_hash", "")).strip()
         cli_command = str(manifest.get("cli_command", "")).strip()
+        results_config = results_payload.get("config", {})
+        if not isinstance(results_config, dict):
+            results_config = {}
+        results_task_pack = str(results_config.get("task_pack", "")).strip()
+        results_task_pack_version = str(results_config.get("task_pack_version", "")).strip()
 
         if not task_pack:
             errors.append("Manifest task_pack cannot be empty")
@@ -792,18 +797,18 @@ def verify_submission_bundle(submission_path: Path) -> dict[str, Any]:
                 discovered_version = resolve_task_pack_version(task_pack)
                 if not discovered_version:
                     errors.append(f"Task pack `{task_pack}` does not exist locally.")
-                elif task_pack_version and task_pack_version != discovered_version:
-                    errors.append(
-                        f"Manifest task_pack_version mismatch: bundle={task_pack_version}, local={discovered_version}"
-                    )
+                else:
+                    details["local_task_pack_version"] = discovered_version
+                    details["task_pack_version_matches_local"] = task_pack_version == discovered_version
 
-        results_config = results_payload.get("config", {})
-        if not isinstance(results_config, dict):
-            results_config = {}
-        results_task_pack = str(results_config.get("task_pack", "")).strip()
         if task_pack and results_task_pack and task_pack != results_task_pack:
             errors.append(
                 f"Task pack mismatch between manifest (`{task_pack}`) and results (`{results_task_pack}`)."
+            )
+        if task_pack_version and results_task_pack_version and task_pack_version != results_task_pack_version:
+            errors.append(
+                "Task pack version mismatch between manifest "
+                f"(`{task_pack_version}`) and results (`{results_task_pack_version}`)."
             )
         results_pack_source = str(results_config.get("task_pack_source", task_pack_source)).strip().lower()
         if task_pack_source and results_pack_source and task_pack_source != results_pack_source:
@@ -868,6 +873,15 @@ def render_verification_report(report: dict[str, Any]) -> str:
             lines.append(f"- Pip freeze hash: {details.get('pip_freeze_sha256')}")
         if details.get("task_pack_hash"):
             lines.append(f"- Pack hash: {details.get('task_pack_hash')}")
+        if (
+            details.get("local_task_pack_version")
+            and details.get("local_task_pack_version") != details.get("task_pack_version")
+        ):
+            lines.append(
+                "- Local pack version: "
+                f"{details.get('local_task_pack_version')} "
+                "(historical bundle differs from current local pack)"
+            )
         if details.get("official_submission"):
             lines.append(f"- Protocol: {details.get('official_protocol', 'legacy')}")
             if details.get("protocol_seed_count") is not None:
