@@ -170,3 +170,52 @@ def test_quick_run_simulation_records_integrity_and_audit_passes(monkeypatch, tm
     assert "✓ tests executed" in output
     assert "✓ baseline computed" in output
     assert "✓ artifact integrity verified" in output
+
+
+def test_run_benchmark_propagates_configured_test_timeout_to_harness(monkeypatch, tmp_path: Path) -> None:
+    task = _write_minimal_task(tmp_path)
+    monkeypatch.setattr(runner_module, "resolve_tasks", lambda **_: _selection_for_task(task))
+
+    observed_timeouts: list[int] = []
+
+    def _fake_run_pytest(_workdir: Path, **kwargs: object) -> HarnessTestRunResult:
+        observed_timeouts.append(int(kwargs["timeout_seconds"]))
+        call_index = len(observed_timeouts)
+        if call_index == 1:
+            return HarnessTestRunResult(
+                exit_code=1,
+                passed=False,
+                output="1 failed in 0.25s",
+                duration_seconds=0.25,
+                tests_executed=1,
+                tests_passed=0,
+                tests_failed=1,
+                timed_out=False,
+            )
+        return HarnessTestRunResult(
+            exit_code=0,
+            passed=True,
+            output="1 passed in 0.22s",
+            duration_seconds=0.22,
+            tests_executed=1,
+            tests_passed=1,
+            tests_failed=0,
+            timed_out=False,
+        )
+
+    monkeypatch.setattr(runner_module, "run_pytest", _fake_run_pytest)
+
+    config = BenchmarkConfig(
+        models=["qwen2.5-coder:7b"],
+        mentor_models_override=["llama3.1:8b"],
+        worker_models_override=["qwen2.5-coder:7b"],
+        run_modes=("worker_only",),
+        task_pack="task_pack_v2",
+        suite="quick",
+        seed=1337,
+        results_path=tmp_path / "results.json",
+        test_timeout_seconds=17,
+    )
+
+    run_benchmark(config, mentor_client=_FakeClient(), worker_client=_FakeClient(), write_outputs=False)
+    assert observed_timeouts == [17, 17]

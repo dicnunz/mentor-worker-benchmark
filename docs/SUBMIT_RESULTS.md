@@ -7,6 +7,14 @@ This project accepts reproducible result bundles so runs can be compared on a sh
 From repo root:
 
 ```bash
+./scripts/run_local_verification.sh
+```
+
+Use that first for local release-health verification on this machine.
+
+For publication/leaderboard artifacts:
+
+```bash
 ./scripts/run_official_quick.sh
 ```
 
@@ -26,7 +34,8 @@ Official quick default profile (`./scripts/run_official_quick.sh`):
 - `--run-modes worker_only,mentor_worker`
 - `--repro`
 - `--max-turns 3`
-- `--timeout 180`
+- `--model-timeout 180`
+- `--test-timeout 8`
 - `--worker-num-predict 512`
 - `--mentor-num-predict 256`
 
@@ -38,6 +47,7 @@ Official protocol (`v0.3.0`):
 Official interpretation policy:
 - `dev`/`dev50`/`test` official runs are headline baseline runs.
 - `dev10`/`quick` official runs are sanity checks (harness health and error-rate visibility).
+- The official headline scripts remain scientifically valid but are not the practical default local gate on this 16 GB MacBook Air.
 
 Environment variables:
 - `PYTHON_BIN` (default: `python3`)

@@ -46,6 +46,22 @@ Supported suites:
 Official headline suites are `dev`, `dev50`, and `test`.  
 Official sanity suites are `quick` and `dev10` (harness-health checks, not headline claims).
 
+### Operational Profiles
+
+The scientific construct is the same across profiles; the operational profile determines what is practical to run on a given machine.
+
+Local verification profile:
+- single-seed `quick` or `dev10`
+- intended for local release-health checks
+- sanctioned path on this 16 GB MacBook Air: `./scripts/run_local_verification.sh`
+- default local pair: `phi3:mini` worker + `phi3:mini` mentor
+- not sufficient for headline publication claims
+
+Headline publication profile:
+- official `dev` / `dev50` / `test` scripts
+- multi-seed when required by policy
+- scientifically valid for publication, but not a practical default local gate on this machine
+
 ### Multi-Seed Protocol
 
 Official headline protocol uses deterministic seeds:
@@ -83,6 +99,32 @@ Given identical inputs (task pack contents, config, seeds, code revision), the b
 - deterministic replicate grouping and analysis seeding,
 - explicit environment/protocol metadata capture in results and exported bundles.
 
+Backend honesty:
+- strict reproducibility claims are conditional on backend stability
+- local verification should run `mentor_worker_benchmark preflight` first
+- if preflight fails or model-call retries are masking transport instability, report the run as operationally unstable rather than strictly reproducible
+
+### Timeout Semantics And Retries
+
+- `model_timeout_seconds` is the per-model-call timeout.
+- `test_timeout_seconds` is the per-`pytest` execution timeout.
+- The CLI propagates these separately to the backend client and the test harness.
+- Bounded retries apply only to transient backend failures (timeouts, connection resets/refusals, 502/503/504-style failures).
+- Non-transient backend errors are not retried.
+
+### Checkpointing And Resumability
+
+- The resumable unit is `(seed, mode, task_id, worker_model, mentor_model)`.
+- Single-seed runs persist completed units incrementally in `<results-stem>.checkpoint.jsonl`.
+- Multi-seed runs write `<results-stem>.seed-<seed>.json` after each completed seed before the final merged artifact is written.
+- Re-running the same command with the same `--results-path` deterministically skips completed units whose checkpoint metadata matches.
+- `benchmark_wall_time_seconds` is accumulated over completed units; `checkpointing.session_wall_time_seconds` captures only the current invocation.
+
+What is not resumable until the run completes:
+- final merged multi-seed `results.json`
+- exported submission bundles
+- derived markdown leaderboard artifacts
+
 ## Failure Accounting and Interpretation
 
 Results include explicit failure accounting:
@@ -97,7 +139,9 @@ Interpretation should always include both pass-rate/lift and failure diagnostics
 Compute budget metadata is recorded per run/export:
 
 - `max_turns`
-- `timeout_seconds`
+- `timeout_seconds` (legacy alias for model timeout)
+- `model_timeout_seconds`
+- `test_timeout_seconds`
 - `total_model_calls_attempted`
 - `total_tokens_estimate` (or `"unavailable"`)
 - `total_wall_time_seconds`

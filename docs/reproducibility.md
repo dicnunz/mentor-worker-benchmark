@@ -2,13 +2,61 @@
 
 This document lists the exact commands used to reproduce benchmark checks and artifacts.
 
+Operational policy for this machine:
+- `./scripts/run_local_verification.sh` is the sanctioned local release-health path.
+- Full leaderboard/publication reproduction remains available, but it is not the practical default local gate on this 16 GB MacBook Air.
+
 `task_pack_v2` reproducibility note:
 
 - Active release pack: `473` exact-family-independent tasks.
 - Audited source corpus: `652` generated tasks.
 - The provenance `--fail-on-overlap` check fails on active exact-family leakage, not on softer near-similarity clusters.
 
-## One-Command Leaderboard Reproduction
+## Local Operational Verification
+
+Recommended first step on this machine:
+
+```bash
+./scripts/run_local_verification.sh
+```
+
+Default local verification profile:
+- `task_pack_v2`
+- `suite=dev10`
+- `seed=1337`
+- `worker=phi3:mini`
+- `mentor=phi3:mini`
+- `run-modes=worker_only,mentor_worker`
+
+This path performs, in order:
+1. backend stability preflight
+2. single-seed benchmark run
+3. integrity audit
+4. community bundle export
+5. bundle verification
+
+It is intended for local release-health verification only, not for headline publication.
+
+### Resume semantics
+
+Resume source of truth:
+- `<results-stem>.checkpoint.jsonl` for single-seed progress
+- `<results-stem>.seed-<seed>.json` for completed per-seed artifacts
+
+Resumable unit:
+- `(seed, mode, task_id, worker_model, mentor_model)`
+
+Changing suite, seed, models, or run modes requires a new `--results-path`, because checkpoint metadata must match exactly.
+When a run is resumed, `benchmark_wall_time_seconds` reflects accumulated completed run time, while `checkpointing.session_wall_time_seconds` reflects only the current invocation.
+
+Not resumable until completion:
+- final merged multi-seed `results.json`
+- exported submission bundles
+- derived leaderboard markdown/html
+
+## Full Leaderboard Reproduction
+
+This is the full reproducibility/publishing pipeline, not the recommended first local check on this machine.
 
 Run the full reproducibility pipeline:
 
@@ -100,7 +148,7 @@ python -m mentor_worker_benchmark sanity --task-pack task_pack_v2 --suite quick 
 TASK_SUITE=dev50 ./scripts/run_official_dev_v1.sh
 ```
 
-`quick` sanity defaults (reliable local profile):
+`quick` sanity defaults (official sanity artifact, still heavier than local verification):
 
 ```bash
 ./scripts/run_official_quick.sh
@@ -111,7 +159,8 @@ Quick profile defaults:
 - `--run-modes worker_only,mentor_worker`
 - `--repro`
 - `--max-turns 3`
-- `--timeout 180`
+- `--model-timeout 180`
+- `--test-timeout 8`
 - `--worker-num-predict 512`
 - `--mentor-num-predict 256`
 
@@ -127,6 +176,8 @@ Default headline seeds are:
   --suite dev50 \
   --run-modes worker_only,mentor_worker,mentor_only_suggestion_noise \
   --repro \
+  --model-timeout 180 \
+  --test-timeout 8 \
   --seeds 1337,2026,9001 \
   --results-path results/official_dev50_results.json
 ```

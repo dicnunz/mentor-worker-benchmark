@@ -116,26 +116,56 @@ If Ollama is installed but not running, start it with the desktop app or:
 ollama serve
 ```
 
-## Reproducible Run (Recommended)
+## Local Verification (Recommended On This Machine)
 
-Run quick suite in reproducibility mode:
+Use the sanctioned local verification path before any headline/publication run.
+
+- It is a single-seed local release-health check.
+- It is intended to be operationally viable on this 16 GB MacBook Air.
+- It is not a headline benchmark publication path.
 
 ```bash
+./scripts/run_local_verification.sh
+```
+
+Default local verification profile:
+- `task_pack_v2`
+- `suite=dev10`
+- `seed=1337`
+- `worker=phi3:mini`
+- `mentor=phi3:mini`
+- `run-modes=worker_only,mentor_worker`
+- backend preflight required before the run starts
+
+Manual equivalent:
+
+```bash
+python -m mentor_worker_benchmark preflight \
+  --models phi3:mini \
+  --model-timeout 30 \
+  --attempts 2
+
 python -m mentor_worker_benchmark run \
   --task-pack task_pack_v2 \
-  --suite quick \
-  --models phi3:mini \
+  --suite dev10 \
+  --mentor-model phi3:mini \
+  --worker-model phi3:mini \
   --run-modes worker_only,mentor_worker \
   --repro \
   --max-turns 3 \
-  --timeout 180 \
+  --model-timeout 180 \
+  --test-timeout 8 \
+  --model-retries 1 \
+  --model-retry-backoff 1.0 \
   --worker-num-predict 512 \
   --mentor-num-predict 256 \
   --seed 1337 \
-  --results-path results/results.json
+  --results-path results/local_verification_dev10.json
 ```
 
 `--repro` fixes key generation/runtime settings (temperature, top_p, seeds, max tokens, max turns).
+If you rerun the same command with the same `--results-path`, completed units are resumed from `<results-stem>.checkpoint.jsonl`.
+If you change suite, seed, models, or run modes, use a new `--results-path`.
 
 ## Run With OpenAI SOTA Models
 
@@ -157,7 +187,8 @@ python -m mentor_worker_benchmark run \
   --run-modes worker_only,mentor_worker \
   --repro \
   --max-turns 3 \
-  --timeout 180 \
+  --model-timeout 180 \
+  --test-timeout 8 \
   --worker-num-predict 512 \
   --mentor-num-predict 256
 ```
@@ -174,7 +205,8 @@ python -m mentor_worker_benchmark run \
   --run-modes worker_only,mentor_worker \
   --repro \
   --max-turns 3 \
-  --timeout 180 \
+  --model-timeout 180 \
+  --test-timeout 8 \
   --worker-num-predict 512 \
   --mentor-num-predict 256
 ```
@@ -197,10 +229,16 @@ Warning:
 Standardized scripts (macOS/Linux):
 
 ```bash
+./scripts/run_local_verification.sh
 ./scripts/run_official_quick.sh
 ./scripts/run_official_dev.sh
 ./scripts/run_official_dev_v1.sh
 ```
+
+Operational policy:
+- `./scripts/run_local_verification.sh` is the sanctioned local release-health path on this machine.
+- `./scripts/run_official_dev.sh` and headline `dev`/`dev50`/`test` publication paths remain scientifically valid, but they are not a practical default local gate on this hardware.
+- `./scripts/run_official_quick.sh` produces an official sanity artifact; it is still heavier than the sanctioned local verification path.
 
 `run_official_dev_v1.sh` accepts `TASK_SUITE=dev|dev50|test` (default `dev50`).
 
@@ -233,7 +271,8 @@ python -m mentor_worker_benchmark provenance --task-pack task_pack_v2
 
 ```bash
 python -m mentor_worker_benchmark setup [--models default|m1,m2] [--skip-pull]
-python -m mentor_worker_benchmark run [--task-pack task_pack_v2|task_pack_v1] [--suite quick|dev10|dev50|dev|test|all] [--seed 1337|--seeds 1337,2026,9001] [--repro] [--debug]
+python -m mentor_worker_benchmark preflight [--models m1,m2] [--model-timeout 30] [--attempts 2]
+python -m mentor_worker_benchmark run [--task-pack task_pack_v2|task_pack_v1] [--suite quick|dev10|dev50|dev|test|all] [--seed 1337|--seeds 1337,2026,9001] [--model-timeout N] [--test-timeout M] [--repro] [--debug]
 python -m mentor_worker_benchmark run --task-pack-path /abs/path/to/pack --suite dev
 python -m mentor_worker_benchmark sanity [--task-pack task_pack_v2|task_pack_v1] [--suite quick|dev10|dev50|dev|test|all]
 python -m mentor_worker_benchmark leaderboard --results results/results.json --output results/leaderboard.md
@@ -268,14 +307,26 @@ make quick
 
 Generated files:
 - `results/results.json`
+- `results/<stem>.checkpoint.jsonl` (append-only resume log; source of truth for interrupted single-seed runs)
+- `results/<stem>.seed-<seed>.json` (written for completed seeds before multi-seed final merge)
 - `results/analysis.json` (from `analyze`, or bundled automatically during `export`)
 - `results/leaderboard.md`
 - `docs/index.html` (optional GitHub Pages view)
 
+## Checkpointing And Resume
+
+- Resume unit: `(seed, mode, task_id, worker_model, mentor_model)`.
+- Checkpoints are append-only JSONL files stored next to `--results-path`.
+- Re-running the same command with the same `--results-path` skips already completed units deterministically.
+- Multi-seed runs write per-seed partial JSON artifacts before the final merged `results.json`.
+- Not resumable until completion: final merged multi-seed `results.json`, exported submission ZIPs, and `leaderboard.md`.
+- `benchmark_wall_time_seconds` reflects accumulated completed run time across resumed units; `checkpointing.session_wall_time_seconds` records the current invocation.
+
 ## How To Submit Results
 
-1. Run an official suite (`./scripts/run_official_quick.sh` or `./scripts/run_official_dev.sh`).
-2. If needed, manually export:
+1. Run `./scripts/run_local_verification.sh` first.
+2. If you are producing a publication/leaderboard artifact, run an official suite (`./scripts/run_official_quick.sh` or `./scripts/run_official_dev.sh`).
+3. If needed, manually export:
 
 ```bash
 python -m mentor_worker_benchmark export \
@@ -283,13 +334,13 @@ python -m mentor_worker_benchmark export \
   --out submissions/my_run.zip
 ```
 
-3. Verify your bundle:
+4. Verify your bundle:
 
 ```bash
 python -m mentor_worker_benchmark verify --submission submissions/my_run.zip
 ```
 
-4. Open a submission issue and attach/link the zip.
+5. Open a submission issue and attach/link the zip.
 
 Submission details and maintainer verification flow are documented in `docs/SUBMIT_RESULTS.md`.
 Pack registry/data-card guidance is documented in `docs/PACKS.md`.
@@ -349,15 +400,18 @@ python scripts/build_community_leaderboard.py --strict
 - Mentor can only send natural-language guidance; code-like mentor output is blocked/sanitized and logged.
 - Worker must return a unified diff patch; patch format and paths are validated.
 - Patch application forbids traversal outside the task workspace.
-- Tests run in isolated temp directories with per-task timeout and network disabled.
+- Tests run in isolated temp directories with a configurable per-test timeout and network disabled.
 - Run metadata logs environment and provenance (Python, platform, Ollama version/model tags, git commit hash).
+- Strict reproducibility claims should only be made when the backend preflight passes and the same model digests are used.
 
 ## Compute Budget
 
 Each run writes a `compute_budget` manifest in `results.json` and in exported `submission_manifest.json`:
 
 - `max_turns`
-- `timeout_seconds`
+- `timeout_seconds` (legacy alias for model timeout)
+- `model_timeout_seconds`
+- `test_timeout_seconds`
 - `total_model_calls_attempted`
 - `total_tokens_estimate` (or explicit `"unavailable"`)
 - `total_wall_time_seconds`

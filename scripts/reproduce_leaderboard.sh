@@ -46,6 +46,7 @@ echo "[2/5] Verifying Ollama models"
 "${PYTHON_BIN}" -m mentor_worker_benchmark setup --models "${CANONICAL_MODELS}"
 
 echo "[3/5] Running canonical quick benchmark"
+echo "Note: this is the full reproducibility/publishing pipeline. On a 16 GB MacBook Air, use ./scripts/run_local_verification.sh for local release-health checks before attempting this path."
 PYTHON_BIN="${PYTHON_BIN}" \
 PROTOCOL_VERSION="${PROTOCOL_VERSION}" \
 WORKER_MODELS="${CANONICAL_WORKER_MODELS}" \

@@ -6,6 +6,7 @@ import json
 import re
 import subprocess
 import sys
+import time
 from collections import Counter, defaultdict
 from pathlib import Path
 from statistics import mean, pvariance
@@ -558,6 +559,143 @@ def cmd_setup(args: argparse.Namespace) -> int:
     return 0
 
 
+def _normalize_probe_response(text: str) -> str:
+    return re.sub(r"\s+", " ", text).strip()
+
+
+def _probe_model_stability(
+    *,
+    client: Any,
+    model: str,
+    attempts: int,
+    seed: int,
+    num_predict: int,
+) -> dict[str, Any]:
+    expected_response = "STABLE_OK"
+    responses: list[str] = []
+    latencies: list[float] = []
+    errors: list[str] = []
+
+    for _ in range(attempts):
+        started = time.perf_counter()
+        try:
+            response = client.chat(
+                model=model,
+                messages=[{"role": "user", "content": "Reply with exactly STABLE_OK and nothing else."}],
+                temperature=0.0,
+                top_p=1.0,
+                num_predict=num_predict,
+                seed=seed,
+            )
+        except RuntimeError as exc:
+            errors.append(str(exc))
+            continue
+        latencies.append(time.perf_counter() - started)
+        responses.append(_normalize_probe_response(response))
+
+    unique_responses = sorted(set(responses))
+    stable = (
+        not errors
+        and len(unique_responses) == 1
+        and len(responses) == attempts
+        and unique_responses == [expected_response]
+    )
+    return {
+        "model": model,
+        "attempts": attempts,
+        "seed": int(seed),
+        "success_count": len(responses),
+        "error_count": len(errors),
+        "stable": stable,
+        "expected_response": expected_response,
+        "responses": unique_responses,
+        "errors": errors,
+        "latency_seconds": [round(item, 4) for item in latencies],
+        "avg_latency_seconds": round(mean(latencies), 4) if latencies else None,
+    }
+
+
+def cmd_preflight(args: argparse.Namespace) -> int:
+    try:
+        models = _parse_models(args.models)
+        provider = normalize_provider_name(args.provider)
+    except ValueError as exc:
+        print(str(exc))
+        return 1
+
+    if args.attempts < 1:
+        print("--attempts must be >= 1")
+        return 1
+
+    try:
+        client = build_client(
+            provider=provider,
+            timeout_seconds=args.model_timeout,
+            reasoning_level="none",
+        )
+    except RuntimeError as exc:
+        print(str(exc))
+        return 1
+
+    if isinstance(client, OllamaClient):
+        status = client.ensure_server_running(auto_start=False)
+        if not status.reachable:
+            print(status.message)
+            return 1
+        local_models = client.list_local_models()
+        missing = [model for model in models if model not in local_models]
+        if missing:
+            print("Missing models in Ollama: " + ", ".join(missing))
+            return 1
+
+    report = {
+        "provider": provider,
+        "model_timeout_seconds": int(args.model_timeout),
+        "attempts": int(args.attempts),
+        "seed": int(args.seed),
+        "num_predict": int(args.num_predict),
+        "models": [
+            _probe_model_stability(
+                client=client,
+                model=model,
+                attempts=args.attempts,
+                seed=args.seed,
+                num_predict=args.num_predict,
+            )
+            for model in models
+        ],
+    }
+
+    if args.out:
+        out_path = Path(args.out)
+        out_path.parent.mkdir(parents=True, exist_ok=True)
+        out_path.write_text(json.dumps(report, indent=2), encoding="utf-8")
+
+    all_stable = True
+    for item in report["models"]:
+        status = "stable" if item["stable"] else "UNSTABLE"
+        print(
+            f"{item['model']}: {status} "
+            f"(successes={item['success_count']}/{item['attempts']}, "
+            f"errors={item['error_count']}, avg_latency={item['avg_latency_seconds']})"
+        )
+        if item["responses"]:
+            print("  responses: " + ", ".join(item["responses"]))
+        if item["errors"]:
+            print("  last_error: " + item["errors"][-1])
+        all_stable = all_stable and bool(item["stable"])
+
+    if all_stable:
+        print("Backend preflight passed. Stability is sufficient for local verification.")
+        return 0
+
+    print(
+        "Backend preflight failed. Local backend stability is insufficient for strict local "
+        "verification; do not claim strict reproducibility from this run."
+    )
+    return 1
+
+
 def cmd_run(args: argparse.Namespace) -> int:
     try:
         models = _parse_models(args.models)
@@ -600,14 +738,28 @@ def cmd_run(args: argparse.Namespace) -> int:
     if args.max_turns < 1:
         print("--max-turns must be >= 1")
         return 1
+    if args.test_timeout < 1:
+        print("--test-timeout must be >= 1")
+        return 1
+    if args.model_retries < 0:
+        print("--model-retries must be >= 0")
+        return 1
+    if args.model_retry_backoff < 0:
+        print("--model-retry-backoff must be >= 0")
+        return 1
     if args.tasks and args.suite:
         print("--tasks provided; ignoring --suite for task selection.")
+
+    model_timeout_seconds = args.model_timeout
+    if args.timeout is not None:
+        print("`--timeout` is deprecated; use `--model-timeout`.", file=sys.stderr)
+        model_timeout_seconds = args.timeout
 
     try:
         if mentor_provider == worker_provider:
             shared_client = build_client(
                 provider=mentor_provider,
-                timeout_seconds=args.timeout,
+                timeout_seconds=model_timeout_seconds,
                 reasoning_level=args.reasoning_level,
             )
             mentor_client = shared_client
@@ -615,12 +767,12 @@ def cmd_run(args: argparse.Namespace) -> int:
         else:
             mentor_client = build_client(
                 provider=mentor_provider,
-                timeout_seconds=args.timeout,
+                timeout_seconds=model_timeout_seconds,
                 reasoning_level=args.reasoning_level,
             )
             worker_client = build_client(
                 provider=worker_provider,
-                timeout_seconds=args.timeout,
+                timeout_seconds=model_timeout_seconds,
                 reasoning_level=args.reasoning_level,
             )
     except RuntimeError as exc:
@@ -675,7 +827,10 @@ def cmd_run(args: argparse.Namespace) -> int:
         stronger_worker_model=args.stronger_worker_model,
         worker_num_predict_override=args.worker_num_predict,
         mentor_num_predict_override=args.mentor_num_predict,
-        timeout_seconds=args.timeout,
+        timeout_seconds=model_timeout_seconds,
+        test_timeout_seconds=args.test_timeout,
+        model_retry_attempts=args.model_retries,
+        model_retry_backoff_seconds=args.model_retry_backoff,
     )
 
     try:
@@ -688,6 +843,13 @@ def cmd_run(args: argparse.Namespace) -> int:
             )
         else:
             results = run_benchmark(config, mentor_client=mentor_client, worker_client=worker_client)
+    except KeyboardInterrupt:
+        checkpoint_path = config.results_path.with_name(f"{config.results_path.stem}.checkpoint.jsonl")
+        print(
+            "Benchmark interrupted. Completed units remain in the checkpoint log and can be resumed "
+            f"by rerunning the same command with the same --results-path.\nCheckpoint JSONL: {checkpoint_path}"
+        )
+        return 130
     except (ValueError, RuntimeError) as exc:
         print(str(exc))
         return 1
@@ -703,6 +865,8 @@ def cmd_run(args: argparse.Namespace) -> int:
         print(f"- {mode}: {count}")
     print(f"Results JSON: {config.results_path}")
     print(f"Leaderboard: {config.results_path.parent / 'leaderboard.md'}")
+    checkpoint_path = config.results_path.with_name(f"{config.results_path.stem}.checkpoint.jsonl")
+    print(f"Checkpoint JSONL: {checkpoint_path}")
     if args.debug:
         _print_debug_report(results)
     return 0
@@ -1052,6 +1216,24 @@ def build_parser() -> argparse.ArgumentParser:
     setup.add_argument("--skip-pull", action="store_true", help="Skip `ollama pull` checks.")
     setup.set_defaults(func=cmd_setup)
 
+    preflight = subparsers.add_parser(
+        "preflight",
+        help="Probe backend stability for lightweight local verification.",
+    )
+    preflight.add_argument("--models", default="phi3:mini,llama3.1:8b")
+    preflight.add_argument(
+        "--provider",
+        choices=SUPPORTED_PROVIDERS,
+        default="ollama",
+        help="Provider to probe (default: ollama).",
+    )
+    preflight.add_argument("--model-timeout", type=int, default=30)
+    preflight.add_argument("--attempts", type=int, default=2)
+    preflight.add_argument("--seed", type=int, default=1337)
+    preflight.add_argument("--num-predict", type=int, default=24)
+    preflight.add_argument("--out", default=None, help="Optional JSON path for the preflight report.")
+    preflight.set_defaults(func=cmd_preflight)
+
     run = subparsers.add_parser("run", help="Run benchmark suites and ablations.")
     run.add_argument("--models", default="default", help="Comma-separated model list or `default`.")
     run.add_argument(
@@ -1146,8 +1328,44 @@ def build_parser() -> argparse.ArgumentParser:
         default=None,
         help="Optional explicit stronger worker model to use when run mode includes stronger_worker.",
     )
-    run.add_argument("--results-path", default="results/results.json")
-    run.add_argument("--timeout", type=int, default=180)
+    run.add_argument(
+        "--results-path",
+        default="results/results.json",
+        help=(
+            "Final results JSON path. Resume state is stored alongside it as "
+            "<stem>.checkpoint.jsonl; multi-seed runs also emit <stem>.seed-<seed>.json."
+        ),
+    )
+    run.add_argument(
+        "--model-timeout",
+        type=int,
+        default=180,
+        help="Per-model-call timeout in seconds.",
+    )
+    run.add_argument(
+        "--test-timeout",
+        type=int,
+        default=8,
+        help="Per-pytest execution timeout in seconds.",
+    )
+    run.add_argument(
+        "--timeout",
+        type=int,
+        default=None,
+        help="Deprecated alias for --model-timeout.",
+    )
+    run.add_argument(
+        "--model-retries",
+        type=int,
+        default=1,
+        help="Bounded retry count for transient backend timeouts/errors.",
+    )
+    run.add_argument(
+        "--model-retry-backoff",
+        type=float,
+        default=1.0,
+        help="Base backoff in seconds between transient model-call retries.",
+    )
     run.add_argument(
         "--debug",
         action="store_true",

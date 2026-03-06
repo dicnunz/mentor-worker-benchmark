@@ -13,7 +13,7 @@ It does not measure broad software engineering ability, product quality, or real
 - "Model X achieved Y% pass rate on this benchmark configuration."
 - "Mentor A improved Worker B by Z points over the worker-only baseline in this run."
 - "In this offline setup, mentor guidance was associated with positive/negative lift."
-- "Results are reproducible with the same task pack, seed, models, and repro settings."
+- "Results are reproducible with the same task pack, seed, models, repro settings, and a stable backend preflight."
 
 ## Disallowed Claims
 

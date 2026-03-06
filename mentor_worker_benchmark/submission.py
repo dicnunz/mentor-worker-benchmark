@@ -86,6 +86,12 @@ def validate_results_payload(payload: dict[str, Any]) -> list[str]:
         timeout_seconds = config.get("timeout_seconds")
         if timeout_seconds is not None and not isinstance(timeout_seconds, int):
             errors.append("results.config.timeout_seconds must be an integer when present")
+        model_timeout_seconds = config.get("model_timeout_seconds")
+        if model_timeout_seconds is not None and not isinstance(model_timeout_seconds, int):
+            errors.append("results.config.model_timeout_seconds must be an integer when present")
+        test_timeout_seconds = config.get("test_timeout_seconds")
+        if test_timeout_seconds is not None and not isinstance(test_timeout_seconds, int):
+            errors.append("results.config.test_timeout_seconds must be an integer when present")
         task_pack_version = config.get("task_pack_version")
         if task_pack_version is not None and not isinstance(task_pack_version, str):
             errors.append("results.config.task_pack_version must be a string when present")
@@ -250,7 +256,8 @@ def _infer_cli_command(results_payload: dict[str, Any]) -> str:
     task_pack_source = str(config.get("task_pack_source", "builtin"))
     task_pack_manifest_path = str(config.get("task_pack_manifest_path", ""))
     repro = bool(config.get("repro_mode", False))
-    timeout_seconds = config.get("timeout_seconds", 180)
+    model_timeout_seconds = config.get("model_timeout_seconds", config.get("timeout_seconds", 180))
+    test_timeout_seconds = config.get("test_timeout_seconds", 8)
 
     command = [
         "python -m mentor_worker_benchmark run",
@@ -260,7 +267,8 @@ def _infer_cli_command(results_payload: dict[str, Any]) -> str:
         f"--run-modes {','.join(str(item) for item in run_modes) if run_modes else 'default'}",
         f"--seed {seed}",
         f"--max-turns {max_turns}",
-        f"--timeout {timeout_seconds}",
+        f"--model-timeout {model_timeout_seconds}",
+        f"--test-timeout {test_timeout_seconds}",
         "--results-path results/results.json",
     ]
     if provider:
@@ -386,9 +394,16 @@ def _normalize_compute_budget_for_manifest(payload: dict[str, Any]) -> dict[str,
     max_turns = _safe_int(budget.get("max_turns"))
     if max_turns is None:
         max_turns = _safe_int(config.get("max_turns"))
-    timeout_seconds = _safe_int(budget.get("timeout_seconds"))
-    if timeout_seconds is None:
-        timeout_seconds = _safe_int(config.get("timeout_seconds"))
+    model_timeout_seconds = _safe_int(budget.get("model_timeout_seconds"))
+    if model_timeout_seconds is None:
+        model_timeout_seconds = _safe_int(budget.get("timeout_seconds"))
+    if model_timeout_seconds is None:
+        model_timeout_seconds = _safe_int(config.get("model_timeout_seconds"))
+    if model_timeout_seconds is None:
+        model_timeout_seconds = _safe_int(config.get("timeout_seconds"))
+    test_timeout_seconds = _safe_int(budget.get("test_timeout_seconds"))
+    if test_timeout_seconds is None:
+        test_timeout_seconds = _safe_int(config.get("test_timeout_seconds"))
 
     total_calls = _safe_int(budget.get("total_model_calls_attempted"))
     if total_calls is None:
@@ -409,7 +424,9 @@ def _normalize_compute_budget_for_manifest(payload: dict[str, Any]) -> dict[str,
 
     return {
         "max_turns": int(max_turns) if max_turns is not None else 0,
-        "timeout_seconds": int(timeout_seconds) if timeout_seconds is not None else 0,
+        "timeout_seconds": int(model_timeout_seconds) if model_timeout_seconds is not None else 0,
+        "model_timeout_seconds": int(model_timeout_seconds) if model_timeout_seconds is not None else 0,
+        "test_timeout_seconds": int(test_timeout_seconds) if test_timeout_seconds is not None else 0,
         "total_model_calls_attempted": int(total_calls),
         "total_tokens_estimate": total_tokens,
         "total_wall_time_seconds": round(wall_value, 4),
@@ -430,6 +447,12 @@ def _validate_compute_budget_manifest(
         value = budget.get(key)
         if isinstance(value, bool) or not isinstance(value, int):
             errors.append(f"{path}.{key} must be an integer")
+    for optional_key in ("model_timeout_seconds", "test_timeout_seconds"):
+        if optional_key not in budget:
+            continue
+        value = budget.get(optional_key)
+        if isinstance(value, bool) or not isinstance(value, int):
+            errors.append(f"{path}.{optional_key} must be an integer")
 
     token_value = budget.get("total_tokens_estimate")
     if isinstance(token_value, str):
