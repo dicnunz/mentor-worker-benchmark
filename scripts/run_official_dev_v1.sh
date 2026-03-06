@@ -4,7 +4,13 @@ set -euo pipefail
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "${ROOT_DIR}"
 
-PYTHON_BIN="${PYTHON_BIN:-python3}"
+if [[ -n "${PYTHON_BIN:-}" ]]; then
+  PYTHON_BIN="${PYTHON_BIN}"
+elif [[ -x "${ROOT_DIR}/.venv/bin/python" ]]; then
+  PYTHON_BIN="${ROOT_DIR}/.venv/bin/python"
+else
+  PYTHON_BIN="python3"
+fi
 PROTOCOL_VERSION="${PROTOCOL_VERSION:-v0.3.0}"
 TASK_PACK="${TASK_PACK:-task_pack_v2}"
 TASK_SUITE="${TASK_SUITE:-dev50}"
