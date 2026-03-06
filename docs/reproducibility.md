@@ -46,7 +46,8 @@ Resume source of truth:
 Resumable unit:
 - `(seed, mode, task_id, worker_model, mentor_model)`
 
-Changing suite, seed, models, or run modes requires a new `--results-path`, because checkpoint metadata must match exactly.
+Changing suite, seed, models, run modes, or benchmark revision requires a new `--results-path`, because checkpoint metadata must match exactly.
+Checkpoint metadata includes the benchmark git commit and task-pack metadata; resume is for interrupted reruns of the same effective benchmark, not for carrying work across code revisions.
 When a run is resumed, `benchmark_wall_time_seconds` reflects accumulated completed run time, while `checkpointing.session_wall_time_seconds` reflects only the current invocation.
 
 Not resumable until completion:

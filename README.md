@@ -164,8 +164,8 @@ python -m mentor_worker_benchmark run \
 ```
 
 `--repro` fixes key generation/runtime settings (temperature, top_p, seeds, max tokens, max turns).
-If you rerun the same command with the same `--results-path`, completed units are resumed from `<results-stem>.checkpoint.jsonl`.
-If you change suite, seed, models, or run modes, use a new `--results-path`.
+If you rerun the same command with the same `--results-path` on the same benchmark code/task-pack revision, completed units are resumed from `<results-stem>.checkpoint.jsonl`.
+If you change suite, seed, models, run modes, or benchmark revision, use a new `--results-path`.
 
 ## Run With OpenAI SOTA Models
 
@@ -317,7 +317,8 @@ Generated files:
 
 - Resume unit: `(seed, mode, task_id, worker_model, mentor_model)`.
 - Checkpoints are append-only JSONL files stored next to `--results-path`.
-- Re-running the same command with the same `--results-path` skips already completed units deterministically.
+- Re-running the same command with the same `--results-path` and the same checkpoint metadata skips already completed units deterministically.
+- Checkpoint metadata includes the benchmark git commit and task-pack metadata, so resume does not cross code/task-pack revisions.
 - Multi-seed runs write per-seed partial JSON artifacts before the final merged `results.json`.
 - Not resumable until completion: final merged multi-seed `results.json`, exported submission ZIPs, and `leaderboard.md`.
 - `benchmark_wall_time_seconds` reflects accumulated completed run time across resumed units; `checkpointing.session_wall_time_seconds` records the current invocation.

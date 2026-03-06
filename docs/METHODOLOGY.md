@@ -118,6 +118,7 @@ Backend honesty:
 - Single-seed runs persist completed units incrementally in `<results-stem>.checkpoint.jsonl`.
 - Multi-seed runs write `<results-stem>.seed-<seed>.json` after each completed seed before the final merged artifact is written.
 - Re-running the same command with the same `--results-path` deterministically skips completed units whose checkpoint metadata matches.
+- Checkpoint metadata includes the benchmark git commit and task-pack metadata, so resume is intentionally scoped to the same code/task-pack revision.
 - `benchmark_wall_time_seconds` is accumulated over completed units; `checkpointing.session_wall_time_seconds` captures only the current invocation.
 
 What is not resumable until the run completes:
