@@ -14,6 +14,9 @@ from statistics import mean
 from typing import Any
 
 from mentor_worker_benchmark.tasks.task_pack_validation import build_task_strength_report
+from mentor_worker_benchmark.tasks.task_pack_v2.exact_families import (
+    compute_exact_family_hash_for_file_map,
+)
 
 DEFAULT_SIMILARITY_THRESHOLD = 0.985
 DEFAULT_MAX_CLUSTERS = 12
@@ -253,6 +256,41 @@ def _originality_flags(records: list[TaskRecord]) -> list[dict[str, str]]:
     return rows
 
 
+def _active_exact_family_audit(records: list[TaskRecord]) -> dict[str, Any]:
+    families: dict[str, list[TaskRecord]] = defaultdict(list)
+    for record in records:
+        family_id = compute_exact_family_hash_for_file_map(record.file_texts)
+        families[family_id].append(record)
+
+    duplicate_families = {family_id: members for family_id, members in families.items() if len(members) > 1}
+    size_counts: defaultdict[int, int] = defaultdict(int)
+    for members in duplicate_families.values():
+        size_counts[len(members)] += 1
+    family_size_distribution = {str(size): int(count) for size, count in sorted(size_counts.items())}
+
+    cross_split_family_count = 0
+    cross_split_task_count = 0
+    eval_family_duplicates = 0
+    for members in families.values():
+        splits = {member.split for member in members}
+        eval_members = [member for member in members if member.split in {"dev", "test"}]
+        if len(splits) > 1:
+            cross_split_family_count += 1
+            cross_split_task_count += len(members)
+        if len(eval_members) > 1:
+            eval_family_duplicates += 1
+
+    return {
+        "task_count": len(records),
+        "exact_family_count": len(families),
+        "duplicate_family_count": len(duplicate_families),
+        "family_size_distribution": family_size_distribution,
+        "cross_split_family_count": cross_split_family_count,
+        "cross_split_task_count": cross_split_task_count,
+        "eval_family_duplicates": eval_family_duplicates,
+    }
+
+
 def build_provenance_payload(
     *,
     seed: int | None = None,
@@ -277,6 +315,8 @@ def build_provenance_payload(
 
     originality_flags = _originality_flags(records)
     file_count = sum(len(record.file_texts) for record in records)
+    source_audit = metadata.get("source_audit", {}) if isinstance(metadata.get("source_audit"), dict) else {}
+    active_family_audit = _active_exact_family_audit(records)
     strength_snapshot = build_task_strength_report(
         root=_pack_root(),
         payload=metadata,
@@ -317,12 +357,24 @@ def build_provenance_payload(
             "limitations": [
                 "This does not prove zero contamination risk in model pretraining corpora.",
                 (
-                    "Models may still have seen similar programming motifs or patterns during pretraining, "
-                    "so results should be interpreted as relative benchmark behavior, not absolute novelty."
+                "Models may still have seen similar programming motifs or patterns during pretraining, "
+                "so results should be interpreted as relative benchmark behavior, not absolute novelty."
+                ),
+                (
+                    "The active release pack is exact-family deduplicated for split independence, but the "
+                    "underlying generated source corpus contained duplicate templates before hardening."
                 ),
             ],
         },
         "checks": {
+            "exact_family_audit": {
+                "method": (
+                    "sha256 over prompt.md + starter_code.py + tests/*.py "
+                    "(sorted paths; __pycache__ ignored)"
+                ),
+                "source_corpus": source_audit,
+                "active_release": active_family_audit,
+            },
             "similarity_scan": {
                 "method": "hashed token/char n-gram cosine similarity over prompt+tests",
                 "threshold": similarity_threshold,
@@ -357,6 +409,9 @@ def build_provenance_payload(
 def render_provenance_markdown(payload: dict[str, Any]) -> str:
     generator = payload["generator"]
     contamination = payload["contamination"]
+    exact_family = payload["checks"]["exact_family_audit"]
+    source_exact = exact_family.get("source_corpus", {})
+    active_exact = exact_family.get("active_release", {})
     similarity = payload["checks"]["similarity_scan"]
     originality = payload["checks"]["originality_scan"]
     strength_snapshot = payload["checks"].get("test_strength_snapshot", {})
@@ -390,6 +445,27 @@ def render_provenance_markdown(payload: dict[str, Any]) -> str:
     lines.extend([f"- {item}" for item in contamination["limitations"]])
     lines.extend(
         [
+            "",
+            "## Exact-Family Audit",
+            "",
+            f"- Method: `{exact_family['method']}`",
+            f"- Source corpus tasks audited: `{source_exact.get('total_tasks', 'n/a')}`",
+            f"- Source exact families: `{source_exact.get('exact_family_count', 'n/a')}`",
+            f"- Duplicate families detected: `{source_exact.get('duplicate_families_detected', 'n/a')}`",
+            f"- Source family size distribution: `{source_exact.get('family_size_distribution', {})}`",
+            (
+                "- Cross-split overlap before hardening: "
+                f"`{source_exact.get('cross_split_overlap', {}).get('family_count', 'n/a')}` families / "
+                f"`{source_exact.get('cross_split_overlap', {}).get('task_count', 'n/a')}` tasks"
+            ),
+            f"- Active release tasks: `{active_exact.get('task_count', 'n/a')}`",
+            f"- Active duplicate families remaining: `{active_exact.get('duplicate_family_count', 'n/a')}`",
+            (
+                "- Active cross-split overlap: "
+                f"`{active_exact.get('cross_split_family_count', 'n/a')}` families / "
+                f"`{active_exact.get('cross_split_task_count', 'n/a')}` tasks"
+            ),
+            f"- Active dev/test multi-representative families: `{active_exact.get('eval_family_duplicates', 'n/a')}`",
             "",
             "## Similarity Scan (Intra-Pack)",
             "",
@@ -508,9 +584,32 @@ def validate_provenance_files(metadata: dict[str, Any]) -> tuple[bool, list[str]
         errors.append("provenance.json contamination.limitations should acknowledge pretraining similarity risk")
 
     checks = payload.get("checks", {})
+    exact_family_audit = checks.get("exact_family_audit", {}) if isinstance(checks, dict) else {}
     similarity_scan = checks.get("similarity_scan", {}) if isinstance(checks, dict) else {}
     originality_scan = checks.get("originality_scan", {}) if isinstance(checks, dict) else {}
     strength_snapshot = checks.get("test_strength_snapshot", {}) if isinstance(checks, dict) else {}
+    source_exact = exact_family_audit.get("source_corpus", {}) if isinstance(exact_family_audit, dict) else {}
+    active_exact = exact_family_audit.get("active_release", {}) if isinstance(exact_family_audit, dict) else {}
+    if not isinstance(source_exact, dict):
+        errors.append("provenance.json exact_family_audit.source_corpus missing")
+    else:
+        if int(source_exact.get("total_tasks", 0)) < int(metadata["counts"]["total"]):
+            errors.append("provenance.json source exact-family audit total_tasks is smaller than active pack")
+        if int(source_exact.get("exact_family_count", 0)) != int(metadata["counts"]["total"]):
+            errors.append("provenance.json source exact-family audit exact_family_count mismatch")
+        if int(source_exact.get("duplicate_families_detected", 0)) <= 0:
+            errors.append("provenance.json source exact-family audit should detect duplicate families")
+    if not isinstance(active_exact, dict):
+        errors.append("provenance.json exact_family_audit.active_release missing")
+    else:
+        if int(active_exact.get("task_count", 0)) != int(metadata["counts"]["total"]):
+            errors.append("provenance.json active exact-family audit task_count mismatch")
+        if int(active_exact.get("duplicate_family_count", -1)) != 0:
+            errors.append("provenance.json active release still contains duplicate exact families")
+        if int(active_exact.get("cross_split_family_count", -1)) != 0:
+            errors.append("provenance.json active release still contains cross-split exact families")
+        if int(active_exact.get("eval_family_duplicates", -1)) != 0:
+            errors.append("provenance.json active release still contains duplicate eval family members")
     if int(similarity_scan.get("task_count", 0)) != int(metadata["counts"]["total"]):
         errors.append("provenance.json similarity scan task_count mismatch")
     if int(originality_scan.get("flagged_files_count", -1)) < 0:
@@ -538,14 +637,21 @@ def main() -> None:
         similarity_threshold=args.similarity_threshold,
         max_clusters=args.max_clusters,
     )
+    active_exact = payload["checks"]["exact_family_audit"]["active_release"]
     similarity = payload["checks"]["similarity_scan"]
     originality = payload["checks"]["originality_scan"]
     print(
         f"Wrote provenance manifest for {payload['pack_name']} "
-        f"(clusters={similarity['cluster_count']}, flagged_files={originality['flagged_files_count']})."
+        f"(similarity_clusters={similarity['cluster_count']}, "
+        f"active_duplicate_families={active_exact['duplicate_family_count']}, "
+        f"flagged_files={originality['flagged_files_count']})."
     )
 
-    if args.fail_on_overlap and int(similarity["cluster_count"]) > 0:
+    if args.fail_on_overlap and (
+        int(active_exact.get("duplicate_family_count", 0)) > 0
+        or int(active_exact.get("cross_split_family_count", 0)) > 0
+        or int(active_exact.get("eval_family_duplicates", 0)) > 0
+    ):
         raise SystemExit(1)
     if int(originality["flagged_files_count"]) > 0:
         raise SystemExit(1)

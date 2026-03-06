@@ -1,1 +1,0 @@
-RULE:unused_import|SEVERITY:warn|FILE:grove.py|LINE:54\nRULE:unsafe_eval|SEVERITY:error|FILE:mosaic.py|LINE:64\nRULE:line_too_long|SEVERITY:info|FILE:grove.py|LINE:74\nRULE:unused_import|SEVERITY:warn|FILE:mosaic.py|LINE:84\n

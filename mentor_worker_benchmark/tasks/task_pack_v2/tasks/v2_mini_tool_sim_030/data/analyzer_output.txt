@@ -1,1 +1,0 @@
-RULE:unused_import|SEVERITY:warn|FILE:atlas.py|LINE:40\nRULE:unsafe_eval|SEVERITY:error|FILE:lumen.py|LINE:50\nRULE:line_too_long|SEVERITY:info|FILE:atlas.py|LINE:60\nRULE:unused_import|SEVERITY:warn|FILE:lumen.py|LINE:70\n

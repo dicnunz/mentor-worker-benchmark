@@ -101,7 +101,7 @@ def test_task_selection_quick_v2() -> None:
 
 def test_task_selection_default_eval_split_v2() -> None:
     selection = resolve_tasks(task_pack="task_pack_v2", suite=None, legacy_selector=None, seed=1337)
-    assert len(selection.tasks) == 160
+    assert len(selection.tasks) == 208
     splits = {task.split for task in selection.tasks}
     assert splits == {"dev", "test"}
 
@@ -144,7 +144,7 @@ def test_capture_runtime_context_records_pip_hash_and_task_pack(monkeypatch: Any
         mentor_provider="ollama",
         worker_provider="ollama",
         task_pack_id="task_pack_v2",
-        task_pack_version="2.0.0",
+        task_pack_version="2.1.0",
         task_pack_source="registry",
         task_pack_hash="b" * 64,
         task_pack_manifest_path="mentor_worker_benchmark/tasks/task_pack_v2/metadata.json",
@@ -156,3 +156,7 @@ def test_capture_runtime_context_records_pip_hash_and_task_pack(monkeypatch: Any
     assert context["task_pack"]["id"] == "task_pack_v2"
     assert context["task_pack"]["source"] == "registry"
     assert context["task_pack"]["hash"] == "b" * 64
+    assert context["reproducibility"]["python_version"] == context["python"]["version"]
+    assert context["reproducibility"]["cpu_architecture"] == context["platform"]["machine"]
+    assert context["reproducibility"]["commit_hash"] == "de5a929"
+    assert isinstance(context["reproducibility"]["model_versions"], list)

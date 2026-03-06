@@ -69,6 +69,17 @@ def _safe_int(value: Any) -> int | None:
     return None
 
 
+def _submission_zip_paths(submissions_dir: Path) -> list[Path]:
+    paths: list[Path] = []
+    for path in submissions_dir.rglob("*.zip"):
+        if not path.is_file():
+            continue
+        if path.name.startswith(("local_", "tmp_")):
+            continue
+        paths.append(path)
+    return sorted(paths, key=lambda item: item.as_posix())
+
+
 def _seed_list_from_results(results: dict[str, Any]) -> list[int]:
     seeds: list[int] = []
     replicates = results.get("replicates")
@@ -368,7 +379,16 @@ def _normalize_submission(submission_path: Path) -> dict[str, Any]:
     mentored_ci_high = round(_metric_or_default(primary_group.get("mentored_ci_high"), mentored_mean), 4)
     lift_ci_low = round(_metric_or_default(primary_group.get("lift_ci_low"), lift_mean), 4)
     lift_ci_high = round(_metric_or_default(primary_group.get("lift_ci_high"), lift_mean), 4)
-    lift_significant = bool(primary_group.get("lift_significant", False))
+    lift_ci_excludes_zero = lift_ci_low > 0.0 or lift_ci_high < 0.0
+    if isinstance(primary_group.get("lift_significant"), bool):
+        lift_significant = bool(primary_group.get("lift_significant"))
+    else:
+        lift_significant = lift_ci_excludes_zero
+    lift_p_value_gt_zero = _safe_float(primary_group.get("lift_p_value_gt_zero"))
+    if lift_p_value_gt_zero is None:
+        paired = primary_group.get("paired_significance")
+        if isinstance(paired, dict):
+            lift_p_value_gt_zero = _safe_float(paired.get("p_value_lift_gt_zero"))
 
     return {
         "submission_id": stem,
@@ -415,6 +435,9 @@ def _normalize_submission(submission_path: Path) -> dict[str, Any]:
         "lift_ci_low": lift_ci_low,
         "lift_ci_high": lift_ci_high,
         "lift_significant": lift_significant,
+        "lift_p_value_gt_zero": round(lift_p_value_gt_zero, 8)
+        if isinstance(lift_p_value_gt_zero, float)
+        else None,
         "best_worker": {
             "worker_model": str(best_worker.get("worker_model", "")) if isinstance(best_worker, dict) else "",
             # Keep legacy fields but map to analysis means for backward-compatible UI consumers.
@@ -965,8 +988,8 @@ def _render_index_html(summary: dict[str, Any], output_path: Path) -> None:
     <section class="card intro">
       <h2>What This Measures</h2>
       <p>This benchmark asks one question: does mentor guidance help a worker model solve objective coding tasks scored by tests?</p>
-      <p><strong>Baseline</strong> and <strong>Mentored</strong> are means across replicates with task-level bootstrap confidence intervals.</p>
-      <p><strong>Lift</strong> is mentored minus baseline, with a paired bootstrap CI and a <code>sig</code> marker when CI excludes 0.</p>
+      <p><strong>Baseline</strong> and <strong>Mentored</strong> are means across replicates with task-family bootstrap confidence intervals.</p>
+      <p><strong>Lift</strong> is mentored minus baseline, with a paired task-family bootstrap CI and a <code>sig</code> marker when CI excludes 0.</p>
       <p><strong>Errors</strong> and <strong>Timeouts</strong> count model-call failures; sanity runs focus on harness health and are not headline performance claims.</p>
       <p class="subtle">Hover glossary chips for plain-English definitions.</p>
       <div class="glossary">
@@ -1432,7 +1455,11 @@ def _render_index_html(summary: dict[str, Any], output_path: Path) -> None:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Verify submissions and regenerate community leaderboard artifacts.")
-    parser.add_argument("--submissions-dir", default="submissions")
+    parser.add_argument(
+        "--submissions-dir",
+        default="submissions",
+        help="Root directory scanned recursively for tracked submission bundles.",
+    )
     parser.add_argument("--leaderboard-dir", default="leaderboard")
     parser.add_argument("--docs-html", default="docs/index.html")
     parser.add_argument("--docs-markdown", default="docs/leaderboard.md")
@@ -1453,11 +1480,7 @@ def main() -> None:
     normalized_dir = leaderboard_dir / "submissions"
     normalized_dir.mkdir(parents=True, exist_ok=True)
 
-    zip_paths = sorted(
-        path
-        for path in submissions_dir.glob("*.zip")
-        if path.is_file() and not path.name.startswith(("local_", "tmp_"))
-    )
+    zip_paths = _submission_zip_paths(submissions_dir)
     valid_entries: list[dict[str, Any]] = []
     failed_reports: list[dict[str, Any]] = []
 

@@ -1,7 +1,16 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-PYTHON_BIN="${PYTHON_BIN:-python3}"
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "${ROOT_DIR}"
+
+if [[ -n "${PYTHON_BIN:-}" ]]; then
+  PYTHON_BIN="${PYTHON_BIN}"
+elif [[ -x "${ROOT_DIR}/.venv/bin/python" ]]; then
+  PYTHON_BIN="${ROOT_DIR}/.venv/bin/python"
+else
+  PYTHON_BIN="python3"
+fi
 PROTOCOL_VERSION="${PROTOCOL_VERSION:-v0.3.0}"
 TASK_PACK="${TASK_PACK:-task_pack_v2}"
 TASK_SUITE="${TASK_SUITE:-dev50}"
@@ -9,7 +18,10 @@ WORKER_MODELS="${WORKER_MODELS:-qwen2.5-coder:7b}"
 MENTOR_MODELS="${MENTOR_MODELS:-llama3.1:8b,mistral:7b}"
 RUN_MODES="${RUN_MODES:-worker_only,mentor_worker,mentor_only_suggestion_noise}"
 MAX_TURNS="${MAX_TURNS:-2}"
-TIMEOUT_SECONDS="${TIMEOUT_SECONDS:-20}"
+MODEL_TIMEOUT_SECONDS="${MODEL_TIMEOUT_SECONDS:-${TIMEOUT_SECONDS:-20}}"
+TEST_TIMEOUT_SECONDS="${TEST_TIMEOUT_SECONDS:-8}"
+MODEL_RETRIES="${MODEL_RETRIES:-1}"
+MODEL_RETRY_BACKOFF_SECONDS="${MODEL_RETRY_BACKOFF_SECONDS:-1.0}"
 SEEDS="${SEEDS:-1337,2026,9001}"
 WORKER_NUM_PREDICT="${WORKER_NUM_PREDICT:-220}"
 MENTOR_NUM_PREDICT="${MENTOR_NUM_PREDICT:-120}"
@@ -31,9 +43,10 @@ fi
 
 mkdir -p "$(dirname "${RESULTS_PATH}")" "$(dirname "${SUBMISSION_PATH}")"
 
-RUN_COMMAND="${PYTHON_BIN} -m mentor_worker_benchmark run --task-pack ${TASK_PACK} --suite ${TASK_SUITE} --mentor-models ${MENTOR_MODELS} --worker-models ${WORKER_MODELS} --run-modes ${RUN_MODES} --max-turns ${MAX_TURNS} --timeout ${TIMEOUT_SECONDS} --seeds ${SEEDS} --worker-num-predict ${WORKER_NUM_PREDICT} --mentor-num-predict ${MENTOR_NUM_PREDICT} --results-path ${RESULTS_PATH}"
+RUN_COMMAND="${PYTHON_BIN} -m mentor_worker_benchmark run --task-pack ${TASK_PACK} --suite ${TASK_SUITE} --mentor-models ${MENTOR_MODELS} --worker-models ${WORKER_MODELS} --run-modes ${RUN_MODES} --max-turns ${MAX_TURNS} --model-timeout ${MODEL_TIMEOUT_SECONDS} --test-timeout ${TEST_TIMEOUT_SECONDS} --model-retries ${MODEL_RETRIES} --model-retry-backoff ${MODEL_RETRY_BACKOFF_SECONDS} --seeds ${SEEDS} --worker-num-predict ${WORKER_NUM_PREDICT} --mentor-num-predict ${MENTOR_NUM_PREDICT} --results-path ${RESULTS_PATH}"
 
 echo "Running official protocol suite (${TASK_SUITE}) with seeds ${SEEDS}..."
+echo "Note: this is a headline/publication script and is not the practical default local gate on a 16 GB MacBook Air. Use ./scripts/run_local_verification.sh for local release-health checks."
 if ! "${PYTHON_BIN}" -m mentor_worker_benchmark run \
   --task-pack "${TASK_PACK}" \
   --suite "${TASK_SUITE}" \
@@ -41,7 +54,10 @@ if ! "${PYTHON_BIN}" -m mentor_worker_benchmark run \
   --worker-models "${WORKER_MODELS}" \
   --run-modes "${RUN_MODES}" \
   --max-turns "${MAX_TURNS}" \
-  --timeout "${TIMEOUT_SECONDS}" \
+  --model-timeout "${MODEL_TIMEOUT_SECONDS}" \
+  --test-timeout "${TEST_TIMEOUT_SECONDS}" \
+  --model-retries "${MODEL_RETRIES}" \
+  --model-retry-backoff "${MODEL_RETRY_BACKOFF_SECONDS}" \
   --seeds "${SEEDS}" \
   --worker-num-predict "${WORKER_NUM_PREDICT}" \
   --mentor-num-predict "${MENTOR_NUM_PREDICT}" \

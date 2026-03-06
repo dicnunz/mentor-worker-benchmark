@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -18,7 +19,55 @@ class TestRunResult:
     passed: bool
     output: str
     duration_seconds: float
+    tests_executed: int = 0
+    tests_passed: int = 0
+    tests_failed: int = 0
     timed_out: bool = False
+
+
+_PYTEST_STAT_RE = re.compile(
+    r"(?P<count>\d+)\s+(?P<label>passed|failed|error|errors|xfailed|xpassed|skipped)\b",
+    re.IGNORECASE,
+)
+_PYTEST_POSIX_PATH_RE = re.compile(r"PosixPath\('([^']*pytest-of[^']*)'\)")
+_PYTEST_WINDOWS_PATH_RE = re.compile(r"WindowsPath\('([^']*pytest-of[^']*)'\)")
+_PYTEST_BARE_TEMP_PATH_RE = re.compile(r"((?:/|[A-Za-z]:\\)[^\s'\":)]*pytest-of[^\s'\":)]*)")
+_PYTEST_DURATION_RE = re.compile(r"(?<=\bin )\d+(?:\.\d+)?(?=s\b)")
+
+
+def _parse_pytest_stats(output: str) -> tuple[int, int, int]:
+    passed = 0
+    failed = 0
+    errors = 0
+    xfailed = 0
+    xpassed = 0
+
+    for match in _PYTEST_STAT_RE.finditer(output):
+        count = int(match.group("count"))
+        label = match.group("label").lower()
+        if label == "passed":
+            passed += count
+        elif label == "failed":
+            failed += count
+        elif label in {"error", "errors"}:
+            errors += count
+        elif label == "xfailed":
+            xfailed += count
+        elif label == "xpassed":
+            xpassed += count
+
+    tests_failed = failed + errors
+    tests_executed = passed + tests_failed + xfailed + xpassed
+    return tests_executed, passed, tests_failed
+
+
+def normalize_pytest_output(output: str) -> str:
+    normalized = output.replace("\r\n", "\n")
+    normalized = _PYTEST_POSIX_PATH_RE.sub("PosixPath('<TMP_PATH>')", normalized)
+    normalized = _PYTEST_WINDOWS_PATH_RE.sub("WindowsPath('<TMP_PATH>')", normalized)
+    normalized = _PYTEST_BARE_TEMP_PATH_RE.sub("<TMP_PATH>", normalized)
+    normalized = _PYTEST_DURATION_RE.sub("<TIME>", normalized)
+    return normalized.strip()
 
 
 def materialize_task(task: TaskDefinition) -> tuple[tempfile.TemporaryDirectory[str], Path]:
@@ -87,7 +136,12 @@ def project_snapshot(workdir: Path, max_total_chars: int = 8000) -> str:
     return "\n".join(blocks).strip()
 
 
-def run_pytest(workdir: Path, timeout_seconds: int = 8) -> TestRunResult:
+def run_pytest(
+    workdir: Path,
+    timeout_seconds: int = 8,
+    *,
+    pythonhashseed: int = 0,
+) -> TestRunResult:
     start = time.perf_counter()
     runtime_hook_dir = Path(__file__).resolve().parents[2] / "_runtime"
     env = os.environ.copy()
@@ -99,6 +153,7 @@ def run_pytest(workdir: Path, timeout_seconds: int = 8) -> TestRunResult:
     )
     env["MWB_BLOCK_NETWORK"] = "1"
     env["PYTEST_DISABLE_PLUGIN_AUTOLOAD"] = "1"
+    env["PYTHONHASHSEED"] = str(int(pythonhashseed))
 
     try:
         process = subprocess.run(
@@ -111,20 +166,32 @@ def run_pytest(workdir: Path, timeout_seconds: int = 8) -> TestRunResult:
             timeout=timeout_seconds,
         )
         duration = time.perf_counter() - start
+        normalized_output = normalize_pytest_output(process.stdout)
+        tests_executed, tests_passed, tests_failed = _parse_pytest_stats(normalized_output)
         return TestRunResult(
             exit_code=process.returncode,
             passed=process.returncode == 0,
-            output=process.stdout,
+            output=normalized_output,
             duration_seconds=duration,
+            tests_executed=tests_executed,
+            tests_passed=tests_passed,
+            tests_failed=tests_failed,
             timed_out=False,
         )
     except subprocess.TimeoutExpired as exc:
         duration = time.perf_counter() - start
         stdout_text = exc.stdout if isinstance(exc.stdout, str) else ""
+        merged_output = normalize_pytest_output(
+            stdout_text + "\n[timeout] pytest exceeded timeout budget."
+        )
+        tests_executed, tests_passed, tests_failed = _parse_pytest_stats(merged_output)
         return TestRunResult(
             exit_code=124,
             passed=False,
-            output=(stdout_text + "\n[timeout] pytest exceeded timeout budget.").strip(),
+            output=merged_output,
             duration_seconds=duration,
+            tests_executed=tests_executed,
+            tests_passed=tests_passed,
+            tests_failed=tests_failed,
             timed_out=True,
         )

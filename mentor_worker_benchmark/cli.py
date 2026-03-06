@@ -1,13 +1,19 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
+import re
+import subprocess
 import sys
+import time
+from collections import Counter, defaultdict
 from pathlib import Path
+from statistics import mean, pvariance
 
 from mentor_worker_benchmark.analysis import DEFAULT_BOOTSTRAP_SAMPLES, generate_analysis_payload
 from mentor_worker_benchmark.ollama_client import OllamaClient
-from mentor_worker_benchmark.protocol import parse_seed_list
+from mentor_worker_benchmark.protocol import expand_replicate_seeds, parse_seed_list
 from mentor_worker_benchmark.provider_factory import (
     SUPPORTED_PROVIDERS,
     build_client,
@@ -35,6 +41,10 @@ from mentor_worker_benchmark.tasks.task_pack_v2.provenance import (
     DEFAULT_SIMILARITY_THRESHOLD,
     write_provenance_artifacts,
 )
+
+
+_SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
+_GIT_HASH_RE = re.compile(r"^[0-9a-f]{7,40}$")
 
 
 def _parse_models(raw: str) -> list[str]:
@@ -86,6 +96,365 @@ def _parse_seeds(raw: str | None, *, fallback_seed: int) -> list[int]:
     if len(set(seeds)) != len(seeds):
         raise ValueError("--seeds must not contain duplicates.")
     return seeds
+
+
+def _resolve_run_seeds(*, seed: int, seeds_raw: str | None, replicates: int) -> list[int]:
+    if replicates < 1:
+        raise ValueError("--replicates must be >= 1.")
+    has_seed_list = bool(seeds_raw and seeds_raw.strip())
+    if has_seed_list:
+        if replicates != 1:
+            raise ValueError("--replicates cannot be combined with --seeds.")
+        return _parse_seeds(seeds_raw, fallback_seed=seed)
+    return expand_replicate_seeds(base_seed=seed, replicates=replicates)
+
+
+def _is_sha256(value: object) -> bool:
+    return isinstance(value, str) and _SHA256_RE.fullmatch(value) is not None
+
+
+def _is_git_hash(value: object) -> bool:
+    return isinstance(value, str) and _GIT_HASH_RE.fullmatch(value) is not None
+
+
+def _iter_runs(payload: dict[str, object]) -> list[dict[str, object]]:
+    runs = payload.get("runs", [])
+    if not isinstance(runs, list):
+        return []
+    return [run for run in runs if isinstance(run, dict)]
+
+
+def _safe_pass_value(value: object) -> float | None:
+    if isinstance(value, bool):
+        return 1.0 if value else 0.0
+    return None
+
+
+def _task_difficulty_lookup(
+    payload: dict[str, object],
+    runs: list[dict[str, object]],
+) -> dict[str, str]:
+    lookup: dict[str, str] = {}
+    task_ids: set[str] = set()
+    for run in runs:
+        task_id = run.get("task_id")
+        if isinstance(task_id, str) and task_id:
+            task_ids.add(task_id)
+            difficulty = run.get("task_difficulty")
+            if isinstance(difficulty, str) and difficulty:
+                lookup[task_id] = difficulty
+
+    unresolved = {task_id for task_id in task_ids if task_id not in lookup}
+    if not unresolved:
+        return lookup
+
+    environment = payload.get("environment", {})
+    if not isinstance(environment, dict):
+        return lookup
+    task_pack = environment.get("task_pack", {})
+    if not isinstance(task_pack, dict):
+        return lookup
+
+    manifest_path_value = task_pack.get("manifest_path")
+    if not isinstance(manifest_path_value, str) or not manifest_path_value.strip():
+        return lookup
+
+    manifest_path = Path(manifest_path_value)
+    if not manifest_path.is_absolute():
+        manifest_path = (Path.cwd() / manifest_path).resolve()
+    if not manifest_path.exists():
+        return lookup
+
+    try:
+        metadata = json.loads(manifest_path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return lookup
+    tasks = metadata.get("tasks", [])
+    if not isinstance(tasks, list):
+        return lookup
+
+    for task in tasks:
+        if not isinstance(task, dict):
+            continue
+        task_id = task.get("task_id")
+        difficulty = task.get("difficulty")
+        if not isinstance(task_id, str) or not task_id:
+            continue
+        if not isinstance(difficulty, str) or not difficulty:
+            continue
+        if task_id in unresolved:
+            lookup[task_id] = difficulty
+
+    return lookup
+
+
+def _per_task_pass_rates(runs: list[dict[str, object]]) -> list[float]:
+    by_task: dict[str, list[float]] = defaultdict(list)
+    for run in runs:
+        task_id = run.get("task_id")
+        pass_value = _safe_pass_value(run.get("pass"))
+        if not isinstance(task_id, str) or not task_id:
+            continue
+        if pass_value is None:
+            continue
+        by_task[task_id].append(pass_value)
+    rates = [mean(values) for _, values in sorted(by_task.items()) if values]
+    return rates
+
+
+def _percent_histogram(values: list[float]) -> dict[str, int]:
+    labels = [f"{start:02d}-{start + 9:02d}%" for start in range(0, 100, 10)]
+    labels[-1] = "90-100%"
+    histogram = {label: 0 for label in labels}
+    for value in values:
+        pct = min(100.0, max(0.0, float(value) * 100.0))
+        bucket_index = min(9, int(pct // 10))
+        histogram[labels[bucket_index]] += 1
+    return histogram
+
+
+def _baseline_seed_stats(runs: list[dict[str, object]]) -> tuple[dict[int, float], float]:
+    by_seed: dict[int, list[float]] = defaultdict(list)
+    for run in runs:
+        seed_raw = run.get("seed")
+        pass_value = _safe_pass_value(run.get("pass"))
+        if isinstance(seed_raw, bool) or not isinstance(seed_raw, (int, float)):
+            continue
+        if pass_value is None:
+            continue
+        by_seed[int(seed_raw)].append(pass_value)
+
+    means_by_seed = {
+        seed: mean(values)
+        for seed, values in sorted(by_seed.items())
+        if values
+    }
+    variance = pvariance(list(means_by_seed.values())) if len(means_by_seed) > 1 else 0.0
+    return means_by_seed, variance
+
+
+def _mentor_lifts(runs: list[dict[str, object]]) -> list[float]:
+    baseline_map: dict[tuple[int, str, str], float] = {}
+    for run in runs:
+        if str(run.get("mode")) != "worker_only":
+            continue
+        seed_raw = run.get("seed")
+        task_id = run.get("task_id")
+        worker_model = run.get("worker_model")
+        pass_value = _safe_pass_value(run.get("pass"))
+        if isinstance(seed_raw, bool) or not isinstance(seed_raw, (int, float)):
+            continue
+        if not isinstance(task_id, str) or not task_id:
+            continue
+        if not isinstance(worker_model, str) or not worker_model:
+            continue
+        if pass_value is None:
+            continue
+        baseline_map[(int(seed_raw), worker_model, task_id)] = pass_value
+
+    lifts: list[float] = []
+    for run in runs:
+        if str(run.get("mode")) != "mentor_worker":
+            continue
+        seed_raw = run.get("seed")
+        task_id = run.get("task_id")
+        worker_model = run.get("worker_model")
+        mentored_pass = _safe_pass_value(run.get("pass"))
+        if isinstance(seed_raw, bool) or not isinstance(seed_raw, (int, float)):
+            continue
+        if not isinstance(task_id, str) or not task_id:
+            continue
+        if not isinstance(worker_model, str) or not worker_model:
+            continue
+        if mentored_pass is None:
+            continue
+
+        key = (int(seed_raw), worker_model, task_id)
+        if key in baseline_map:
+            baseline_pass = baseline_map[key]
+        else:
+            baseline_raw = run.get("baseline_pass")
+            baseline_pass = _safe_pass_value(baseline_raw)
+            if baseline_pass is None:
+                continue
+        lifts.append(mentored_pass - baseline_pass)
+    return lifts
+
+
+def _detect_baseline_reuse_groups(runs: list[dict[str, object]]) -> list[str]:
+    worker_only_runs = [run for run in runs if str(run.get("mode")) == "worker_only"]
+    grouped: dict[tuple[str, int], list[dict[str, object]]] = {}
+    for run in worker_only_runs:
+        worker_model = str(run.get("worker_model", "unknown"))
+        seed_raw = run.get("seed")
+        seed = int(seed_raw) if isinstance(seed_raw, (int, float)) and not isinstance(seed_raw, bool) else 0
+        grouped.setdefault((worker_model, seed), []).append(run)
+
+    signatures: dict[tuple[tuple[int, ...], tuple[str, ...]], list[tuple[str, int]]] = {}
+    for key, items in grouped.items():
+        # Small samples can naturally share identical outcome/patch vectors.
+        # Require enough task coverage before treating it as suspicious reuse.
+        if len(items) < 5:
+            continue
+        ordered = sorted(items, key=lambda item: str(item.get("task_id", "")))
+        baseline_vector = tuple(1 if bool(item.get("pass")) else 0 for item in ordered)
+        patch_vector = tuple(str(item.get("patch_hash") or "") for item in ordered)
+        signatures.setdefault((baseline_vector, patch_vector), []).append(key)
+
+    suspicious: list[str] = []
+    for groups in signatures.values():
+        if len(groups) <= 1:
+            continue
+        suspicious.append(", ".join(f"{worker}@seed{seed}" for worker, seed in sorted(groups)))
+    return suspicious
+
+
+def _audit_patch_hashes(runs: list[dict[str, object]]) -> tuple[bool, str]:
+    total_patch_hashes = 0
+    missing: list[str] = []
+    mismatches: list[str] = []
+    short_patch_count = 0
+
+    for run in runs:
+        task_id = str(run.get("task_id", "unknown"))
+        mode = str(run.get("mode", ""))
+        log = run.get("log", {})
+        if not isinstance(log, dict):
+            log = {}
+
+        if mode == "worker_only":
+            extracted = log.get("extracted_patch")
+            patch_hash = run.get("patch_hash")
+            if isinstance(extracted, str):
+                if len(extracted.strip()) < 5:
+                    short_patch_count += 1
+                if not _is_sha256(patch_hash):
+                    missing.append(f"{task_id}:{mode}")
+                else:
+                    expected = hashlib.sha256(extracted.encode("utf-8")).hexdigest()
+                    if patch_hash != expected:
+                        mismatches.append(f"{task_id}:{mode}")
+                    total_patch_hashes += 1
+            continue
+
+        turns = log.get("turns", [])
+        if not isinstance(turns, list):
+            continue
+        for index, turn in enumerate(turns, start=1):
+            if not isinstance(turn, dict):
+                continue
+            extracted = turn.get("extracted_patch")
+            patch_hash = turn.get("patch_hash")
+            if not isinstance(extracted, str):
+                continue
+            if len(extracted.strip()) < 5:
+                short_patch_count += 1
+            if not _is_sha256(patch_hash):
+                missing.append(f"{task_id}:{mode}:turn{index}")
+            else:
+                expected = hashlib.sha256(extracted.encode("utf-8")).hexdigest()
+                if patch_hash != expected:
+                    mismatches.append(f"{task_id}:{mode}:turn{index}")
+                total_patch_hashes += 1
+
+    if short_patch_count > 0:
+        return False, f"Found {short_patch_count} patch attempts with length <5 characters."
+    if missing:
+        return False, "Missing patch hashes for extracted patches: " + ", ".join(missing[:12])
+    if mismatches:
+        return False, "Patch hash mismatches detected: " + ", ".join(mismatches[:12])
+    if total_patch_hashes == 0:
+        return False, "No patch hashes recorded in results."
+    return True, f"{total_patch_hashes} hashed patch attempts verified."
+
+
+def _audit_tests_executed(runs: list[dict[str, object]]) -> tuple[bool, str]:
+    zero_tasks: list[str] = []
+    for run in runs:
+        tests_executed = run.get("tests_executed")
+        if isinstance(tests_executed, bool) or not isinstance(tests_executed, (int, float)):
+            zero_tasks.append(f"{run.get('task_id')}:{run.get('mode')}")
+            continue
+        if int(tests_executed) <= 0:
+            zero_tasks.append(f"{run.get('task_id')}:{run.get('mode')}")
+
+    if zero_tasks:
+        return False, "Found runs with tests_executed <= 0: " + ", ".join(zero_tasks[:12])
+    return True, f"{len(runs)} runs recorded tests_executed > 0."
+
+
+def _audit_runtime_distribution(runs: list[dict[str, object]]) -> tuple[bool, str]:
+    runtimes: list[float] = []
+    for run in runs:
+        value = run.get("test_runtime_seconds")
+        if isinstance(value, bool) or not isinstance(value, (int, float)):
+            continue
+        runtimes.append(float(value))
+
+    if not runtimes:
+        return False, "No test runtime evidence found."
+
+    low_count = sum(1 for runtime in runtimes if runtime < 0.1)
+    share = low_count / len(runtimes)
+    if share > 0.8:
+        return False, (
+            "tests may not be executing "
+            f"(runtime <0.1s for {low_count}/{len(runtimes)} runs)."
+        )
+    return True, f"Runtime distribution plausible ({low_count}/{len(runtimes)} under 0.1s)."
+
+
+def _audit_baseline_reuse(runs: list[dict[str, object]]) -> tuple[bool, str]:
+    suspicious = _detect_baseline_reuse_groups(runs)
+    if suspicious:
+        return False, (
+            "Potential artifact reuse detected across worker-only baseline vectors: "
+            + "; ".join(suspicious[:4])
+        )
+    return True, "Baseline vectors appear freshly computed per run."
+
+
+def _audit_commit_metadata(payload: dict[str, object]) -> tuple[bool, str]:
+    env = payload.get("environment", {})
+    if not isinstance(env, dict):
+        return False, "Missing results.environment metadata."
+    git_data = env.get("git", {})
+    if not isinstance(git_data, dict):
+        return False, "Missing results.environment.git metadata."
+
+    artifact_commit = git_data.get("commit_hash") or git_data.get("commit")
+    if not _is_git_hash(artifact_commit):
+        return False, "Invalid or missing artifact commit hash."
+
+    artifact_commit_text = str(artifact_commit)
+    try:
+        subprocess.run(
+            ["git", "cat-file", "-e", f"{artifact_commit_text}^{{commit}}"],
+            check=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+        )
+    except subprocess.CalledProcessError:
+        return False, f"Artifact commit not found in local git object store: {artifact_commit_text}"
+
+    try:
+        head = subprocess.run(
+            ["git", "rev-parse", "HEAD"],
+            check=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+        ).stdout.strip()
+    except subprocess.CalledProcessError as exc:
+        return False, f"Unable to resolve local HEAD commit: {exc}"
+
+    if artifact_commit_text != head:
+        return False, (
+            "Artifact commit metadata mismatch: "
+            f"results={artifact_commit_text}, local_head={head}"
+        )
+    return True, f"Artifact commit verified: {artifact_commit_text}"
 
 
 def _head_lines(text: str, *, max_lines: int = 50) -> str:
@@ -190,6 +559,143 @@ def cmd_setup(args: argparse.Namespace) -> int:
     return 0
 
 
+def _normalize_probe_response(text: str) -> str:
+    return re.sub(r"\s+", " ", text).strip()
+
+
+def _probe_model_stability(
+    *,
+    client: Any,
+    model: str,
+    attempts: int,
+    seed: int,
+    num_predict: int,
+) -> dict[str, Any]:
+    expected_response = "STABLE_OK"
+    responses: list[str] = []
+    latencies: list[float] = []
+    errors: list[str] = []
+
+    for _ in range(attempts):
+        started = time.perf_counter()
+        try:
+            response = client.chat(
+                model=model,
+                messages=[{"role": "user", "content": "Reply with exactly STABLE_OK and nothing else."}],
+                temperature=0.0,
+                top_p=1.0,
+                num_predict=num_predict,
+                seed=seed,
+            )
+        except RuntimeError as exc:
+            errors.append(str(exc))
+            continue
+        latencies.append(time.perf_counter() - started)
+        responses.append(_normalize_probe_response(response))
+
+    unique_responses = sorted(set(responses))
+    stable = (
+        not errors
+        and len(unique_responses) == 1
+        and len(responses) == attempts
+        and unique_responses == [expected_response]
+    )
+    return {
+        "model": model,
+        "attempts": attempts,
+        "seed": int(seed),
+        "success_count": len(responses),
+        "error_count": len(errors),
+        "stable": stable,
+        "expected_response": expected_response,
+        "responses": unique_responses,
+        "errors": errors,
+        "latency_seconds": [round(item, 4) for item in latencies],
+        "avg_latency_seconds": round(mean(latencies), 4) if latencies else None,
+    }
+
+
+def cmd_preflight(args: argparse.Namespace) -> int:
+    try:
+        models = _parse_models(args.models)
+        provider = normalize_provider_name(args.provider)
+    except ValueError as exc:
+        print(str(exc))
+        return 1
+
+    if args.attempts < 1:
+        print("--attempts must be >= 1")
+        return 1
+
+    try:
+        client = build_client(
+            provider=provider,
+            timeout_seconds=args.model_timeout,
+            reasoning_level="none",
+        )
+    except RuntimeError as exc:
+        print(str(exc))
+        return 1
+
+    if isinstance(client, OllamaClient):
+        status = client.ensure_server_running(auto_start=False)
+        if not status.reachable:
+            print(status.message)
+            return 1
+        local_models = client.list_local_models()
+        missing = [model for model in models if model not in local_models]
+        if missing:
+            print("Missing models in Ollama: " + ", ".join(missing))
+            return 1
+
+    report = {
+        "provider": provider,
+        "model_timeout_seconds": int(args.model_timeout),
+        "attempts": int(args.attempts),
+        "seed": int(args.seed),
+        "num_predict": int(args.num_predict),
+        "models": [
+            _probe_model_stability(
+                client=client,
+                model=model,
+                attempts=args.attempts,
+                seed=args.seed,
+                num_predict=args.num_predict,
+            )
+            for model in models
+        ],
+    }
+
+    if args.out:
+        out_path = Path(args.out)
+        out_path.parent.mkdir(parents=True, exist_ok=True)
+        out_path.write_text(json.dumps(report, indent=2), encoding="utf-8")
+
+    all_stable = True
+    for item in report["models"]:
+        status = "stable" if item["stable"] else "UNSTABLE"
+        print(
+            f"{item['model']}: {status} "
+            f"(successes={item['success_count']}/{item['attempts']}, "
+            f"errors={item['error_count']}, avg_latency={item['avg_latency_seconds']})"
+        )
+        if item["responses"]:
+            print("  responses: " + ", ".join(item["responses"]))
+        if item["errors"]:
+            print("  last_error: " + item["errors"][-1])
+        all_stable = all_stable and bool(item["stable"])
+
+    if all_stable:
+        print("Backend preflight passed. Stability is sufficient for local verification.")
+        return 0
+
+    print(
+        "Backend preflight failed. Local backend stability is insufficient for strict local "
+        "verification; do not claim strict reproducibility from this run."
+    )
+    return 1
+
+
 def cmd_run(args: argparse.Namespace) -> int:
     try:
         models = _parse_models(args.models)
@@ -220,7 +726,11 @@ def cmd_run(args: argparse.Namespace) -> int:
 
     run_modes = _parse_run_modes(args.run_modes)
     try:
-        seeds = _parse_seeds(args.seeds, fallback_seed=args.seed)
+        seeds = _resolve_run_seeds(
+            seed=args.seed,
+            seeds_raw=args.seeds,
+            replicates=args.replicates,
+        )
     except ValueError as exc:
         print(str(exc))
         return 1
@@ -228,14 +738,28 @@ def cmd_run(args: argparse.Namespace) -> int:
     if args.max_turns < 1:
         print("--max-turns must be >= 1")
         return 1
+    if args.test_timeout < 1:
+        print("--test-timeout must be >= 1")
+        return 1
+    if args.model_retries < 0:
+        print("--model-retries must be >= 0")
+        return 1
+    if args.model_retry_backoff < 0:
+        print("--model-retry-backoff must be >= 0")
+        return 1
     if args.tasks and args.suite:
         print("--tasks provided; ignoring --suite for task selection.")
+
+    model_timeout_seconds = args.model_timeout
+    if args.timeout is not None:
+        print("`--timeout` is deprecated; use `--model-timeout`.", file=sys.stderr)
+        model_timeout_seconds = args.timeout
 
     try:
         if mentor_provider == worker_provider:
             shared_client = build_client(
                 provider=mentor_provider,
-                timeout_seconds=args.timeout,
+                timeout_seconds=model_timeout_seconds,
                 reasoning_level=args.reasoning_level,
             )
             mentor_client = shared_client
@@ -243,12 +767,12 @@ def cmd_run(args: argparse.Namespace) -> int:
         else:
             mentor_client = build_client(
                 provider=mentor_provider,
-                timeout_seconds=args.timeout,
+                timeout_seconds=model_timeout_seconds,
                 reasoning_level=args.reasoning_level,
             )
             worker_client = build_client(
                 provider=worker_provider,
-                timeout_seconds=args.timeout,
+                timeout_seconds=model_timeout_seconds,
                 reasoning_level=args.reasoning_level,
             )
     except RuntimeError as exc:
@@ -303,7 +827,10 @@ def cmd_run(args: argparse.Namespace) -> int:
         stronger_worker_model=args.stronger_worker_model,
         worker_num_predict_override=args.worker_num_predict,
         mentor_num_predict_override=args.mentor_num_predict,
-        timeout_seconds=args.timeout,
+        timeout_seconds=model_timeout_seconds,
+        test_timeout_seconds=args.test_timeout,
+        model_retry_attempts=args.model_retries,
+        model_retry_backoff_seconds=args.model_retry_backoff,
     )
 
     try:
@@ -316,6 +843,13 @@ def cmd_run(args: argparse.Namespace) -> int:
             )
         else:
             results = run_benchmark(config, mentor_client=mentor_client, worker_client=worker_client)
+    except KeyboardInterrupt:
+        checkpoint_path = config.results_path.with_name(f"{config.results_path.stem}.checkpoint.jsonl")
+        print(
+            "Benchmark interrupted. Completed units remain in the checkpoint log and can be resumed "
+            f"by rerunning the same command with the same --results-path.\nCheckpoint JSONL: {checkpoint_path}"
+        )
+        return 130
     except (ValueError, RuntimeError) as exc:
         print(str(exc))
         return 1
@@ -331,6 +865,8 @@ def cmd_run(args: argparse.Namespace) -> int:
         print(f"- {mode}: {count}")
     print(f"Results JSON: {config.results_path}")
     print(f"Leaderboard: {config.results_path.parent / 'leaderboard.md'}")
+    checkpoint_path = config.results_path.with_name(f"{config.results_path.stem}.checkpoint.jsonl")
+    print(f"Checkpoint JSONL: {checkpoint_path}")
     if args.debug:
         _print_debug_report(results)
     return 0
@@ -430,6 +966,148 @@ def cmd_analyze(args: argparse.Namespace) -> int:
     print(
         f"Bootstrap: samples={analysis.get('bootstrap_samples')} seed={analysis.get('bootstrap_seed')}"
     )
+    return 0
+
+
+def cmd_audit(args: argparse.Namespace) -> int:
+    results_path = Path(args.results)
+    if not results_path.exists():
+        print(f"Results file not found: {results_path}")
+        return 1
+
+    try:
+        payload = json.loads(results_path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as exc:
+        print(f"Invalid JSON at {results_path}: {exc}")
+        return 1
+
+    if not isinstance(payload, dict):
+        print("Results payload must be a JSON object.")
+        return 1
+
+    runs = _iter_runs(payload)
+    if not runs:
+        print("Results payload contains no runs to audit.")
+        return 1
+
+    checks = [
+        ("real patches generated", _audit_patch_hashes(runs)),
+        ("tests executed", _audit_tests_executed(runs)),
+        ("baseline computed", _audit_baseline_reuse(runs)),
+        ("runtime distribution plausible", _audit_runtime_distribution(runs)),
+        ("artifact integrity verified", _audit_commit_metadata(payload)),
+    ]
+
+    all_ok = True
+    for label, (ok, detail) in checks:
+        prefix = "✓" if ok else "✗"
+        print(f"{prefix} {label}")
+        print(f"  {detail}")
+        if not ok:
+            all_ok = False
+
+    return 0 if all_ok else 1
+
+
+def cmd_healthcheck(args: argparse.Namespace) -> int:
+    results_path = Path(args.results)
+    if not results_path.exists():
+        print(f"Results file not found: {results_path}")
+        return 1
+
+    try:
+        payload = json.loads(results_path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as exc:
+        print(f"Invalid JSON at {results_path}: {exc}")
+        return 1
+
+    if not isinstance(payload, dict):
+        print("Results payload must be a JSON object.")
+        return 1
+
+    runs = _iter_runs(payload)
+    if not runs:
+        print("Results payload contains no runs.")
+        return 1
+
+    baseline_runs = [run for run in runs if str(run.get("mode")) == "worker_only"]
+    analyzed_runs = baseline_runs if baseline_runs else runs
+    analyzed_label = "baseline worker_only" if baseline_runs else "all modes (fallback)"
+
+    difficulty_lookup = _task_difficulty_lookup(payload, runs)
+    task_ids = sorted(
+        {
+            str(run.get("task_id"))
+            for run in runs
+            if isinstance(run.get("task_id"), str) and str(run.get("task_id"))
+        }
+    )
+    difficulty_counts: Counter[str] = Counter(
+        difficulty_lookup.get(task_id, "unknown") for task_id in task_ids
+    )
+
+    pass_rates = _per_task_pass_rates(analyzed_runs)
+    pass_histogram = _percent_histogram(pass_rates)
+    solved_rate = mean(pass_rates) if pass_rates else 0.0
+
+    seed_means, seed_variance = _baseline_seed_stats(baseline_runs)
+
+    lifts = _mentor_lifts(runs)
+    lift_mean = mean(lifts) if lifts else 0.0
+    lift_variance = pvariance(lifts) if len(lifts) > 1 else 0.0
+    lift_sign_counts = {
+        "negative": sum(1 for value in lifts if value < 0.0),
+        "zero": sum(1 for value in lifts if value == 0.0),
+        "positive": sum(1 for value in lifts if value > 0.0),
+    }
+
+    print("Benchmark Healthcheck")
+    print(f"Results: {results_path}")
+    print(f"Runs analyzed: {len(runs)}")
+    print(f"Pass-rate basis: {analyzed_label}")
+
+    print("\nTask difficulty distribution:")
+    for difficulty, count in sorted(difficulty_counts.items()):
+        print(f"- {difficulty}: {count}")
+
+    print("\nPass-rate histogram (per-task):")
+    for bucket, count in pass_histogram.items():
+        print(f"- {bucket}: {count}")
+    print(f"- solved_rate_mean: {solved_rate:.4f}")
+
+    print("\nBaseline variance across seeds:")
+    if seed_means:
+        for seed, rate in seed_means.items():
+            print(f"- seed {seed}: {rate:.4f}")
+        print(f"- variance: {seed_variance:.8f}")
+    else:
+        print("- no baseline worker_only runs found")
+
+    print("\nMentor lift distribution:")
+    print(f"- sample_count: {len(lifts)}")
+    print(f"- mean: {lift_mean:.4f}")
+    print(f"- variance: {lift_variance:.8f}")
+    print(f"- negative: {lift_sign_counts['negative']}")
+    print(f"- zero: {lift_sign_counts['zero']}")
+    print(f"- positive: {lift_sign_counts['positive']}")
+
+    warnings: list[str] = []
+    if solved_rate > 0.80:
+        warnings.append(
+            f"Benchmark may be too easy: solved_rate_mean={solved_rate:.2%} (>80%)."
+        )
+    if solved_rate < 0.05:
+        warnings.append(
+            f"Benchmark may be too hard: solved_rate_mean={solved_rate:.2%} (<5%)."
+        )
+
+    if warnings:
+        print("\nWarnings:")
+        for warning in warnings:
+            print(f"- WARNING: {warning}")
+    else:
+        print("\nWarnings:\n- none")
+
     return 0
 
 
@@ -538,6 +1216,24 @@ def build_parser() -> argparse.ArgumentParser:
     setup.add_argument("--skip-pull", action="store_true", help="Skip `ollama pull` checks.")
     setup.set_defaults(func=cmd_setup)
 
+    preflight = subparsers.add_parser(
+        "preflight",
+        help="Probe backend stability for lightweight local verification.",
+    )
+    preflight.add_argument("--models", default="phi3:mini,llama3.1:8b")
+    preflight.add_argument(
+        "--provider",
+        choices=SUPPORTED_PROVIDERS,
+        default="ollama",
+        help="Provider to probe (default: ollama).",
+    )
+    preflight.add_argument("--model-timeout", type=int, default=30)
+    preflight.add_argument("--attempts", type=int, default=2)
+    preflight.add_argument("--seed", type=int, default=1337)
+    preflight.add_argument("--num-predict", type=int, default=24)
+    preflight.add_argument("--out", default=None, help="Optional JSON path for the preflight report.")
+    preflight.set_defaults(func=cmd_preflight)
+
     run = subparsers.add_parser("run", help="Run benchmark suites and ablations.")
     run.add_argument("--models", default="default", help="Comma-separated model list or `default`.")
     run.add_argument(
@@ -609,6 +1305,15 @@ def build_parser() -> argparse.ArgumentParser:
             "When set, --seed is ignored."
         ),
     )
+    run.add_argument(
+        "--replicates",
+        type=int,
+        default=1,
+        help=(
+            "Number of deterministic replicate seeds to run (derived from --seed). "
+            "Cannot be combined with --seeds."
+        ),
+    )
     run.add_argument("--repro", action="store_true", help="Enable deterministic reproducibility mode.")
     run.add_argument(
         "--run-modes",
@@ -623,8 +1328,44 @@ def build_parser() -> argparse.ArgumentParser:
         default=None,
         help="Optional explicit stronger worker model to use when run mode includes stronger_worker.",
     )
-    run.add_argument("--results-path", default="results/results.json")
-    run.add_argument("--timeout", type=int, default=180)
+    run.add_argument(
+        "--results-path",
+        default="results/results.json",
+        help=(
+            "Final results JSON path. Resume state is stored alongside it as "
+            "<stem>.checkpoint.jsonl; multi-seed runs also emit <stem>.seed-<seed>.json."
+        ),
+    )
+    run.add_argument(
+        "--model-timeout",
+        type=int,
+        default=180,
+        help="Per-model-call timeout in seconds.",
+    )
+    run.add_argument(
+        "--test-timeout",
+        type=int,
+        default=8,
+        help="Per-pytest execution timeout in seconds.",
+    )
+    run.add_argument(
+        "--timeout",
+        type=int,
+        default=None,
+        help="Deprecated alias for --model-timeout.",
+    )
+    run.add_argument(
+        "--model-retries",
+        type=int,
+        default=1,
+        help="Bounded retry count for transient backend timeouts/errors.",
+    )
+    run.add_argument(
+        "--model-retry-backoff",
+        type=float,
+        default=1.0,
+        help="Base backoff in seconds between transient model-call retries.",
+    )
     run.add_argument(
         "--debug",
         action="store_true",
@@ -697,6 +1438,20 @@ def build_parser() -> argparse.ArgumentParser:
         help="Optional base bootstrap seed override (deterministic if omitted).",
     )
     analyze.set_defaults(func=cmd_analyze)
+
+    audit = subparsers.add_parser(
+        "audit",
+        help="Verify harness integrity signals in a benchmark results JSON artifact.",
+    )
+    audit.add_argument("results", help="Path to benchmark results JSON.")
+    audit.set_defaults(func=cmd_audit)
+
+    healthcheck = subparsers.add_parser(
+        "healthcheck",
+        help="Compute benchmark health diagnostics from a results JSON artifact.",
+    )
+    healthcheck.add_argument("--results", default="results/results.json")
+    healthcheck.set_defaults(func=cmd_healthcheck)
 
     export = subparsers.add_parser("export", help="Export a standardized submission zip from results.json.")
     export.add_argument("--results", default="results/results.json")

@@ -86,6 +86,12 @@ def validate_results_payload(payload: dict[str, Any]) -> list[str]:
         timeout_seconds = config.get("timeout_seconds")
         if timeout_seconds is not None and not isinstance(timeout_seconds, int):
             errors.append("results.config.timeout_seconds must be an integer when present")
+        model_timeout_seconds = config.get("model_timeout_seconds")
+        if model_timeout_seconds is not None and not isinstance(model_timeout_seconds, int):
+            errors.append("results.config.model_timeout_seconds must be an integer when present")
+        test_timeout_seconds = config.get("test_timeout_seconds")
+        if test_timeout_seconds is not None and not isinstance(test_timeout_seconds, int):
+            errors.append("results.config.test_timeout_seconds must be an integer when present")
         task_pack_version = config.get("task_pack_version")
         if task_pack_version is not None and not isinstance(task_pack_version, str):
             errors.append("results.config.task_pack_version must be a string when present")
@@ -250,7 +256,8 @@ def _infer_cli_command(results_payload: dict[str, Any]) -> str:
     task_pack_source = str(config.get("task_pack_source", "builtin"))
     task_pack_manifest_path = str(config.get("task_pack_manifest_path", ""))
     repro = bool(config.get("repro_mode", False))
-    timeout_seconds = config.get("timeout_seconds", 180)
+    model_timeout_seconds = config.get("model_timeout_seconds", config.get("timeout_seconds", 180))
+    test_timeout_seconds = config.get("test_timeout_seconds", 8)
 
     command = [
         "python -m mentor_worker_benchmark run",
@@ -260,7 +267,8 @@ def _infer_cli_command(results_payload: dict[str, Any]) -> str:
         f"--run-modes {','.join(str(item) for item in run_modes) if run_modes else 'default'}",
         f"--seed {seed}",
         f"--max-turns {max_turns}",
-        f"--timeout {timeout_seconds}",
+        f"--model-timeout {model_timeout_seconds}",
+        f"--test-timeout {test_timeout_seconds}",
         "--results-path results/results.json",
     ]
     if provider:
@@ -386,9 +394,16 @@ def _normalize_compute_budget_for_manifest(payload: dict[str, Any]) -> dict[str,
     max_turns = _safe_int(budget.get("max_turns"))
     if max_turns is None:
         max_turns = _safe_int(config.get("max_turns"))
-    timeout_seconds = _safe_int(budget.get("timeout_seconds"))
-    if timeout_seconds is None:
-        timeout_seconds = _safe_int(config.get("timeout_seconds"))
+    model_timeout_seconds = _safe_int(budget.get("model_timeout_seconds"))
+    if model_timeout_seconds is None:
+        model_timeout_seconds = _safe_int(budget.get("timeout_seconds"))
+    if model_timeout_seconds is None:
+        model_timeout_seconds = _safe_int(config.get("model_timeout_seconds"))
+    if model_timeout_seconds is None:
+        model_timeout_seconds = _safe_int(config.get("timeout_seconds"))
+    test_timeout_seconds = _safe_int(budget.get("test_timeout_seconds"))
+    if test_timeout_seconds is None:
+        test_timeout_seconds = _safe_int(config.get("test_timeout_seconds"))
 
     total_calls = _safe_int(budget.get("total_model_calls_attempted"))
     if total_calls is None:
@@ -409,7 +424,9 @@ def _normalize_compute_budget_for_manifest(payload: dict[str, Any]) -> dict[str,
 
     return {
         "max_turns": int(max_turns) if max_turns is not None else 0,
-        "timeout_seconds": int(timeout_seconds) if timeout_seconds is not None else 0,
+        "timeout_seconds": int(model_timeout_seconds) if model_timeout_seconds is not None else 0,
+        "model_timeout_seconds": int(model_timeout_seconds) if model_timeout_seconds is not None else 0,
+        "test_timeout_seconds": int(test_timeout_seconds) if test_timeout_seconds is not None else 0,
         "total_model_calls_attempted": int(total_calls),
         "total_tokens_estimate": total_tokens,
         "total_wall_time_seconds": round(wall_value, 4),
@@ -430,6 +447,12 @@ def _validate_compute_budget_manifest(
         value = budget.get(key)
         if isinstance(value, bool) or not isinstance(value, int):
             errors.append(f"{path}.{key} must be an integer")
+    for optional_key in ("model_timeout_seconds", "test_timeout_seconds"):
+        if optional_key not in budget:
+            continue
+        value = budget.get(optional_key)
+        if isinstance(value, bool) or not isinstance(value, int):
+            errors.append(f"{path}.{optional_key} must be an integer")
 
     token_value = budget.get("total_tokens_estimate")
     if isinstance(token_value, str):
@@ -735,6 +758,11 @@ def verify_submission_bundle(submission_path: Path) -> dict[str, Any]:
         task_pack_hash = str(manifest.get("task_pack_hash", "")).strip()
         commit_hash = str(manifest.get("git_commit_hash", "")).strip()
         cli_command = str(manifest.get("cli_command", "")).strip()
+        results_config = results_payload.get("config", {})
+        if not isinstance(results_config, dict):
+            results_config = {}
+        results_task_pack = str(results_config.get("task_pack", "")).strip()
+        results_task_pack_version = str(results_config.get("task_pack_version", "")).strip()
 
         if not task_pack:
             errors.append("Manifest task_pack cannot be empty")
@@ -769,18 +797,18 @@ def verify_submission_bundle(submission_path: Path) -> dict[str, Any]:
                 discovered_version = resolve_task_pack_version(task_pack)
                 if not discovered_version:
                     errors.append(f"Task pack `{task_pack}` does not exist locally.")
-                elif task_pack_version and task_pack_version != discovered_version:
-                    errors.append(
-                        f"Manifest task_pack_version mismatch: bundle={task_pack_version}, local={discovered_version}"
-                    )
+                else:
+                    details["local_task_pack_version"] = discovered_version
+                    details["task_pack_version_matches_local"] = task_pack_version == discovered_version
 
-        results_config = results_payload.get("config", {})
-        if not isinstance(results_config, dict):
-            results_config = {}
-        results_task_pack = str(results_config.get("task_pack", "")).strip()
         if task_pack and results_task_pack and task_pack != results_task_pack:
             errors.append(
                 f"Task pack mismatch between manifest (`{task_pack}`) and results (`{results_task_pack}`)."
+            )
+        if task_pack_version and results_task_pack_version and task_pack_version != results_task_pack_version:
+            errors.append(
+                "Task pack version mismatch between manifest "
+                f"(`{task_pack_version}`) and results (`{results_task_pack_version}`)."
             )
         results_pack_source = str(results_config.get("task_pack_source", task_pack_source)).strip().lower()
         if task_pack_source and results_pack_source and task_pack_source != results_pack_source:
@@ -845,6 +873,15 @@ def render_verification_report(report: dict[str, Any]) -> str:
             lines.append(f"- Pip freeze hash: {details.get('pip_freeze_sha256')}")
         if details.get("task_pack_hash"):
             lines.append(f"- Pack hash: {details.get('task_pack_hash')}")
+        if (
+            details.get("local_task_pack_version")
+            and details.get("local_task_pack_version") != details.get("task_pack_version")
+        ):
+            lines.append(
+                "- Local pack version: "
+                f"{details.get('local_task_pack_version')} "
+                "(historical bundle differs from current local pack)"
+            )
         if details.get("official_submission"):
             lines.append(f"- Protocol: {details.get('official_protocol', 'legacy')}")
             if details.get("protocol_seed_count") is not None:

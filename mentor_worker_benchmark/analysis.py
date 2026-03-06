@@ -7,9 +7,9 @@ from math import ceil, floor
 from statistics import mean
 from typing import Any
 
-ANALYSIS_VERSION = "0.3.0"
-CI_METHOD = "bootstrap_percentile_95_task_within_replicate_pooled"
-PAIRED_SIGNIFICANCE_METHOD = "paired_bootstrap_over_tasks"
+ANALYSIS_VERSION = "0.4.0"
+CI_METHOD = "bootstrap_percentile_95_task_family_within_replicate_pooled"
+PAIRED_SIGNIFICANCE_METHOD = "paired_bootstrap_over_task_families"
 DEFAULT_BOOTSTRAP_SAMPLES = 2000
 
 
@@ -211,14 +211,24 @@ def _group_keys_for_replicate(replicate: dict[str, Any]) -> list[dict[str, Any]]
     return keys
 
 
-def _task_outcomes_for_mode(
+def _resampling_unit_id(run: dict[str, Any]) -> str | None:
+    family_id = run.get("task_family_id")
+    if isinstance(family_id, str) and family_id:
+        return family_id
+    task_id = run.get("task_id")
+    if isinstance(task_id, str) and task_id:
+        return task_id
+    return None
+
+
+def _resampling_unit_outcomes_for_mode(
     *,
     runs: list[dict[str, Any]],
     mode: str,
     worker_model: str,
     mentor_model: str,
 ) -> dict[str, float]:
-    by_task: dict[str, list[float]] = {}
+    by_unit: dict[str, list[float]] = {}
     for run in runs:
         if run.get("mode") != mode:
             continue
@@ -229,15 +239,15 @@ def _task_outcomes_for_mode(
             mentor = run.get("mentor_model")
             if not isinstance(mentor, str) or mentor != mentor_model:
                 continue
-        task_id = run.get("task_id")
-        if not isinstance(task_id, str) or not task_id:
+        unit_id = _resampling_unit_id(run)
+        if unit_id is None:
             continue
         passed = run.get("pass")
         if not isinstance(passed, bool):
             continue
-        by_task.setdefault(task_id, []).append(1.0 if passed else 0.0)
+        by_unit.setdefault(unit_id, []).append(1.0 if passed else 0.0)
 
-    return {task_id: mean(values) for task_id, values in by_task.items() if values}
+    return {unit_id: mean(values) for unit_id, values in by_unit.items() if values}
 
 
 def _percentile(sorted_values: list[float], quantile: float) -> float | None:
@@ -312,6 +322,15 @@ def _two_sided_pvalue(distribution: list[float]) -> float | None:
     return min(1.0, 2.0 * min(less_equal_zero, greater_equal_zero))
 
 
+def _one_sided_pvalue_lift_gt_zero(distribution: list[float]) -> float | None:
+    if not distribution:
+        return None
+    # Add-one smoothing avoids returning exactly 0.0 for finite bootstrap draws.
+    n = len(distribution)
+    non_positive = sum(1 for value in distribution if value <= 0.0)
+    return (non_positive + 1.0) / (n + 1.0)
+
+
 def generate_analysis_payload(
     results_payload: dict[str, Any],
     *,
@@ -361,7 +380,7 @@ def generate_analysis_payload(
             pass_rates_by_mode: dict[str, float | None] = {}
             task_counts_by_mode: dict[str, int] = {}
             for mode in run_modes:
-                outcomes = _task_outcomes_for_mode(
+                outcomes = _resampling_unit_outcomes_for_mode(
                     runs=runs,
                     mode=mode,
                     worker_model=worker_model,
@@ -393,6 +412,9 @@ def generate_analysis_payload(
                     "pass_rates_by_mode": {
                         mode: _round_or_none(pass_rates_by_mode.get(mode))
                         for mode in sorted(pass_rates_by_mode)
+                    },
+                    "effective_sample_size_by_mode": {
+                        mode: int(task_counts_by_mode.get(mode, 0)) for mode in sorted(task_counts_by_mode)
                     },
                     "task_counts_by_mode": {
                         mode: int(task_counts_by_mode.get(mode, 0)) for mode in sorted(task_counts_by_mode)
@@ -438,8 +460,13 @@ def generate_analysis_payload(
         lift_ci_excludes_zero = False
         if lift_ci_low is not None and lift_ci_high is not None:
             lift_ci_excludes_zero = lift_ci_low > 0.0 or lift_ci_high < 0.0
-        paired_pvalue = _two_sided_pvalue(lift_distribution)
-        paired_significant = bool(paired_pvalue is not None and paired_pvalue < 0.05)
+        paired_pvalue_two_sided = _two_sided_pvalue(lift_distribution)
+        paired_pvalue_lift_gt_zero = _one_sided_pvalue_lift_gt_zero(lift_distribution)
+        paired_significant = bool(
+            paired_pvalue_lift_gt_zero is not None
+            and paired_pvalue_lift_gt_zero < 0.05
+            and (lift_mean or 0.0) > 0.0
+        )
 
         groups_payload.append(
             {
@@ -460,12 +487,15 @@ def generate_analysis_payload(
                 "lift_ci_high": _round_or_none(lift_ci_high),
                 "lift_ci_excludes_zero": lift_ci_excludes_zero,
                 "lift_significant": lift_ci_excludes_zero,
+                "lift_p_value_gt_zero": _round_or_none(paired_pvalue_lift_gt_zero, 8),
                 "paired_significance": {
                     "method": PAIRED_SIGNIFICANCE_METHOD,
                     "significant": paired_significant,
-                    "p_value_two_sided": _round_or_none(paired_pvalue, 8),
+                    "p_value_two_sided": _round_or_none(paired_pvalue_two_sided, 8),
+                    "p_value_lift_gt_zero": _round_or_none(paired_pvalue_lift_gt_zero, 8),
                     "ci_low": _round_or_none(lift_ci_low),
                     "ci_high": _round_or_none(lift_ci_high),
+                    "unit_pair_count": int(sum(len(item) for item in replicate_pair_diffs)),
                     "task_pair_count": int(sum(len(item) for item in replicate_pair_diffs)),
                 },
                 "replicate_metrics": replicate_metrics,
@@ -575,6 +605,17 @@ def validate_analysis_payload(payload: dict[str, Any]) -> list[str]:
                             f"{path}.paired_significance.{paired_numeric}",
                             errors,
                         )
+                    _expect_number_or_none(
+                        paired.get("p_value_lift_gt_zero"),
+                        f"{path}.paired_significance.p_value_lift_gt_zero",
+                        errors,
+                    )
+
+            _expect_number_or_none(
+                item.get("lift_p_value_gt_zero"),
+                f"{path}.lift_p_value_gt_zero",
+                errors,
+            )
 
     return errors
 

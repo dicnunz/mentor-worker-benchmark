@@ -195,6 +195,25 @@ def test_official_role_classification_for_headline_and_sanity(
     assert sanity_normalized["official_role"] == "sanity"
 
 
+def test_submission_zip_discovery_recurses_into_archive_and_skips_local_temp(tmp_path: Path) -> None:
+    builder = _load_builder_module()
+
+    root_zip = tmp_path / "community_root.zip"
+    archive_zip = tmp_path / "archive" / "task_pack_v2_2.0.0" / "official_dev50.zip"
+    local_zip = tmp_path / "local_verification_dev10.zip"
+    tmp_zip = tmp_path / "archive" / "tmp_submission.zip"
+
+    archive_zip.parent.mkdir(parents=True, exist_ok=True)
+    root_zip.write_text("root", encoding="utf-8")
+    archive_zip.write_text("archive", encoding="utf-8")
+    local_zip.write_text("local", encoding="utf-8")
+    tmp_zip.write_text("tmp", encoding="utf-8")
+
+    discovered = builder._submission_zip_paths(tmp_path)
+
+    assert discovered == sorted([root_zip, archive_zip], key=lambda path: path.as_posix())
+
+
 def test_normalize_submission_surfaces_analysis_means_cis_and_significance(
     tmp_path: Path,
     monkeypatch: Any,
@@ -215,6 +234,8 @@ def test_normalize_submission_surfaces_analysis_means_cis_and_significance(
     assert normalized["mentored_ci_low"] <= normalized["mentored_ci_high"]
     assert normalized["lift_ci_low"] <= normalized["lift_ci_high"]
     assert isinstance(normalized["lift_significant"], bool)
+    assert isinstance(normalized["lift_p_value_gt_zero"], float)
+    assert 0.0 <= normalized["lift_p_value_gt_zero"] <= 1.0
     assert normalized["best_worker"]["baseline_pass_rate"] == normalized["baseline_mean"]
     assert normalized["best_worker"]["mentored_pass_rate"] == normalized["mentored_mean"]
     assert normalized["best_worker"]["lift"] == normalized["lift_mean"]

@@ -11,7 +11,13 @@ Primary question:
 - The worker is the only actor allowed to emit code changes.
 - The mentor is constrained to high-level natural language guidance; code-like output is blocked/sanitized and logged as a violation.
 - The worker output must be a unified diff patch applied inside an isolated task workspace.
-- Task outcome is objective: `pytest` pass/fail on task tests.
+- The worker sees the task prompt, local workspace snapshot, failing `pytest` output, and test files.
+- No internet access is allowed during execution.
+- Task outcome is objective: the bundled `pytest` suite is the evaluation oracle.
+
+Construct note:
+
+- This benchmark measures deterministic, test-driven repair ability under a visible local test oracle.
 
 Scored modes include:
 
@@ -40,6 +46,22 @@ Supported suites:
 Official headline suites are `dev`, `dev50`, and `test`.  
 Official sanity suites are `quick` and `dev10` (harness-health checks, not headline claims).
 
+### Operational Profiles
+
+The scientific construct is the same across profiles; the operational profile determines what is practical to run on a given machine.
+
+Local verification profile:
+- single-seed `quick` or `dev10`
+- intended for local release-health checks
+- sanctioned path on this 16 GB MacBook Air: `./scripts/run_local_verification.sh`
+- default local pair: `phi3:mini` worker + `phi3:mini` mentor
+- not sufficient for headline publication claims
+
+Headline publication profile:
+- official `dev` / `dev50` / `test` scripts
+- multi-seed when required by policy
+- scientifically valid for publication, but not a practical default local gate on this machine
+
 ### Multi-Seed Protocol
 
 Official headline protocol uses deterministic seeds:
@@ -59,13 +81,14 @@ Analysis (`python -m mentor_worker_benchmark analyze`) reports:
 
 Current CI method label:
 
-- `bootstrap_percentile_95_task_within_replicate_pooled`
+- `bootstrap_percentile_95_task_family_within_replicate_pooled`
 
 Paired significance method label:
 
-- `paired_bootstrap_over_tasks`
+- `paired_bootstrap_over_task_families`
 
 Bootstrap is deterministic; seed provenance is stored (`bootstrap_samples`, `bootstrap_seed`, per-group derived seeds).
+When exact duplicate task families exist in the source corpus, resampling is performed at the task-family level rather than the raw task row level to avoid inflated effective sample size.
 
 ### Determinism Guarantees
 
@@ -75,6 +98,33 @@ Given identical inputs (task pack contents, config, seeds, code revision), the b
 - reproducibility mode (`--repro`) with fixed generation settings,
 - deterministic replicate grouping and analysis seeding,
 - explicit environment/protocol metadata capture in results and exported bundles.
+
+Backend honesty:
+- strict reproducibility claims are conditional on backend stability
+- local verification should run `mentor_worker_benchmark preflight` first
+- if preflight fails or model-call retries are masking transport instability, report the run as operationally unstable rather than strictly reproducible
+
+### Timeout Semantics And Retries
+
+- `model_timeout_seconds` is the per-model-call timeout.
+- `test_timeout_seconds` is the per-`pytest` execution timeout.
+- The CLI propagates these separately to the backend client and the test harness.
+- Bounded retries apply only to transient backend failures (timeouts, connection resets/refusals, 502/503/504-style failures).
+- Non-transient backend errors are not retried.
+
+### Checkpointing And Resumability
+
+- The resumable unit is `(seed, mode, task_id, worker_model, mentor_model)`.
+- Single-seed runs persist completed units incrementally in `<results-stem>.checkpoint.jsonl`.
+- Multi-seed runs write `<results-stem>.seed-<seed>.json` after each completed seed before the final merged artifact is written.
+- Re-running the same command with the same `--results-path` deterministically skips completed units whose checkpoint metadata matches.
+- Checkpoint metadata includes the benchmark git commit and task-pack metadata, so resume is intentionally scoped to the same code/task-pack revision.
+- `benchmark_wall_time_seconds` is accumulated over completed units; `checkpointing.session_wall_time_seconds` captures only the current invocation.
+
+What is not resumable until the run completes:
+- final merged multi-seed `results.json`
+- exported submission bundles
+- derived markdown leaderboard artifacts
 
 ## Failure Accounting and Interpretation
 
@@ -90,7 +140,9 @@ Interpretation should always include both pass-rate/lift and failure diagnostics
 Compute budget metadata is recorded per run/export:
 
 - `max_turns`
-- `timeout_seconds`
+- `timeout_seconds` (legacy alias for model timeout)
+- `model_timeout_seconds`
+- `test_timeout_seconds`
 - `total_model_calls_attempted`
 - `total_tokens_estimate` (or `"unavailable"`)
 - `total_wall_time_seconds`
@@ -125,6 +177,8 @@ What these gates do not guarantee:
 
 ## Pack Registry, External Packs, and Contamination
 
+For `task_pack_v2`, the active release pack contains `473` exact-family-independent tasks selected from a `652`-task generated source corpus. The source corpus audit detected `38` exact duplicate families; split hardening removes those duplicates from the active evaluation corpus by keeping one representative per exact family.
+
 Built-in packs are declared in `mentor_worker_benchmark/packs/registry.json` with data-card fields (license, intended use, limitations, contamination risks, recommendations).
 
 Pack selection supports:
@@ -145,3 +199,4 @@ Contamination remains a limitation:
 
 - task generation is synthetic, but overlap with pretraining patterns cannot be fully excluded;
 - claims should be bounded to measured benchmark behavior and not over-generalized to all software engineering tasks.
+- the task corpus, tests, and exported submission bundles are open, so leaderboard-specific overfitting is possible and headline numbers should not be interpreted as hidden-holdout estimates.

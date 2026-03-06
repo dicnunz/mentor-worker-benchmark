@@ -22,7 +22,7 @@
     {
       "submission_id": "community_quick_signal_qwen25coder7b_gemma29b_2026-03-04",
       "submission_file": "community_quick_signal_qwen25coder7b_gemma29b_2026-03-04.zip",
-      "submission_path": "submissions/community_quick_signal_qwen25coder7b_gemma29b_2026-03-04.zip",
+      "submission_path": "submissions/archive/task_pack_v2_2.0.0/community_quick_signal_qwen25coder7b_gemma29b_2026-03-04.zip",
       "official_submission": false,
       "submission_label": "community (not official)",
       "official_role": "community",
@@ -89,6 +89,7 @@
       "lift_ci_low": -0.1,
       "lift_ci_high": 0.0,
       "lift_significant": false,
+      "lift_p_value_gt_zero": 0.0,
       "best_worker": {
         "worker_model": "qwen2.5-coder:7b",
         "baseline_pass_rate": 0.1667,
@@ -106,7 +107,7 @@
     {
       "submission_id": "official_dev50_signal_qwen_llama",
       "submission_file": "official_dev50_signal_qwen_llama.zip",
-      "submission_path": "submissions/official_dev50_signal_qwen_llama.zip",
+      "submission_path": "submissions/archive/task_pack_v2_2.0.0/official_dev50_signal_qwen_llama.zip",
       "official_submission": true,
       "submission_label": "official",
       "official_role": "headline",
@@ -175,6 +176,7 @@
       "lift_ci_low": 0.0,
       "lift_ci_high": 0.0,
       "lift_significant": false,
+      "lift_p_value_gt_zero": 0.0,
       "best_worker": {
         "worker_model": "qwen2.5-coder:7b",
         "baseline_pass_rate": 0.0,
@@ -192,7 +194,7 @@
     {
       "submission_id": "community_quick_signal_qwen25coder7b_llama318b_2026-03-03",
       "submission_file": "community_quick_signal_qwen25coder7b_llama318b_2026-03-03.zip",
-      "submission_path": "submissions/community_quick_signal_qwen25coder7b_llama318b_2026-03-03.zip",
+      "submission_path": "submissions/archive/task_pack_v2_2.0.0/community_quick_signal_qwen25coder7b_llama318b_2026-03-03.zip",
       "official_submission": false,
       "submission_label": "community (not official)",
       "official_role": "community",
@@ -253,6 +255,7 @@
       "lift_ci_low": 0.0,
       "lift_ci_high": 0.1,
       "lift_significant": false,
+      "lift_p_value_gt_zero": 0.0,
       "best_worker": {
         "worker_model": "qwen2.5-coder:7b",
         "baseline_pass_rate": 0.1667,
@@ -270,7 +273,7 @@
     {
       "submission_id": "community_quick_signal_qwen25coder7b_deepseekcoder67b_2026-03-03",
       "submission_file": "community_quick_signal_qwen25coder7b_deepseekcoder67b_2026-03-03.zip",
-      "submission_path": "submissions/community_quick_signal_qwen25coder7b_deepseekcoder67b_2026-03-03.zip",
+      "submission_path": "submissions/archive/task_pack_v2_2.0.0/community_quick_signal_qwen25coder7b_deepseekcoder67b_2026-03-03.zip",
       "official_submission": false,
       "submission_label": "community (not official)",
       "official_role": "community",
@@ -335,6 +338,7 @@
       "lift_ci_low": -0.1,
       "lift_ci_high": 0.0,
       "lift_significant": false,
+      "lift_p_value_gt_zero": 0.0,
       "best_worker": {
         "worker_model": "qwen2.5-coder:7b",
         "baseline_pass_rate": 0.1667,
@@ -352,7 +356,7 @@
     {
       "submission_id": "community_quick_signal_qwen25coder7b_qwen25coder7b_2026-03-03",
       "submission_file": "community_quick_signal_qwen25coder7b_qwen25coder7b_2026-03-03.zip",
-      "submission_path": "submissions/community_quick_signal_qwen25coder7b_qwen25coder7b_2026-03-03.zip",
+      "submission_path": "submissions/archive/task_pack_v2_2.0.0/community_quick_signal_qwen25coder7b_qwen25coder7b_2026-03-03.zip",
       "official_submission": false,
       "submission_label": "community (not official)",
       "official_role": "community",
@@ -412,6 +416,7 @@
       "lift_ci_low": 0.0,
       "lift_ci_high": 0.0,
       "lift_significant": false,
+      "lift_p_value_gt_zero": 0.0,
       "best_worker": {
         "worker_model": "qwen2.5-coder:7b",
         "baseline_pass_rate": 0.1667,
@@ -429,7 +434,7 @@
     {
       "submission_id": "community_quick_signal_qwen25coder7b_mistral7b_2026-03-03",
       "submission_file": "community_quick_signal_qwen25coder7b_mistral7b_2026-03-03.zip",
-      "submission_path": "submissions/community_quick_signal_qwen25coder7b_mistral7b_2026-03-03.zip",
+      "submission_path": "submissions/archive/task_pack_v2_2.0.0/community_quick_signal_qwen25coder7b_mistral7b_2026-03-03.zip",
       "official_submission": false,
       "submission_label": "community (not official)",
       "official_role": "community",
@@ -494,6 +499,7 @@
       "lift_ci_low": -0.1,
       "lift_ci_high": 0.0,
       "lift_significant": false,
+      "lift_p_value_gt_zero": 0.0,
       "best_worker": {
         "worker_model": "qwen2.5-coder:7b",
         "baseline_pass_rate": 0.1667,
@@ -513,7 +519,7 @@
     {
       "submission_id": "official_dev50_signal_qwen_llama",
       "submission_file": "official_dev50_signal_qwen_llama.zip",
-      "submission_path": "submissions/official_dev50_signal_qwen_llama.zip",
+      "submission_path": "submissions/archive/task_pack_v2_2.0.0/official_dev50_signal_qwen_llama.zip",
       "official_submission": true,
       "submission_label": "official",
       "official_role": "headline",
@@ -582,6 +588,7 @@
       "lift_ci_low": 0.0,
       "lift_ci_high": 0.0,
       "lift_significant": false,
+      "lift_p_value_gt_zero": 0.0,
       "best_worker": {
         "worker_model": "qwen2.5-coder:7b",
         "baseline_pass_rate": 0.0,
@@ -602,7 +609,7 @@
     {
       "submission_id": "official_dev50_signal_qwen_llama",
       "submission_file": "official_dev50_signal_qwen_llama.zip",
-      "submission_path": "submissions/official_dev50_signal_qwen_llama.zip",
+      "submission_path": "submissions/archive/task_pack_v2_2.0.0/official_dev50_signal_qwen_llama.zip",
       "official_submission": true,
       "submission_label": "official",
       "official_role": "headline",
@@ -671,6 +678,7 @@
       "lift_ci_low": 0.0,
       "lift_ci_high": 0.0,
       "lift_significant": false,
+      "lift_p_value_gt_zero": 0.0,
       "best_worker": {
         "worker_model": "qwen2.5-coder:7b",
         "baseline_pass_rate": 0.0,

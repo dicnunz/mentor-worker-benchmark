@@ -28,6 +28,27 @@ def parse_seed_list(raw: str) -> list[int]:
     return seeds
 
 
+def expand_replicate_seeds(*, base_seed: int, replicates: int) -> list[int]:
+    if replicates < 1:
+        raise ValueError("replicates must be >= 1")
+
+    seeds: list[int] = [int(base_seed)]
+    seen = {int(base_seed)}
+    for index in range(1, replicates):
+        nonce = 0
+        while True:
+            digest = hashlib.sha256(
+                f"replicate|{base_seed}|{index}|{nonce}".encode("utf-8")
+            ).hexdigest()
+            candidate = int(digest[:8], 16)
+            if candidate not in seen:
+                seen.add(candidate)
+                seeds.append(candidate)
+                break
+            nonce += 1
+    return seeds
+
+
 def canonical_json(value: Any) -> str:
     return json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=True)
 

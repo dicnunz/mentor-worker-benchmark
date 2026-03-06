@@ -1,1 +1,0 @@
-RULE:unused_import|SEVERITY:warn|FILE:willow.py|LINE:45\nRULE:unsafe_eval|SEVERITY:error|FILE:quartz.py|LINE:55\nRULE:line_too_long|SEVERITY:info|FILE:willow.py|LINE:65\nRULE:unused_import|SEVERITY:warn|FILE:quartz.py|LINE:75\n

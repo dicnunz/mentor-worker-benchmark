@@ -14,11 +14,13 @@ from statistics import mean
 from typing import Any, Literal
 
 from mentor_worker_benchmark import __version__
+from mentor_worker_benchmark.checkpointing import BenchmarkCheckpointStore, RunUnitKey
 from mentor_worker_benchmark.llm_client import LLMClient
 from mentor_worker_benchmark.ollama_client import OllamaClient
 from mentor_worker_benchmark.protocol import deterministic_run_group_id
 from mentor_worker_benchmark.tasks.task_codegen_py.harness import (
     materialize_task,
+    normalize_pytest_output,
     project_snapshot,
     read_task_prompt,
     run_pytest,
@@ -102,6 +104,9 @@ class BenchmarkConfig:
     worker_num_predict_override: int | None = None
     mentor_num_predict_override: int | None = None
     timeout_seconds: int = 180
+    test_timeout_seconds: int = 8
+    model_retry_attempts: int = 1
+    model_retry_backoff_seconds: float = 1.0
 
 
 @dataclass(slots=True)
@@ -171,6 +176,113 @@ def _seed_for_call(base_seed: int, *parts: str) -> int:
     joined = "|".join(parts)
     digest = hashlib.sha256(f"{base_seed}|{joined}".encode("utf-8")).hexdigest()
     return int(digest[:8], 16)
+
+
+def _checkpoint_path_for_results(results_path: Path) -> Path:
+    return results_path.with_name(f"{results_path.stem}.checkpoint.jsonl")
+
+
+def _seed_results_path(results_path: Path, seed: int) -> Path:
+    return results_path.with_name(f"{results_path.stem}.seed-{int(seed)}{results_path.suffix}")
+
+
+def _run_unit_key(
+    *,
+    seed: int,
+    mode: str,
+    task_id: str,
+    worker_model: str,
+    mentor_model: str | None,
+) -> RunUnitKey:
+    return RunUnitKey(
+        seed=int(seed),
+        mode=mode,
+        task_id=task_id,
+        worker_model=worker_model,
+        mentor_model=mentor_model,
+    )
+
+
+def _run_pytest_deterministic(
+    workdir: Path,
+    *,
+    evaluation_seed: int,
+    timeout_seconds: int,
+) -> Any:
+    result = run_pytest(
+        workdir,
+        timeout_seconds=timeout_seconds,
+        pythonhashseed=evaluation_seed,
+    )
+    normalized_output = normalize_pytest_output(result.output)
+    if normalized_output == result.output:
+        return result
+    return replace(result, output=normalized_output)
+
+
+def _is_transient_model_error(message: str) -> bool:
+    lowered = message.lower()
+    transient_markers = (
+        "timed out",
+        "timeout",
+        "connection refused",
+        "connection reset",
+        "temporarily unavailable",
+        "http 502",
+        "http 503",
+        "http 504",
+        "unexpected ollama response format",
+    )
+    return any(marker in lowered for marker in transient_markers)
+
+
+def _call_model_with_retries(
+    *,
+    client: LLMClient,
+    retry_attempts: int,
+    retry_backoff_seconds: float,
+    **chat_kwargs: Any,
+) -> tuple[str, str | None, int]:
+    attempts = 0
+    max_attempts = max(1, 1 + int(retry_attempts))
+    last_error: str | None = None
+
+    while attempts < max_attempts:
+        attempts += 1
+        try:
+            return client.chat(**chat_kwargs), None, attempts - 1
+        except RuntimeError as exc:
+            last_error = str(exc)
+            if attempts >= max_attempts or not _is_transient_model_error(last_error):
+                break
+            backoff = max(0.0, float(retry_backoff_seconds)) * attempts
+            if backoff > 0:
+                time.sleep(backoff)
+
+    assert last_error is not None  # pragma: no cover - guarded by RuntimeError branch above
+    return "", last_error, attempts - 1
+
+
+def _hash_patch_text(patch_text: str | None) -> str | None:
+    if patch_text is None:
+        return None
+    return hashlib.sha256(patch_text.encode("utf-8")).hexdigest()
+
+
+def _is_patch_text_valid_length(patch_text: str | None) -> bool:
+    if patch_text is None:
+        return False
+    return len(patch_text.strip()) >= 5
+
+
+def _assert_tests_executed(test_result: Any, *, task_id: str, mode: str, phase: str) -> None:
+    tests_executed = int(getattr(test_result, "tests_executed", 0) or 0)
+    if tests_executed <= 0:
+        raise RuntimeError(
+            "No tests executed for "
+            f"task `{task_id}` (mode={mode}, phase={phase}). "
+            "Aborting benchmark run."
+        )
 
 
 def _normalize_patch_path(raw_path: str) -> str | None:
@@ -676,12 +788,22 @@ def _baseline_run(
     worker_model: str,
     task_prompt: str,
     task_id: str,
+    task_family_id: str | None,
     worker_template: str,
     workdir: Path,
     generation: GenerationSettings,
+    test_timeout_seconds: int,
+    model_retry_attempts: int,
+    model_retry_backoff_seconds: float,
 ) -> dict[str, Any]:
     start = time.perf_counter()
-    initial_tests = run_pytest(workdir)
+    evaluation_seed = _seed_for_call(generation.seed, "evaluation", "worker_only", worker_model, task_id)
+    initial_tests = _run_pytest_deterministic(
+        workdir,
+        evaluation_seed=evaluation_seed,
+        timeout_seconds=test_timeout_seconds,
+    )
+    _assert_tests_executed(initial_tests, task_id=task_id, mode="worker_only", phase="initial")
     snapshot = project_snapshot(workdir)
     worker_prompt = _render_worker_prompt(
         template=worker_template,
@@ -692,30 +814,44 @@ def _baseline_run(
     )
 
     worker_seed = _seed_for_call(generation.seed, "worker_only", worker_model, task_id)
-    worker_error: str | None = None
-    try:
-        worker_response = client.chat(
-            model=worker_model,
-            messages=[{"role": "user", "content": worker_prompt}],
-            system=WORKER_SYSTEM_PROMPT,
-            temperature=generation.temperature,
-            top_p=generation.top_p,
-            num_predict=generation.worker_num_predict,
-            seed=worker_seed,
-        )
-    except RuntimeError as exc:
-        worker_response = f"[worker_error] {exc}"
-        worker_error = str(exc)
+    worker_response, worker_error, worker_retry_count = _call_model_with_retries(
+        client=client,
+        retry_attempts=model_retry_attempts,
+        retry_backoff_seconds=model_retry_backoff_seconds,
+        model=worker_model,
+        messages=[{"role": "user", "content": worker_prompt}],
+        system=WORKER_SYSTEM_PROMPT,
+        temperature=generation.temperature,
+        top_p=generation.top_p,
+        num_predict=generation.worker_num_predict,
+        seed=worker_seed,
+    )
+    if worker_error:
+        worker_response = f"[worker_error] {worker_error}"
 
     extracted = _extract_diff(worker_response)
+    patch_hash = _hash_patch_text(extracted)
+    patch_length = len(extracted.strip()) if extracted else 0
+    patch_valid_length = _is_patch_text_valid_length(extracted)
     patch_applied = False
     patch_log = "No valid unified diff found in worker response."
-    if extracted:
+    if extracted and not patch_valid_length:
+        patch_log = "Patch too short (<5 chars); marked invalid."
+    elif extracted:
         patch_applied, patch_log = _apply_patch(workdir, extracted)
     elif worker_error:
         patch_log = worker_error
 
-    final_tests = run_pytest(workdir)
+    final_tests = (
+        initial_tests
+        if not patch_applied
+        else _run_pytest_deterministic(
+            workdir,
+            evaluation_seed=evaluation_seed,
+            timeout_seconds=test_timeout_seconds,
+        )
+    )
+    _assert_tests_executed(final_tests, task_id=task_id, mode="worker_only", phase="final")
     elapsed = time.perf_counter() - start
 
     total_tokens = (
@@ -728,23 +864,63 @@ def _baseline_run(
     return {
         "mode": "worker_only",
         "task_id": task_id,
+        "task_family_id": task_family_id,
+        "seed": generation.seed,
+        "evaluation_seed": evaluation_seed,
         "worker_model": worker_model,
         "mentor_model": None,
         "pass": final_tests.passed,
         "turns_used": 1,
         "wall_time_seconds": round(elapsed, 4),
         "total_tokens_estimate": total_tokens,
+        "patch_hash": patch_hash,
+        "test_runtime_seconds": round(final_tests.duration_seconds, 4),
+        "tests_executed": int(final_tests.tests_executed),
+        "tests_passed": int(final_tests.tests_passed),
+        "tests_failed": int(final_tests.tests_failed),
         "mentor_turn_count": 0,
         "mentor_violation_count": 0,
+        "execution_evidence": {
+            "initial_test_runtime_seconds": round(initial_tests.duration_seconds, 4),
+            "initial_tests_executed": int(initial_tests.tests_executed),
+            "initial_tests_passed": int(initial_tests.tests_passed),
+            "initial_tests_failed": int(initial_tests.tests_failed),
+            "final_test_runtime_seconds": round(final_tests.duration_seconds, 4),
+            "final_tests_executed": int(final_tests.tests_executed),
+            "final_tests_passed": int(final_tests.tests_passed),
+            "final_tests_failed": int(final_tests.tests_failed),
+            "patch_hash": patch_hash,
+            "patch_length": patch_length,
+            "patch_length_valid": patch_valid_length,
+            "evaluation_seed": evaluation_seed,
+            "worker_retry_count": worker_retry_count,
+        },
         "log": {
             "initial_test_output": initial_tests.output,
             "worker_prompt": worker_prompt,
             "worker_response": worker_response,
             "worker_error": worker_error,
+            "worker_retry_count": worker_retry_count,
             "extracted_patch": extracted,
+            "patch_hash": patch_hash,
+            "patch_length": patch_length,
+            "patch_length_valid": patch_valid_length,
+            "evaluation_seed": evaluation_seed,
             "patch_applied": patch_applied,
             "patch_log": patch_log,
             "final_test_output": final_tests.output,
+            "initial_test_stats": {
+                "tests_executed": int(initial_tests.tests_executed),
+                "tests_passed": int(initial_tests.tests_passed),
+                "tests_failed": int(initial_tests.tests_failed),
+                "duration_seconds": round(initial_tests.duration_seconds, 4),
+            },
+            "final_test_stats": {
+                "tests_executed": int(final_tests.tests_executed),
+                "tests_passed": int(final_tests.tests_passed),
+                "tests_failed": int(final_tests.tests_failed),
+                "duration_seconds": round(final_tests.duration_seconds, 4),
+            },
         },
     }
 
@@ -756,23 +932,47 @@ def _mentored_run(
     worker_model: str,
     task_prompt: str,
     task_id: str,
+    task_family_id: str | None,
     worker_template: str,
     mentor_template: str,
     workdir: Path,
     generation: GenerationSettings,
     mentor_strategy: Literal["real", "dummy_control"] = "real",
+    test_timeout_seconds: int = 8,
+    model_retry_attempts: int = 1,
+    model_retry_backoff_seconds: float = 1.0,
 ) -> dict[str, Any]:
+    effective_mode = "mentor_worker" if mentor_strategy == "real" else "mentor_only_suggestion_noise"
     start = time.perf_counter()
     guidance_history: list[str] = []
     turns: list[dict[str, Any]] = []
     violations: list[dict[str, Any]] = []
+    patch_hashes: list[str] = []
+    evaluation_seed = _seed_for_call(
+        generation.seed,
+        "evaluation",
+        mentor_strategy,
+        mentor_model,
+        worker_model,
+        task_id,
+    )
 
-    current_tests = run_pytest(workdir)
+    current_tests = _run_pytest_deterministic(
+        workdir,
+        evaluation_seed=evaluation_seed,
+        timeout_seconds=test_timeout_seconds,
+    )
+    _assert_tests_executed(current_tests, task_id=task_id, mode=effective_mode, phase="initial")
     token_accumulator = _estimate_tokens(current_tests.output)
     passed = current_tests.passed
+    initial_test_result = current_tests
+    final_patch_hash: str | None = None
+    cached_snapshot: str | None = None
 
     for turn_index in range(1, generation.max_turns + 1):
-        snapshot = project_snapshot(workdir)
+        if cached_snapshot is None:
+            cached_snapshot = project_snapshot(workdir)
+        snapshot = cached_snapshot
         worker_prompt = _render_worker_prompt(
             template=worker_template,
             task_prompt=task_prompt,
@@ -789,31 +989,51 @@ def _mentored_run(
             task_id,
             f"worker_turn_{turn_index}",
         )
-        worker_error: str | None = None
-        try:
-            worker_response = worker_client.chat(
-                model=worker_model,
-                messages=[{"role": "user", "content": worker_prompt}],
-                system=WORKER_SYSTEM_PROMPT,
-                temperature=generation.temperature,
-                top_p=generation.top_p,
-                num_predict=generation.worker_num_predict,
-                seed=worker_seed,
-            )
-        except RuntimeError as exc:
-            worker_response = f"[worker_error] {exc}"
-            worker_error = str(exc)
+        worker_response, worker_error, worker_retry_count = _call_model_with_retries(
+            client=worker_client,
+            retry_attempts=model_retry_attempts,
+            retry_backoff_seconds=model_retry_backoff_seconds,
+            model=worker_model,
+            messages=[{"role": "user", "content": worker_prompt}],
+            system=WORKER_SYSTEM_PROMPT,
+            temperature=generation.temperature,
+            top_p=generation.top_p,
+            num_predict=generation.worker_num_predict,
+            seed=worker_seed,
+        )
+        if worker_error:
+            worker_response = f"[worker_error] {worker_error}"
 
         token_accumulator += _estimate_tokens(worker_prompt) + _estimate_tokens(worker_response)
         extracted = _extract_diff(worker_response)
+        patch_hash = _hash_patch_text(extracted)
+        patch_length = len(extracted.strip()) if extracted else 0
+        patch_valid_length = _is_patch_text_valid_length(extracted)
+        if patch_hash:
+            patch_hashes.append(patch_hash)
+            final_patch_hash = patch_hash
         patch_applied = False
         patch_log = "No valid unified diff found in worker response."
-        if extracted:
+        if extracted and not patch_valid_length:
+            patch_log = "Patch too short (<5 chars); marked invalid."
+        elif extracted:
             patch_applied, patch_log = _apply_patch(workdir, extracted)
         elif worker_error:
             patch_log = worker_error
 
-        current_tests = run_pytest(workdir)
+        if patch_applied:
+            current_tests = _run_pytest_deterministic(
+                workdir,
+                evaluation_seed=evaluation_seed,
+                timeout_seconds=test_timeout_seconds,
+            )
+            cached_snapshot = None
+        _assert_tests_executed(
+            current_tests,
+            task_id=task_id,
+            mode=effective_mode,
+            phase=f"turn_{turn_index}",
+        )
         token_accumulator += _estimate_tokens(current_tests.output)
         passed = current_tests.passed
 
@@ -822,11 +1042,20 @@ def _mentored_run(
             "worker_prompt": worker_prompt,
             "worker_response": worker_response,
             "worker_error": worker_error,
+            "worker_retry_count": worker_retry_count,
             "extracted_patch": extracted,
+            "patch_hash": patch_hash,
+            "patch_length": patch_length,
+            "patch_length_valid": patch_valid_length,
             "patch_applied": patch_applied,
             "patch_log": patch_log,
             "test_output": current_tests.output,
             "pass_after_turn": passed,
+            "test_runtime_seconds": round(current_tests.duration_seconds, 4),
+            "tests_executed": int(current_tests.tests_executed),
+            "tests_passed": int(current_tests.tests_passed),
+            "tests_failed": int(current_tests.tests_failed),
+            "evaluation_seed": evaluation_seed,
         }
 
         if worker_error:
@@ -847,6 +1076,7 @@ def _mentored_run(
             )
 
             mentor_error: str | None = None
+            mentor_retry_count = 0
             validation: MentorValidation
             if mentor_strategy == "dummy_control":
                 mentor_response = _dummy_mentor_guidance(turn_index)
@@ -865,19 +1095,20 @@ def _mentored_run(
                     task_id,
                     f"mentor_turn_{turn_index}",
                 )
-                try:
-                    mentor_response = mentor_client.chat(
-                        model=mentor_model,
-                        messages=[{"role": "user", "content": mentor_prompt}],
-                        system=MENTOR_SYSTEM_PROMPT,
-                        temperature=generation.temperature,
-                        top_p=generation.top_p,
-                        num_predict=generation.mentor_num_predict,
-                        seed=mentor_seed,
-                    )
-                except RuntimeError as exc:
-                    mentor_response = f"[mentor_error] {exc}"
-                    mentor_error = str(exc)
+                mentor_response, mentor_error, mentor_retry_count = _call_model_with_retries(
+                    client=mentor_client,
+                    retry_attempts=model_retry_attempts,
+                    retry_backoff_seconds=model_retry_backoff_seconds,
+                    model=mentor_model,
+                    messages=[{"role": "user", "content": mentor_prompt}],
+                    system=MENTOR_SYSTEM_PROMPT,
+                    temperature=generation.temperature,
+                    top_p=generation.top_p,
+                    num_predict=generation.mentor_num_predict,
+                    seed=mentor_seed,
+                )
+                if mentor_error:
+                    mentor_response = f"[mentor_error] {mentor_error}"
 
                 validation = _validate_mentor_output(mentor_response)
                 if mentor_error:
@@ -894,6 +1125,7 @@ def _mentored_run(
             turn_log["mentor_prompt"] = mentor_prompt
             turn_log["mentor_response_raw"] = mentor_response if mentor_strategy == "real" else None
             turn_log["mentor_error"] = mentor_error
+            turn_log["mentor_retry_count"] = mentor_retry_count
             turn_log["mentor_guidance"] = validation.guidance
             turn_log["mentor_violation"] = validation.violated
             turn_log["mentor_violation_reasons"] = validation.reasons
@@ -912,24 +1144,58 @@ def _mentored_run(
         turns.append(turn_log)
 
     elapsed = time.perf_counter() - start
-    mode_name = "mentor_worker" if mentor_strategy == "real" else "mentor_only_suggestion_noise"
+    mode_name = effective_mode
     mentor_turn_count = sum(1 for turn in turns if "mentor_prompt" in turn)
 
     return {
         "mode": mode_name,
         "task_id": task_id,
+        "task_family_id": task_family_id,
+        "seed": generation.seed,
+        "evaluation_seed": evaluation_seed,
         "worker_model": worker_model,
         "mentor_model": mentor_model,
         "pass": passed,
         "turns_used": len(turns),
         "wall_time_seconds": round(elapsed, 4),
         "total_tokens_estimate": token_accumulator,
+        "patch_hash": final_patch_hash,
+        "patch_hashes": patch_hashes,
+        "test_runtime_seconds": round(current_tests.duration_seconds, 4),
+        "tests_executed": int(current_tests.tests_executed),
+        "tests_passed": int(current_tests.tests_passed),
+        "tests_failed": int(current_tests.tests_failed),
         "mentor_turn_count": mentor_turn_count,
         "mentor_violation_count": len(violations),
+        "execution_evidence": {
+            "initial_test_runtime_seconds": round(initial_test_result.duration_seconds, 4),
+            "initial_tests_executed": int(initial_test_result.tests_executed),
+            "initial_tests_passed": int(initial_test_result.tests_passed),
+            "initial_tests_failed": int(initial_test_result.tests_failed),
+            "final_test_runtime_seconds": round(current_tests.duration_seconds, 4),
+            "final_tests_executed": int(current_tests.tests_executed),
+            "final_tests_passed": int(current_tests.tests_passed),
+            "final_tests_failed": int(current_tests.tests_failed),
+            "patch_hashes": patch_hashes,
+            "final_patch_hash": final_patch_hash,
+            "evaluation_seed": evaluation_seed,
+        },
         "log": {
             "task_prompt": task_prompt,
             "turns": turns,
             "violations": violations,
+            "initial_test_stats": {
+                "tests_executed": int(initial_test_result.tests_executed),
+                "tests_passed": int(initial_test_result.tests_passed),
+                "tests_failed": int(initial_test_result.tests_failed),
+                "duration_seconds": round(initial_test_result.duration_seconds, 4),
+            },
+            "final_test_stats": {
+                "tests_executed": int(current_tests.tests_executed),
+                "tests_passed": int(current_tests.tests_passed),
+                "tests_failed": int(current_tests.tests_failed),
+                "duration_seconds": round(current_tests.duration_seconds, 4),
+            },
         },
     }
 
@@ -1123,6 +1389,49 @@ def _capture_pip_freeze_hash() -> tuple[str, int]:
     return digest, len(lines)
 
 
+def _model_version_rows(
+    *,
+    provider: str,
+    models: list[str],
+    provider_metadata: dict[str, Any],
+) -> list[dict[str, str]]:
+    model_tags = provider_metadata.get("model_tags", [])
+    tags_by_name: dict[str, dict[str, Any]] = {}
+    if isinstance(model_tags, list):
+        for item in model_tags:
+            if not isinstance(item, dict):
+                continue
+            candidates = (
+                item.get("name"),
+                item.get("model"),
+                item.get("id"),
+            )
+            for candidate in candidates:
+                if isinstance(candidate, str) and candidate:
+                    tags_by_name.setdefault(candidate, item)
+
+    rows: list[dict[str, str]] = []
+    for model in sorted(set(models)):
+        metadata = tags_by_name.get(model, {})
+        version = ""
+        if isinstance(metadata, dict):
+            for key in ("digest", "id", "model", "name", "modified_at"):
+                value = metadata.get(key)
+                if isinstance(value, str) and value.strip():
+                    version = value.strip()
+                    break
+        if not version:
+            version = model
+        rows.append(
+            {
+                "provider": provider,
+                "model": model,
+                "version": version,
+            }
+        )
+    return rows
+
+
 def _capture_runtime_context(
     *,
     mentor_client: LLMClient,
@@ -1156,6 +1465,25 @@ def _capture_runtime_context(
         provider_details["openai"] = {}
 
     pip_freeze_sha256, pip_freeze_line_count = _capture_pip_freeze_hash()
+    git_commit = _git_commit_hash()
+    git_dirty = _git_is_dirty()
+
+    model_versions = sorted(
+        _model_version_rows(
+            provider=mentor_provider,
+            models=mentor_models,
+            provider_metadata=provider_details.get(mentor_provider, {}),
+        )
+        + _model_version_rows(
+            provider=worker_provider,
+            models=worker_models,
+            provider_metadata=provider_details.get(worker_provider, {}),
+        ),
+        key=lambda row: (row["provider"], row["model"], row["version"]),
+    )
+    os_label = f"{platform.system()} {platform.release()}".strip()
+    python_version = platform.python_version()
+    architecture = platform.machine()
 
     return {
         "benchmark_version": __version__,
@@ -1179,8 +1507,15 @@ def _capture_runtime_context(
         "ollama": provider_details["ollama"],
         "openai": provider_details["openai"],
         "git": {
-            "commit": _git_commit_hash(),
-            "dirty": _git_is_dirty(),
+            "commit": git_commit,
+            "dirty": git_dirty,
+        },
+        "reproducibility": {
+            "python_version": python_version,
+            "os": os_label,
+            "cpu_architecture": architecture,
+            "model_versions": model_versions,
+            "commit_hash": git_commit,
         },
         "task_pack": {
             "id": task_pack_id,
@@ -1189,6 +1524,44 @@ def _capture_runtime_context(
             "hash": task_pack_hash,
             "manifest_path": task_pack_manifest_path,
         },
+    }
+
+
+def _build_checkpoint_metadata(
+    *,
+    config: BenchmarkConfig,
+    selection: Any,
+    run_modes: list[str],
+    mentor_models: list[str],
+    worker_models: list[str],
+    generation: GenerationSettings,
+    mentor_provider: str,
+    worker_provider: str,
+) -> dict[str, Any]:
+    return {
+        "benchmark_version": __version__,
+        "git_commit": _git_commit_hash(),
+        "task_pack": selection.task_pack,
+        "task_pack_version": selection.pack_version,
+        "task_pack_hash": selection.pack_hash,
+        "suite": selection.suite,
+        "selector_source": selection.selector_source,
+        "seed": int(config.seed),
+        "task_ids": [task.task_id for task in selection.tasks],
+        "run_modes": list(run_modes),
+        "mentor_models": list(mentor_models),
+        "worker_models": list(worker_models),
+        "provider": config.provider,
+        "mentor_provider": mentor_provider,
+        "worker_provider": worker_provider,
+        "repro_mode": bool(config.repro_mode),
+        "max_turns": int(generation.max_turns),
+        "worker_num_predict": int(generation.worker_num_predict),
+        "mentor_num_predict": int(generation.mentor_num_predict),
+        "model_timeout_seconds": int(config.timeout_seconds),
+        "test_timeout_seconds": int(config.test_timeout_seconds),
+        "model_retry_attempts": int(config.model_retry_attempts),
+        "model_retry_backoff_seconds": float(config.model_retry_backoff_seconds),
     }
 
 
@@ -1347,7 +1720,12 @@ def run_sanity_check(
     for task in selection.tasks:
         temp_dir, workdir = materialize_task(task)
         try:
-            test_result = run_pytest(workdir)
+            evaluation_seed = _seed_for_call(seed, "sanity", task.task_id)
+            test_result = _run_pytest_deterministic(
+                workdir,
+                evaluation_seed=evaluation_seed,
+                timeout_seconds=8,
+            )
             status = "expected_failure"
             if test_result.exit_code == 0:
                 status = "unexpected_pass"
@@ -1363,6 +1741,7 @@ def run_sanity_check(
                     "task_id": task.task_id,
                     "category": task.category,
                     "split": task.split,
+                    "evaluation_seed": evaluation_seed,
                     "status": status,
                     "exit_code": test_result.exit_code,
                     "duration_seconds": round(test_result.duration_seconds, 4),
@@ -1481,29 +1860,99 @@ def run_benchmark(
 
     worker_template = _load_template("worker_prompt.txt")
     mentor_template = _load_template("mentor_prompt.txt")
+    checkpoint_store = BenchmarkCheckpointStore(
+        path=_checkpoint_path_for_results(config.results_path),
+        metadata=_build_checkpoint_metadata(
+            config=config,
+            selection=selection,
+            run_modes=run_modes,
+            mentor_models=mentor_models,
+            worker_models=worker_models,
+            generation=generation,
+            mentor_provider=mentor_provider,
+            worker_provider=worker_provider,
+        ),
+    )
+    loaded_from_checkpoint = 0
+    appended_to_checkpoint = 0
+    task_prompts = {
+        task.task_id: read_task_prompt(task)
+        for task in selected_tasks
+    }
 
     runs: list[dict[str, Any]] = []
     baseline_lookup: dict[tuple[str, str], bool] = {}
 
     benchmark_start = time.perf_counter()
 
+    def _load_completed_run(
+        *,
+        unit_key: RunUnitKey,
+        task: Any,
+    ) -> dict[str, Any] | None:
+        nonlocal loaded_from_checkpoint
+        existing = checkpoint_store.get_completed_run(unit_key)
+        if existing is None:
+            return None
+        existing.setdefault("task_category", task.category)
+        if str(existing.get("mode")) == "worker_only":
+            baseline_lookup[(str(existing.get("worker_model")), str(existing.get("task_id")))] = bool(
+                existing.get("pass")
+            )
+        elif "baseline_pass" not in existing:
+            existing["baseline_pass"] = baseline_lookup.get(
+                (str(existing.get("worker_model")), str(existing.get("task_id")))
+            )
+        runs.append(existing)
+        loaded_from_checkpoint += 1
+        return existing
+
+    def _record_completed_run(
+        *,
+        unit_key: RunUnitKey,
+        task: Any,
+        run: dict[str, Any],
+    ) -> None:
+        nonlocal appended_to_checkpoint
+        run.setdefault("task_category", task.category)
+        if str(run.get("mode")) == "worker_only":
+            baseline_lookup[(str(run.get("worker_model")), str(run.get("task_id")))] = bool(run.get("pass"))
+        elif "baseline_pass" not in run:
+            run["baseline_pass"] = baseline_lookup.get(
+                (str(run.get("worker_model")), str(run.get("task_id")))
+            )
+        runs.append(run)
+        checkpoint_store.record_completed_run(unit_key, run)
+        appended_to_checkpoint += 1
+
     if run_worker_only:
         for worker_model in worker_models:
             for task in selected_tasks:
+                unit_key = _run_unit_key(
+                    seed=generation.seed,
+                    mode="worker_only",
+                    task_id=task.task_id,
+                    worker_model=worker_model,
+                    mentor_model=None,
+                )
+                if _load_completed_run(unit_key=unit_key, task=task) is not None:
+                    continue
                 temp_dir, workdir = materialize_task(task)
                 try:
-                    task_prompt = read_task_prompt(task)
                     baseline = _baseline_run(
                         client=worker_client,
                         worker_model=worker_model,
-                        task_prompt=task_prompt,
+                        task_prompt=task_prompts[task.task_id],
                         task_id=task.task_id,
+                        task_family_id=task.family_id,
                         worker_template=worker_template,
                         workdir=workdir,
                         generation=generation,
+                        test_timeout_seconds=config.test_timeout_seconds,
+                        model_retry_attempts=config.model_retry_attempts,
+                        model_retry_backoff_seconds=config.model_retry_backoff_seconds,
                     )
-                    runs.append(baseline)
-                    baseline_lookup[(worker_model, task.task_id)] = bool(baseline["pass"])
+                    _record_completed_run(unit_key=unit_key, task=task, run=baseline)
                 finally:
                     temp_dir.cleanup()
 
@@ -1511,48 +1960,72 @@ def run_benchmark(
         for mentor_model in mentor_models:
             for worker_model in worker_models:
                 for task in selected_tasks:
+                    unit_key = _run_unit_key(
+                        seed=generation.seed,
+                        mode="mentor_worker",
+                        task_id=task.task_id,
+                        worker_model=worker_model,
+                        mentor_model=mentor_model,
+                    )
+                    if _load_completed_run(unit_key=unit_key, task=task) is not None:
+                        continue
                     temp_dir, workdir = materialize_task(task)
                     try:
-                        task_prompt = read_task_prompt(task)
                         mentored = _mentored_run(
                             worker_client=worker_client,
                             mentor_client=mentor_client,
                             mentor_model=mentor_model,
                             worker_model=worker_model,
-                            task_prompt=task_prompt,
+                            task_prompt=task_prompts[task.task_id],
                             task_id=task.task_id,
+                            task_family_id=task.family_id,
                             worker_template=worker_template,
                             mentor_template=mentor_template,
                             workdir=workdir,
                             generation=generation,
                             mentor_strategy="real",
+                            test_timeout_seconds=config.test_timeout_seconds,
+                            model_retry_attempts=config.model_retry_attempts,
+                            model_retry_backoff_seconds=config.model_retry_backoff_seconds,
                         )
                         mentored["baseline_pass"] = baseline_lookup.get((worker_model, task.task_id))
-                        runs.append(mentored)
+                        _record_completed_run(unit_key=unit_key, task=task, run=mentored)
                     finally:
                         temp_dir.cleanup()
 
     if run_control:
         for worker_model in worker_models:
             for task in selected_tasks:
+                unit_key = _run_unit_key(
+                    seed=generation.seed,
+                    mode="mentor_only_suggestion_noise",
+                    task_id=task.task_id,
+                    worker_model=worker_model,
+                    mentor_model="dummy_control",
+                )
+                if _load_completed_run(unit_key=unit_key, task=task) is not None:
+                    continue
                 temp_dir, workdir = materialize_task(task)
                 try:
-                    task_prompt = read_task_prompt(task)
                     control = _mentored_run(
                         worker_client=worker_client,
                         mentor_client=mentor_client,
                         mentor_model="dummy_control",
                         worker_model=worker_model,
-                        task_prompt=task_prompt,
+                        task_prompt=task_prompts[task.task_id],
                         task_id=task.task_id,
+                        task_family_id=task.family_id,
                         worker_template=worker_template,
                         mentor_template=mentor_template,
                         workdir=workdir,
                         generation=generation,
                         mentor_strategy="dummy_control",
+                        test_timeout_seconds=config.test_timeout_seconds,
+                        model_retry_attempts=config.model_retry_attempts,
+                        model_retry_backoff_seconds=config.model_retry_backoff_seconds,
                     )
                     control["baseline_pass"] = baseline_lookup.get((worker_model, task.task_id))
-                    runs.append(control)
+                    _record_completed_run(unit_key=unit_key, task=task, run=control)
                 finally:
                     temp_dir.cleanup()
 
@@ -1602,12 +2075,18 @@ def run_benchmark(
         mode_name = str(run.get("mode"))
         run_counts_by_mode[mode_name] = run_counts_by_mode.get(mode_name, 0) + 1
     error_summary = _collect_run_error_summary(runs)
+    accumulated_run_wall_time_seconds = round(
+        sum(_safe_float(run.get("wall_time_seconds")) for run in runs),
+        4,
+    )
     compute_budget = _compute_budget_manifest(
         runs=runs,
         max_turns=generation.max_turns,
-        timeout_seconds=config.timeout_seconds,
-        total_wall_time_seconds=elapsed,
+        model_timeout_seconds=config.timeout_seconds,
+        test_timeout_seconds=config.test_timeout_seconds,
+        total_wall_time_seconds=accumulated_run_wall_time_seconds,
     )
+    integrity = _build_integrity_payload(runs)
 
     results = {
         "generated_at": datetime.now(tz=UTC).isoformat(),
@@ -1623,12 +2102,22 @@ def run_benchmark(
             "repro_mode": config.repro_mode,
             "max_turns": generation.max_turns,
             "timeout_seconds": config.timeout_seconds,
+            "model_timeout_seconds": config.timeout_seconds,
+            "test_timeout_seconds": config.test_timeout_seconds,
+            "model_retry_attempts": config.model_retry_attempts,
+            "model_retry_backoff_seconds": config.model_retry_backoff_seconds,
             "generation": {
                 "temperature": generation.temperature,
                 "top_p": generation.top_p,
                 "worker_num_predict": generation.worker_num_predict,
                 "mentor_num_predict": generation.mentor_num_predict,
                 "seed": generation.seed,
+            },
+            "determinism": {
+                "task_order_seed": int(config.seed),
+                "prompt_seed_base": int(generation.seed),
+                "evaluation_seed_base": int(_seed_for_call(generation.seed, "evaluation")),
+                "pythonhashseed": 0,
             },
             "task_pack": selection.task_pack,
             "task_pack_version": selection.pack_version,
@@ -1647,8 +2136,9 @@ def run_benchmark(
         "summary": {
             "total_runs": len(runs),
             "runs_by_mode": run_counts_by_mode,
-            "benchmark_wall_time_seconds": round(elapsed, 4),
+            "benchmark_wall_time_seconds": accumulated_run_wall_time_seconds,
             "violation_count": len(all_violations),
+            "integrity_warning_count": len(integrity["warnings"]),
             "total_passes": int(error_summary["total_passes"]),
             "total_failed_runs": int(error_summary["total_failed_runs"]),
             "passes_by_mode": error_summary["passes_by_mode"],
@@ -1659,10 +2149,20 @@ def run_benchmark(
             "total_model_call_timeouts": int(error_summary["total_model_call_timeouts"]),
         },
         "compute_budget": compute_budget,
+        "integrity": integrity,
+        "checkpointing": {
+            "enabled": True,
+            "checkpoint_path": str(_checkpoint_path_for_results(config.results_path)),
+            "completed_units_loaded": loaded_from_checkpoint,
+            "completed_units_recorded": appended_to_checkpoint,
+            "resumable_unit": "seed,mode,task_id,worker_model,mentor_model",
+            "session_wall_time_seconds": round(elapsed, 4),
+        },
         "runs": runs,
         "violations": all_violations,
         "aggregates": aggregates,
     }
+    _attach_reproducibility_manifest(results)
 
     if write_outputs:
         config.results_path.parent.mkdir(parents=True, exist_ok=True)
@@ -1730,6 +2230,75 @@ def _collect_run_error_summary(runs: list[dict[str, Any]]) -> dict[str, Any]:
     }
 
 
+def _detect_low_runtime_warning(runs: list[dict[str, Any]]) -> list[str]:
+    runtimes: list[float] = []
+    for run in runs:
+        value = run.get("test_runtime_seconds")
+        if isinstance(value, bool) or not isinstance(value, (int, float)):
+            continue
+        runtimes.append(float(value))
+
+    if not runtimes:
+        return []
+
+    low_runtime_count = sum(1 for item in runtimes if item < 0.1)
+    share = low_runtime_count / len(runtimes)
+    if share > 0.8:
+        return [
+            (
+                "tests may not be executing "
+                f"(runtime <0.1s for {low_runtime_count}/{len(runtimes)} task runs)."
+            )
+        ]
+    return []
+
+
+def _detect_baseline_reuse_warning(runs: list[dict[str, Any]]) -> list[str]:
+    worker_only_runs = [run for run in runs if str(run.get("mode")) == "worker_only"]
+    if not worker_only_runs:
+        return []
+
+    grouped: dict[tuple[str, int], list[dict[str, Any]]] = {}
+    for run in worker_only_runs:
+        worker = str(run.get("worker_model", "unknown"))
+        seed_raw = run.get("seed")
+        if isinstance(seed_raw, bool) or not isinstance(seed_raw, (int, float)):
+            seed = 0
+        else:
+            seed = int(seed_raw)
+        grouped.setdefault((worker, seed), []).append(run)
+
+    by_signature: dict[tuple[tuple[int, ...], tuple[str, ...]], list[tuple[str, int]]] = {}
+    for key, items in grouped.items():
+        ordered = sorted(items, key=lambda item: str(item.get("task_id", "")))
+        baseline_vector = tuple(1 if bool(item.get("pass")) else 0 for item in ordered)
+        patch_vector = tuple(str(item.get("patch_hash") or "") for item in ordered)
+        signature = (baseline_vector, patch_vector)
+        by_signature.setdefault(signature, []).append(key)
+
+    warnings: list[str] = []
+    for groups in by_signature.values():
+        if len(groups) <= 1:
+            continue
+        labels = ", ".join(f"{worker}@seed{seed}" for worker, seed in sorted(groups))
+        warnings.append(
+            "potential artifact reuse detected: identical baseline vectors and patch hashes across "
+            f"worker-only groups ({labels})."
+        )
+    return warnings
+
+
+def _build_integrity_payload(runs: list[dict[str, Any]]) -> dict[str, Any]:
+    runtime_warnings = _detect_low_runtime_warning(runs)
+    baseline_warnings = _detect_baseline_reuse_warning(runs)
+    warnings = runtime_warnings + baseline_warnings
+    return {
+        "warnings": warnings,
+        "runtime_warnings": runtime_warnings,
+        "baseline_reuse_warnings": baseline_warnings,
+    }
+
+
 def _count_model_calls_attempted_for_run(run: dict[str, Any]) -> int:
     mode = str(run.get("mode", ""))
     if mode == "worker_only":
@@ -1767,7 +2336,8 @@ def _compute_budget_manifest(
     *,
     runs: list[dict[str, Any]],
     max_turns: int,
-    timeout_seconds: int,
+    model_timeout_seconds: int,
+    test_timeout_seconds: int,
     total_wall_time_seconds: float,
 ) -> dict[str, Any]:
     calls_by_mode: dict[str, int] = {}
@@ -1789,7 +2359,9 @@ def _compute_budget_manifest(
 
     return {
         "max_turns": int(max_turns),
-        "timeout_seconds": int(timeout_seconds),
+        "timeout_seconds": int(model_timeout_seconds),
+        "model_timeout_seconds": int(model_timeout_seconds),
+        "test_timeout_seconds": int(test_timeout_seconds),
         "total_model_calls_attempted": int(total_calls),
         "model_calls_attempted_by_mode": calls_by_mode,
         "total_tokens_estimate": int(total_tokens) if tokens_available else "unavailable",
@@ -1797,11 +2369,105 @@ def _compute_budget_manifest(
     }
 
 
+def _run_signature_rows(runs: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    rows: list[dict[str, Any]] = []
+    for run in runs:
+        if not isinstance(run, dict):
+            continue
+        seed_raw = run.get("seed")
+        seed = int(seed_raw) if isinstance(seed_raw, (int, float)) and not isinstance(seed_raw, bool) else 0
+        patch_hashes_raw = run.get("patch_hashes", [])
+        patch_hashes = (
+            [str(item) for item in patch_hashes_raw if isinstance(item, str)]
+            if isinstance(patch_hashes_raw, list)
+            else []
+        )
+        rows.append(
+            {
+                "seed": seed,
+                "mode": str(run.get("mode", "")),
+                "task_id": str(run.get("task_id", "")),
+                "worker_model": str(run.get("worker_model", "")),
+                "mentor_model": str(run.get("mentor_model", "")),
+                "pass": bool(run.get("pass", False)),
+                "turns_used": int(run.get("turns_used", 0) or 0),
+                "tests_executed": int(run.get("tests_executed", 0) or 0),
+                "tests_passed": int(run.get("tests_passed", 0) or 0),
+                "tests_failed": int(run.get("tests_failed", 0) or 0),
+                "patch_hash": str(run.get("patch_hash", "") or ""),
+                "patch_hashes": patch_hashes,
+            }
+        )
+    rows.sort(
+        key=lambda row: (
+            int(row["seed"]),
+            str(row["mode"]),
+            str(row["worker_model"]),
+            str(row["mentor_model"]),
+            str(row["task_id"]),
+        )
+    )
+    return rows
+
+
+def _deterministic_reproducibility_hash(results_payload: dict[str, Any]) -> str:
+    config = results_payload.get("config", {})
+    if not isinstance(config, dict):
+        config = {}
+
+    determinism = config.get("determinism", {})
+    if not isinstance(determinism, dict):
+        determinism = {}
+
+    material = {
+        "task_pack": config.get("task_pack"),
+        "suite": config.get("suite"),
+        "run_modes": config.get("run_modes"),
+        "seed_list": config.get("seed_list"),
+        "generation_seed": config.get("generation", {}).get("seed")
+        if isinstance(config.get("generation"), dict)
+        else None,
+        "determinism": determinism,
+        "runs": _run_signature_rows(results_payload.get("runs", []) if isinstance(results_payload.get("runs"), list) else []),
+        "aggregates": results_payload.get("aggregates", {}),
+    }
+    payload = json.dumps(material, sort_keys=True, separators=(",", ":"), ensure_ascii=True)
+    return hashlib.sha256(payload.encode("utf-8")).hexdigest()
+
+
+def _attach_reproducibility_manifest(results_payload: dict[str, Any]) -> None:
+    config = results_payload.get("config", {})
+    if not isinstance(config, dict):
+        config = {}
+    determinism = config.get("determinism", {})
+    if not isinstance(determinism, dict):
+        determinism = {}
+
+    seed_list = config.get("seed_list")
+    if isinstance(seed_list, list):
+        normalized_seeds = [int(seed) for seed in seed_list if isinstance(seed, int)]
+    else:
+        generation = config.get("generation", {})
+        seed = generation.get("seed") if isinstance(generation, dict) else None
+        normalized_seeds = [int(seed)] if isinstance(seed, int) else []
+
+    results_payload["reproducibility"] = {
+        "seed_policy": "deterministic",
+        "task_order_seed": determinism.get("task_order_seed"),
+        "prompt_seed_base": determinism.get("prompt_seed_base"),
+        "evaluation_seed_base": determinism.get("evaluation_seed_base"),
+        "pythonhashseed": determinism.get("pythonhashseed"),
+        "seed_list": normalized_seeds,
+        "deterministic_output_sha256": _deterministic_reproducibility_hash(results_payload),
+    }
+
+
 def _merge_compute_budget(
     *,
     replicate_results: list[dict[str, Any]],
     max_turns: int,
-    timeout_seconds: int,
+    model_timeout_seconds: int,
+    test_timeout_seconds: int,
 ) -> dict[str, Any]:
     total_calls = 0
     total_tokens = 0
@@ -1819,7 +2485,8 @@ def _merge_compute_budget(
             call_value = _compute_budget_manifest(
                 runs=replicate.get("runs", []) if isinstance(replicate.get("runs"), list) else [],
                 max_turns=max_turns,
-                timeout_seconds=timeout_seconds,
+                model_timeout_seconds=model_timeout_seconds,
+                test_timeout_seconds=test_timeout_seconds,
                 total_wall_time_seconds=0.0,
             )["total_model_calls_attempted"]
         total_calls += int(call_value)
@@ -1849,7 +2516,9 @@ def _merge_compute_budget(
 
     return {
         "max_turns": int(max_turns),
-        "timeout_seconds": int(timeout_seconds),
+        "timeout_seconds": int(model_timeout_seconds),
+        "model_timeout_seconds": int(model_timeout_seconds),
+        "test_timeout_seconds": int(test_timeout_seconds),
         "total_model_calls_attempted": int(total_calls),
         "model_calls_attempted_by_mode": calls_by_mode,
         "total_tokens_estimate": int(total_tokens) if tokens_available else "unavailable",
@@ -1907,18 +2576,54 @@ def _combine_replicate_results(
         run_counts_by_mode[mode_name] = run_counts_by_mode.get(mode_name, 0) + 1
 
     error_summary = _collect_run_error_summary(merged_runs)
+    integrity = _build_integrity_payload(merged_runs)
     max_turns_raw = first_config.get("max_turns", config.max_turns)
-    timeout_raw = first_config.get("timeout_seconds", config.timeout_seconds)
+    model_timeout_raw = first_config.get("model_timeout_seconds", first_config.get("timeout_seconds", config.timeout_seconds))
+    test_timeout_raw = first_config.get("test_timeout_seconds", config.test_timeout_seconds)
     max_turns = int(max_turns_raw) if isinstance(max_turns_raw, (int, float)) else int(config.max_turns)
-    timeout_seconds = (
-        int(timeout_raw)
-        if isinstance(timeout_raw, (int, float))
+    model_timeout_seconds = (
+        int(model_timeout_raw)
+        if isinstance(model_timeout_raw, (int, float))
         else int(config.timeout_seconds)
+    )
+    test_timeout_seconds = (
+        int(test_timeout_raw)
+        if isinstance(test_timeout_raw, (int, float))
+        else int(config.test_timeout_seconds)
     )
     compute_budget = _merge_compute_budget(
         replicate_results=replicate_results,
         max_turns=max_turns,
-        timeout_seconds=timeout_seconds,
+        model_timeout_seconds=model_timeout_seconds,
+        test_timeout_seconds=test_timeout_seconds,
+    )
+    worker_models = (
+        [str(item) for item in first_config.get("worker_models", []) if isinstance(item, str)]
+        if isinstance(first_config.get("worker_models"), list)
+        else []
+    )
+    mentor_models = (
+        [str(item) for item in first_config.get("mentor_models", []) if isinstance(item, str)]
+        if isinstance(first_config.get("mentor_models"), list)
+        else []
+    )
+    if not mentor_models:
+        mentor_models = worker_models
+
+    task_categories: dict[str, str] = {}
+    for run in merged_runs:
+        if not isinstance(run, dict):
+            continue
+        task_id = run.get("task_id")
+        task_category = run.get("task_category")
+        if isinstance(task_id, str) and task_id and isinstance(task_category, str) and task_category:
+            task_categories[task_id] = task_category
+
+    merged_aggregates = _compute_aggregates(
+        runs=merged_runs,
+        worker_models=worker_models,
+        mentor_models=mentor_models,
+        task_categories=task_categories,
     )
 
     merged = {
@@ -1929,6 +2634,15 @@ def _combine_replicate_results(
             "run_group_id": run_group_id,
             "seed_list": [int(seed) for seed in seeds],
             "seed_count": len(seeds),
+            "determinism": {
+                **(
+                    first_config.get("determinism", {})
+                    if isinstance(first_config.get("determinism"), dict)
+                    else {}
+                ),
+                "seed_list": [int(seed) for seed in seeds],
+                "seed_count": len(seeds),
+            },
             "run_modes": run_modes,
         },
         "environment": first.get("environment", {}),
@@ -1937,6 +2651,7 @@ def _combine_replicate_results(
             "runs_by_mode": run_counts_by_mode,
             "benchmark_wall_time_seconds": compute_budget["total_wall_time_seconds"],
             "violation_count": len(merged_violations),
+            "integrity_warning_count": len(integrity["warnings"]),
             "total_passes": int(error_summary["total_passes"]),
             "total_failed_runs": int(error_summary["total_failed_runs"]),
             "passes_by_mode": error_summary["passes_by_mode"],
@@ -1948,9 +2663,10 @@ def _combine_replicate_results(
             "replicate_count": len(seeds),
         },
         "compute_budget": compute_budget,
+        "integrity": integrity,
         "runs": merged_runs,
         "violations": merged_violations,
-        "aggregates": first.get("aggregates", {}),
+        "aggregates": merged_aggregates,
         "replicates": replicate_payloads,
     }
     return merged
@@ -1999,14 +2715,17 @@ def run_multi_seed_benchmark(
 
     replicate_results: list[dict[str, Any]] = []
     for seed in seeds:
+        seed_results_path = _seed_results_path(config.results_path, int(seed))
         replicate = run_benchmark(
-            replace(config, seed=int(seed)),
+            replace(config, seed=int(seed), results_path=seed_results_path),
             client=client,
             mentor_client=mentor_client,
             worker_client=worker_client,
             write_outputs=False,
             run_group_id=run_group_id,
         )
+        seed_results_path.parent.mkdir(parents=True, exist_ok=True)
+        seed_results_path.write_text(json.dumps(replicate, indent=2), encoding="utf-8")
         replicate_results.append(replicate)
 
     merged = _combine_replicate_results(
@@ -2015,6 +2734,7 @@ def run_multi_seed_benchmark(
         seeds=[int(seed) for seed in seeds],
         run_group_id=run_group_id,
     )
+    _attach_reproducibility_manifest(merged)
 
     config.results_path.parent.mkdir(parents=True, exist_ok=True)
     config.results_path.write_text(json.dumps(merged, indent=2), encoding="utf-8")

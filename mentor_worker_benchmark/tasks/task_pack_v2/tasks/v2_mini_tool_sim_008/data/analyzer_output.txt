@@ -1,1 +1,0 @@
-RULE:unused_import|SEVERITY:warn|FILE:ion.py|LINE:18\nRULE:unsafe_eval|SEVERITY:error|FILE:xylem.py|LINE:28\nRULE:line_too_long|SEVERITY:info|FILE:ion.py|LINE:38\nRULE:unused_import|SEVERITY:warn|FILE:xylem.py|LINE:48\n

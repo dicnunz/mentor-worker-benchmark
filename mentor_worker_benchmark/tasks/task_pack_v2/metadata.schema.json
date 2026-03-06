@@ -10,6 +10,7 @@
     "categories",
     "counts",
     "category_counts",
+    "source_audit",
     "tasks"
   ],
   "properties": {
@@ -57,19 +58,19 @@
       "properties": {
         "total": {
           "type": "integer",
-          "const": 500
+          "const": 473
         },
         "train": {
           "type": "integer",
-          "const": 340
+          "const": 265
         },
         "dev": {
           "type": "integer",
-          "const": 80
+          "const": 104
         },
         "test": {
           "type": "integer",
-          "const": 80
+          "const": 104
         },
         "quick": {
           "type": "integer",
@@ -80,10 +81,61 @@
     "category_counts": {
       "type": "object"
     },
+    "source_audit": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "total_tasks",
+        "exact_family_count",
+        "duplicate_families_detected",
+        "family_size_distribution",
+        "duplicate_tasks_removed",
+        "cross_split_overlap"
+      ],
+      "properties": {
+        "total_tasks": {
+          "type": "integer",
+          "const": 652
+        },
+        "exact_family_count": {
+          "type": "integer",
+          "const": 473
+        },
+        "duplicate_families_detected": {
+          "type": "integer"
+        },
+        "family_size_distribution": {
+          "type": "object"
+        },
+        "duplicate_tasks_removed": {
+          "type": "integer"
+        },
+        "cross_split_overlap": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "family_count",
+            "task_count",
+            "split_pattern_counts"
+          ],
+          "properties": {
+            "family_count": {
+              "type": "integer"
+            },
+            "task_count": {
+              "type": "integer"
+            },
+            "split_pattern_counts": {
+              "type": "object"
+            }
+          }
+        }
+      }
+    },
     "tasks": {
       "type": "array",
-      "minItems": 500,
-      "maxItems": 500,
+      "minItems": 473,
+      "maxItems": 473,
       "items": {
         "type": "object",
         "additionalProperties": false,
@@ -92,6 +144,7 @@
           "title",
           "category",
           "difficulty",
+          "family_id",
           "split",
           "quick",
           "path"
@@ -126,6 +179,10 @@
               "medium",
               "hard"
             ]
+          },
+          "family_id": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
           },
           "split": {
             "type": "string",

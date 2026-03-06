@@ -1,1 +1,0 @@
-RULE:unused_import|SEVERITY:warn|FILE:mosaic.py|LINE:53\nRULE:unsafe_eval|SEVERITY:error|FILE:vector.py|LINE:63\nRULE:line_too_long|SEVERITY:info|FILE:mosaic.py|LINE:73\nRULE:unused_import|SEVERITY:warn|FILE:vector.py|LINE:83\n

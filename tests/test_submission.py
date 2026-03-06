@@ -55,7 +55,7 @@ def _sample_results_payload() -> dict[str, object]:
             "git": {"commit": "de5a929", "dirty": False},
             "task_pack": {
                 "id": "task_pack_v2",
-                "version": "2.0.0",
+                "version": "2.1.0",
                 "source": "registry",
                 "hash": "b" * 64,
                 "manifest_path": "mentor_worker_benchmark/tasks/task_pack_v2/metadata.json",
@@ -161,7 +161,7 @@ def test_verify_rejects_manifest_with_missing_commit(tmp_path: Path) -> None:
                 {
                     "bundle_version": "1",
                     "task_pack": "task_pack_v2",
-                    "task_pack_version": "2.0.0",
+                    "task_pack_version": "2.1.0",
                     "git_commit_hash": "",
                     "cli_command": "",
                 },
@@ -218,7 +218,7 @@ def test_verify_requires_analysis_for_multi_replicate_results(tmp_path: Path) ->
     payload = json.loads(fixture.read_text(encoding="utf-8"))
 
     out_path = tmp_path / "missing_analysis_multi.zip"
-    task_pack_version = resolve_task_pack_version("task_pack_v2") or "2.0.0"
+    task_pack_version = resolve_task_pack_version("task_pack_v2") or "2.1.0"
     with zipfile.ZipFile(out_path, "w", compression=zipfile.ZIP_DEFLATED) as archive:
         archive.writestr("results.json", json.dumps(payload, indent=2))
         archive.writestr("environment.json", json.dumps(payload["environment"], indent=2))
@@ -244,7 +244,7 @@ def test_verify_requires_analysis_for_multi_replicate_results(tmp_path: Path) ->
 def test_verify_backfills_analysis_for_single_replicate_when_missing(tmp_path: Path) -> None:
     payload = _sample_results_payload()
     out_path = tmp_path / "missing_analysis_single.zip"
-    task_pack_version = resolve_task_pack_version("task_pack_v2") or "2.0.0"
+    task_pack_version = resolve_task_pack_version("task_pack_v2") or "2.1.0"
 
     with zipfile.ZipFile(out_path, "w", compression=zipfile.ZIP_DEFLATED) as archive:
         archive.writestr("results.json", json.dumps(payload, indent=2))
@@ -268,13 +268,73 @@ def test_verify_backfills_analysis_for_single_replicate_when_missing(tmp_path: P
     assert report["details"]["analysis_source"] == "generated_single_replicate"
 
 
+def test_verify_allows_historical_builtin_pack_version_when_bundle_is_self_consistent(
+    tmp_path: Path,
+) -> None:
+    payload = _sample_results_payload()
+    payload["config"]["task_pack_version"] = "2.0.0"
+    out_path = tmp_path / "historical_builtin_pack.zip"
+
+    with zipfile.ZipFile(out_path, "w", compression=zipfile.ZIP_DEFLATED) as archive:
+        archive.writestr("results.json", json.dumps(payload, indent=2))
+        archive.writestr("environment.json", json.dumps(payload["environment"], indent=2))
+        archive.writestr("analysis.json", json.dumps(generate_analysis_payload(payload), indent=2))
+        archive.writestr(
+            "submission_manifest.json",
+            json.dumps(
+                {
+                    "bundle_version": "1",
+                    "task_pack": "task_pack_v2",
+                    "task_pack_version": "2.0.0",
+                    "git_commit_hash": "de5a929",
+                    "cli_command": "python -m mentor_worker_benchmark run --suite quick --repro",
+                },
+                indent=2,
+            ),
+        )
+
+    report = verify_submission_bundle(out_path)
+    assert report["ok"], report["errors"]
+    assert report["details"]["task_pack_version"] == "2.0.0"
+    assert report["details"]["local_task_pack_version"] == resolve_task_pack_version("task_pack_v2")
+    assert report["details"]["task_pack_version_matches_local"] is False
+
+
+def test_verify_rejects_manifest_results_task_pack_version_mismatch(tmp_path: Path) -> None:
+    payload = _sample_results_payload()
+    payload["config"]["task_pack_version"] = "2.0.0"
+    out_path = tmp_path / "mismatched_pack_version.zip"
+
+    with zipfile.ZipFile(out_path, "w", compression=zipfile.ZIP_DEFLATED) as archive:
+        archive.writestr("results.json", json.dumps(payload, indent=2))
+        archive.writestr("environment.json", json.dumps(payload["environment"], indent=2))
+        archive.writestr("analysis.json", json.dumps(generate_analysis_payload(payload), indent=2))
+        archive.writestr(
+            "submission_manifest.json",
+            json.dumps(
+                {
+                    "bundle_version": "1",
+                    "task_pack": "task_pack_v2",
+                    "task_pack_version": "2.1.0",
+                    "git_commit_hash": "de5a929",
+                    "cli_command": "python -m mentor_worker_benchmark run --suite quick --repro",
+                },
+                indent=2,
+            ),
+        )
+
+    report = verify_submission_bundle(out_path)
+    assert not report["ok"]
+    assert any("Task pack version mismatch between manifest" in item for item in report["errors"])
+
+
 def test_verify_rejects_new_official_headline_bundle_without_required_multiseed(
     tmp_path: Path,
 ) -> None:
     payload = _sample_results_payload()
     payload["config"]["suite"] = "dev50"
     out_path = tmp_path / "official_dev50_protocol-v0.3.0_seeds-1337.zip"
-    task_pack_version = resolve_task_pack_version("task_pack_v2") or "2.0.0"
+    task_pack_version = resolve_task_pack_version("task_pack_v2") or "2.1.0"
 
     with zipfile.ZipFile(out_path, "w", compression=zipfile.ZIP_DEFLATED) as archive:
         archive.writestr("results.json", json.dumps(payload, indent=2))
@@ -315,7 +375,7 @@ def test_verify_rejects_new_official_headline_bundle_without_required_multiseed(
 def test_verify_allows_legacy_official_bundle_without_protocol_fields(tmp_path: Path) -> None:
     payload = _sample_results_payload()
     out_path = tmp_path / "official_legacy_bundle.zip"
-    task_pack_version = resolve_task_pack_version("task_pack_v2") or "2.0.0"
+    task_pack_version = resolve_task_pack_version("task_pack_v2") or "2.1.0"
     with zipfile.ZipFile(out_path, "w", compression=zipfile.ZIP_DEFLATED) as archive:
         archive.writestr("results.json", json.dumps(payload, indent=2))
         archive.writestr("environment.json", json.dumps(payload["environment"], indent=2))

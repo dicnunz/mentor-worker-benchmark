@@ -1,6 +1,6 @@
 {
   "pack_name": "task_pack_v2",
-  "pack_version": "2.0.0",
+  "pack_version": "2.1.0",
   "generator_seed": 1337,
   "categories": [
     "string_regex_parsing",
@@ -15,23 +15,51 @@
     "mini_repo_tool_sim"
   ],
   "counts": {
-    "total": 500,
-    "train": 340,
-    "dev": 80,
-    "test": 80,
+    "total": 473,
+    "train": 265,
+    "dev": 104,
+    "test": 104,
     "quick": 30
   },
   "category_counts": {
-    "concurrency_basics": 50,
+    "concurrency_basics": 11,
     "ds_algo": 50,
     "file_io_serialization": 50,
     "multi_file_mini_module": 50,
     "numerical_edge_cases": 50,
     "string_regex_parsing": 50,
-    "mini_repo_bugfix": 50,
-    "mini_repo_cli": 50,
-    "mini_repo_feature": 50,
-    "mini_repo_tool_sim": 50
+    "mini_repo_bugfix": 88,
+    "mini_repo_cli": 33,
+    "mini_repo_feature": 88,
+    "mini_repo_tool_sim": 3
+  },
+  "source_audit": {
+    "total_tasks": 652,
+    "exact_family_count": 473,
+    "duplicate_families_detected": 38,
+    "family_size_distribution": {
+      "2": 10,
+      "3": 10,
+      "4": 8,
+      "5": 1,
+      "6": 3,
+      "7": 1,
+      "8": 1,
+      "9": 1,
+      "17": 1,
+      "31": 1,
+      "40": 1
+    },
+    "duplicate_tasks_removed": 179,
+    "cross_split_overlap": {
+      "family_count": 30,
+      "task_count": 194,
+      "split_pattern_counts": {
+        "dev+test+train": 7,
+        "dev+train": 12,
+        "test+train": 11
+      }
+    }
   },
   "tasks": [
     {
@@ -39,6 +67,7 @@
       "title": "Concurrent jobs 000",
       "category": "concurrency_basics",
       "difficulty": "medium",
+      "family_id": "4a373e4a0e322c7fdb22b298d8531a75903f1eabed06a4195bcc666186f62651",
       "split": "train",
       "quick": false,
       "path": "tasks/v1_concurrency_basics_000"
@@ -48,8 +77,9 @@
       "title": "Concurrent jobs 001",
       "category": "concurrency_basics",
       "difficulty": "medium",
-      "split": "train",
-      "quick": false,
+      "family_id": "f25bf6ac8de449fa17687dbf07a88ab1a4724b7ddf787a145241da815b1fe558",
+      "split": "dev",
+      "quick": true,
       "path": "tasks/v1_concurrency_basics_001"
     },
     {
@@ -57,7 +87,8 @@
       "title": "Concurrent jobs 002",
       "category": "concurrency_basics",
       "difficulty": "medium",
-      "split": "train",
+      "family_id": "9bcc7be6c8648cddc6e8013e93f6d67b7614ed986a3346952e825470712f7a2c",
+      "split": "test",
       "quick": false,
       "path": "tasks/v1_concurrency_basics_002"
     },
@@ -66,6 +97,7 @@
       "title": "Concurrent jobs 003",
       "category": "concurrency_basics",
       "difficulty": "easy",
+      "family_id": "8b468f240a0cc6e64f129ea5ac68fe86e36f2510555049b1ac771ee37e29c43d",
       "split": "train",
       "quick": false,
       "path": "tasks/v1_concurrency_basics_003"
@@ -75,7 +107,8 @@
       "title": "Concurrent jobs 004",
       "category": "concurrency_basics",
       "difficulty": "easy",
-      "split": "train",
+      "family_id": "90a19c875852a919b64cbd069cd0241dd9492aa5e60507b1e388bd73079132a7",
+      "split": "dev",
       "quick": false,
       "path": "tasks/v1_concurrency_basics_004"
     },
@@ -84,8 +117,9 @@
       "title": "Concurrent jobs 005",
       "category": "concurrency_basics",
       "difficulty": "hard",
-      "split": "train",
-      "quick": false,
+      "family_id": "75cc430ac61713529fe19a530b15a3513e5723060bd70ffe23be88a87bfaad40",
+      "split": "test",
+      "quick": true,
       "path": "tasks/v1_concurrency_basics_005"
     },
     {
@@ -93,402 +127,57 @@
       "title": "Concurrent jobs 006",
       "category": "concurrency_basics",
       "difficulty": "hard",
-      "split": "dev",
-      "quick": true,
-      "path": "tasks/v1_concurrency_basics_006"
-    },
-    {
-      "task_id": "v1_concurrency_basics_007",
-      "title": "Concurrent jobs 007",
-      "category": "concurrency_basics",
-      "difficulty": "medium",
+      "family_id": "cd154cb5dab4fb3038b302356de8426ce503d54a21999afa4fe0f2a0ee070a11",
       "split": "train",
       "quick": false,
-      "path": "tasks/v1_concurrency_basics_007"
+      "path": "tasks/v1_concurrency_basics_006"
     },
     {
       "task_id": "v1_concurrency_basics_008",
       "title": "Concurrent jobs 008",
       "category": "concurrency_basics",
       "difficulty": "hard",
-      "split": "test",
-      "quick": false,
-      "path": "tasks/v1_concurrency_basics_008"
-    },
-    {
-      "task_id": "v1_concurrency_basics_009",
-      "title": "Concurrent jobs 009",
-      "category": "concurrency_basics",
-      "difficulty": "easy",
-      "split": "test",
-      "quick": false,
-      "path": "tasks/v1_concurrency_basics_009"
-    },
-    {
-      "task_id": "v1_concurrency_basics_010",
-      "title": "Concurrent jobs 010",
-      "category": "concurrency_basics",
-      "difficulty": "easy",
+      "family_id": "1e29db61bbd810e7085eb46d293c7a104353869e47d9342bfb3308e29aa8932c",
       "split": "train",
       "quick": false,
-      "path": "tasks/v1_concurrency_basics_010"
+      "path": "tasks/v1_concurrency_basics_008"
     },
     {
       "task_id": "v1_concurrency_basics_011",
       "title": "Concurrent jobs 011",
       "category": "concurrency_basics",
       "difficulty": "easy",
+      "family_id": "2f0375a64818ecfd45629db45dc5a970d20e93df1066e9a0c2f14bcb3947af7f",
       "split": "train",
       "quick": false,
       "path": "tasks/v1_concurrency_basics_011"
-    },
-    {
-      "task_id": "v1_concurrency_basics_012",
-      "title": "Concurrent jobs 012",
-      "category": "concurrency_basics",
-      "difficulty": "easy",
-      "split": "dev",
-      "quick": false,
-      "path": "tasks/v1_concurrency_basics_012"
     },
     {
       "task_id": "v1_concurrency_basics_013",
       "title": "Concurrent jobs 013",
       "category": "concurrency_basics",
       "difficulty": "hard",
-      "split": "train",
-      "quick": false,
+      "family_id": "fa368ace754fd9ad02184b6fe02aa9bbd404b427fc51df82906f3385ade018c9",
+      "split": "dev",
+      "quick": true,
       "path": "tasks/v1_concurrency_basics_013"
-    },
-    {
-      "task_id": "v1_concurrency_basics_014",
-      "title": "Concurrent jobs 014",
-      "category": "concurrency_basics",
-      "difficulty": "easy",
-      "split": "train",
-      "quick": false,
-      "path": "tasks/v1_concurrency_basics_014"
     },
     {
       "task_id": "v1_concurrency_basics_015",
       "title": "Concurrent jobs 015",
       "category": "concurrency_basics",
       "difficulty": "medium",
-      "split": "train",
+      "family_id": "990844e1b90d86d5121727145fd629b2fbc956d4b62c32a3871075459b3c6b75",
+      "split": "test",
       "quick": false,
       "path": "tasks/v1_concurrency_basics_015"
-    },
-    {
-      "task_id": "v1_concurrency_basics_016",
-      "title": "Concurrent jobs 016",
-      "category": "concurrency_basics",
-      "difficulty": "medium",
-      "split": "train",
-      "quick": false,
-      "path": "tasks/v1_concurrency_basics_016"
-    },
-    {
-      "task_id": "v1_concurrency_basics_017",
-      "title": "Concurrent jobs 017",
-      "category": "concurrency_basics",
-      "difficulty": "medium",
-      "split": "train",
-      "quick": false,
-      "path": "tasks/v1_concurrency_basics_017"
-    },
-    {
-      "task_id": "v1_concurrency_basics_018",
-      "title": "Concurrent jobs 018",
-      "category": "concurrency_basics",
-      "difficulty": "hard",
-      "split": "train",
-      "quick": false,
-      "path": "tasks/v1_concurrency_basics_018"
-    },
-    {
-      "task_id": "v1_concurrency_basics_019",
-      "title": "Concurrent jobs 019",
-      "category": "concurrency_basics",
-      "difficulty": "easy",
-      "split": "train",
-      "quick": false,
-      "path": "tasks/v1_concurrency_basics_019"
-    },
-    {
-      "task_id": "v1_concurrency_basics_020",
-      "title": "Concurrent jobs 020",
-      "category": "concurrency_basics",
-      "difficulty": "medium",
-      "split": "train",
-      "quick": false,
-      "path": "tasks/v1_concurrency_basics_020"
-    },
-    {
-      "task_id": "v1_concurrency_basics_021",
-      "title": "Concurrent jobs 021",
-      "category": "concurrency_basics",
-      "difficulty": "easy",
-      "split": "dev",
-      "quick": false,
-      "path": "tasks/v1_concurrency_basics_021"
-    },
-    {
-      "task_id": "v1_concurrency_basics_022",
-      "title": "Concurrent jobs 022",
-      "category": "concurrency_basics",
-      "difficulty": "medium",
-      "split": "test",
-      "quick": true,
-      "path": "tasks/v1_concurrency_basics_022"
-    },
-    {
-      "task_id": "v1_concurrency_basics_023",
-      "title": "Concurrent jobs 023",
-      "category": "concurrency_basics",
-      "difficulty": "medium",
-      "split": "dev",
-      "quick": false,
-      "path": "tasks/v1_concurrency_basics_023"
-    },
-    {
-      "task_id": "v1_concurrency_basics_024",
-      "title": "Concurrent jobs 024",
-      "category": "concurrency_basics",
-      "difficulty": "medium",
-      "split": "train",
-      "quick": false,
-      "path": "tasks/v1_concurrency_basics_024"
-    },
-    {
-      "task_id": "v1_concurrency_basics_025",
-      "title": "Concurrent jobs 025",
-      "category": "concurrency_basics",
-      "difficulty": "medium",
-      "split": "dev",
-      "quick": false,
-      "path": "tasks/v1_concurrency_basics_025"
-    },
-    {
-      "task_id": "v1_concurrency_basics_026",
-      "title": "Concurrent jobs 026",
-      "category": "concurrency_basics",
-      "difficulty": "medium",
-      "split": "train",
-      "quick": false,
-      "path": "tasks/v1_concurrency_basics_026"
-    },
-    {
-      "task_id": "v1_concurrency_basics_027",
-      "title": "Concurrent jobs 027",
-      "category": "concurrency_basics",
-      "difficulty": "medium",
-      "split": "test",
-      "quick": false,
-      "path": "tasks/v1_concurrency_basics_027"
-    },
-    {
-      "task_id": "v1_concurrency_basics_028",
-      "title": "Concurrent jobs 028",
-      "category": "concurrency_basics",
-      "difficulty": "easy",
-      "split": "dev",
-      "quick": false,
-      "path": "tasks/v1_concurrency_basics_028"
-    },
-    {
-      "task_id": "v1_concurrency_basics_029",
-      "title": "Concurrent jobs 029",
-      "category": "concurrency_basics",
-      "difficulty": "medium",
-      "split": "train",
-      "quick": false,
-      "path": "tasks/v1_concurrency_basics_029"
-    },
-    {
-      "task_id": "v1_concurrency_basics_030",
-      "title": "Concurrent jobs 030",
-      "category": "concurrency_basics",
-      "difficulty": "medium",
-      "split": "dev",
-      "quick": true,
-      "path": "tasks/v1_concurrency_basics_030"
-    },
-    {
-      "task_id": "v1_concurrency_basics_031",
-      "title": "Concurrent jobs 031",
-      "category": "concurrency_basics",
-      "difficulty": "hard",
-      "split": "train",
-      "quick": false,
-      "path": "tasks/v1_concurrency_basics_031"
-    },
-    {
-      "task_id": "v1_concurrency_basics_032",
-      "title": "Concurrent jobs 032",
-      "category": "concurrency_basics",
-      "difficulty": "hard",
-      "split": "train",
-      "quick": false,
-      "path": "tasks/v1_concurrency_basics_032"
-    },
-    {
-      "task_id": "v1_concurrency_basics_033",
-      "title": "Concurrent jobs 033",
-      "category": "concurrency_basics",
-      "difficulty": "medium",
-      "split": "test",
-      "quick": false,
-      "path": "tasks/v1_concurrency_basics_033"
-    },
-    {
-      "task_id": "v1_concurrency_basics_034",
-      "title": "Concurrent jobs 034",
-      "category": "concurrency_basics",
-      "difficulty": "hard",
-      "split": "test",
-      "quick": false,
-      "path": "tasks/v1_concurrency_basics_034"
-    },
-    {
-      "task_id": "v1_concurrency_basics_035",
-      "title": "Concurrent jobs 035",
-      "category": "concurrency_basics",
-      "difficulty": "easy",
-      "split": "dev",
-      "quick": false,
-      "path": "tasks/v1_concurrency_basics_035"
-    },
-    {
-      "task_id": "v1_concurrency_basics_036",
-      "title": "Concurrent jobs 036",
-      "category": "concurrency_basics",
-      "difficulty": "medium",
-      "split": "test",
-      "quick": false,
-      "path": "tasks/v1_concurrency_basics_036"
-    },
-    {
-      "task_id": "v1_concurrency_basics_037",
-      "title": "Concurrent jobs 037",
-      "category": "concurrency_basics",
-      "difficulty": "easy",
-      "split": "train",
-      "quick": false,
-      "path": "tasks/v1_concurrency_basics_037"
-    },
-    {
-      "task_id": "v1_concurrency_basics_038",
-      "title": "Concurrent jobs 038",
-      "category": "concurrency_basics",
-      "difficulty": "medium",
-      "split": "train",
-      "quick": false,
-      "path": "tasks/v1_concurrency_basics_038"
-    },
-    {
-      "task_id": "v1_concurrency_basics_039",
-      "title": "Concurrent jobs 039",
-      "category": "concurrency_basics",
-      "difficulty": "medium",
-      "split": "train",
-      "quick": false,
-      "path": "tasks/v1_concurrency_basics_039"
-    },
-    {
-      "task_id": "v1_concurrency_basics_040",
-      "title": "Concurrent jobs 040",
-      "category": "concurrency_basics",
-      "difficulty": "medium",
-      "split": "dev",
-      "quick": false,
-      "path": "tasks/v1_concurrency_basics_040"
-    },
-    {
-      "task_id": "v1_concurrency_basics_041",
-      "title": "Concurrent jobs 041",
-      "category": "concurrency_basics",
-      "difficulty": "easy",
-      "split": "train",
-      "quick": false,
-      "path": "tasks/v1_concurrency_basics_041"
-    },
-    {
-      "task_id": "v1_concurrency_basics_042",
-      "title": "Concurrent jobs 042",
-      "category": "concurrency_basics",
-      "difficulty": "easy",
-      "split": "train",
-      "quick": false,
-      "path": "tasks/v1_concurrency_basics_042"
-    },
-    {
-      "task_id": "v1_concurrency_basics_043",
-      "title": "Concurrent jobs 043",
-      "category": "concurrency_basics",
-      "difficulty": "easy",
-      "split": "train",
-      "quick": false,
-      "path": "tasks/v1_concurrency_basics_043"
-    },
-    {
-      "task_id": "v1_concurrency_basics_044",
-      "title": "Concurrent jobs 044",
-      "category": "concurrency_basics",
-      "difficulty": "medium",
-      "split": "train",
-      "quick": false,
-      "path": "tasks/v1_concurrency_basics_044"
-    },
-    {
-      "task_id": "v1_concurrency_basics_045",
-      "title": "Concurrent jobs 045",
-      "category": "concurrency_basics",
-      "difficulty": "medium",
-      "split": "train",
-      "quick": false,
-      "path": "tasks/v1_concurrency_basics_045"
-    },
-    {
-      "task_id": "v1_concurrency_basics_046",
-      "title": "Concurrent jobs 046",
-      "category": "concurrency_basics",
-      "difficulty": "hard",
-      "split": "train",
-      "quick": false,
-      "path": "tasks/v1_concurrency_basics_046"
-    },
-    {
-      "task_id": "v1_concurrency_basics_047",
-      "title": "Concurrent jobs 047",
-      "category": "concurrency_basics",
-      "difficulty": "medium",
-      "split": "train",
-      "quick": false,
-      "path": "tasks/v1_concurrency_basics_047"
-    },
-    {
-      "task_id": "v1_concurrency_basics_048",
-      "title": "Concurrent jobs 048",
-      "category": "concurrency_basics",
-      "difficulty": "easy",
-      "split": "train",
-      "quick": false,
-      "path": "tasks/v1_concurrency_basics_048"
-    },
-    {
-      "task_id": "v1_concurrency_basics_049",
-      "title": "Concurrent jobs 049",
-      "category": "concurrency_basics",
-      "difficulty": "medium",
-      "split": "train",
-      "quick": false,
-      "path": "tasks/v1_concurrency_basics_049"
     },
     {
       "task_id": "v1_ds_algo_000",
       "title": "Rank products 000",
       "category": "ds_algo",
       "difficulty": "hard",
+      "family_id": "b068aa968e1f6c86fd7f4dce12c6bd4da8eff89d66225ef5cea47509ba807671",
       "split": "train",
       "quick": false,
       "path": "tasks/v1_ds_algo_000"
@@ -498,6 +187,7 @@
       "title": "Rank products 001",
       "category": "ds_algo",
       "difficulty": "medium",
+      "family_id": "21b78f15f5b446dede12334fef0bb133aa2404a33dc82793842f2e852edc88fa",
       "split": "train",
       "quick": false,
       "path": "tasks/v1_ds_algo_001"
@@ -507,6 +197,7 @@
       "title": "Rank products 002",
       "category": "ds_algo",
       "difficulty": "easy",
+      "family_id": "205f931f74b09afd63bd4577aa51e4a261263ba4f441498dc1a1a01a52f5b748",
       "split": "train",
       "quick": false,
       "path": "tasks/v1_ds_algo_002"
@@ -516,8 +207,9 @@
       "title": "Rank products 003",
       "category": "ds_algo",
       "difficulty": "medium",
-      "split": "dev",
-      "quick": true,
+      "family_id": "bf07029907fdf1fded5ef7fe189c9d0e6c74ccc9cdb8cc2ae7820f95ffa4527d",
+      "split": "test",
+      "quick": false,
       "path": "tasks/v1_ds_algo_003"
     },
     {
@@ -525,6 +217,7 @@
       "title": "Rank products 004",
       "category": "ds_algo",
       "difficulty": "easy",
+      "family_id": "d6a330a6c3e9b70b800036a1c55f7b30b2e78d7703cedbfb714ed8ab1d6e194c",
       "split": "train",
       "quick": false,
       "path": "tasks/v1_ds_algo_004"
@@ -534,8 +227,9 @@
       "title": "Rank products 005",
       "category": "ds_algo",
       "difficulty": "easy",
+      "family_id": "a07338c0ea798725c8201400d2b655c2f5532bb2a271b35b34ee8da68fb17e0c",
       "split": "test",
-      "quick": false,
+      "quick": true,
       "path": "tasks/v1_ds_algo_005"
     },
     {
@@ -543,6 +237,7 @@
       "title": "Rank products 006",
       "category": "ds_algo",
       "difficulty": "hard",
+      "family_id": "91c733a4b7455a8544d2773be5a9b38981f72be4eabe8c5f798fe77845efb67b",
       "split": "train",
       "quick": false,
       "path": "tasks/v1_ds_algo_006"
@@ -552,7 +247,8 @@
       "title": "Rank products 007",
       "category": "ds_algo",
       "difficulty": "medium",
-      "split": "train",
+      "family_id": "e5673858e11ed309de7190698597bb5676ae2ed2f33ad0adce82a1d25bf60a06",
+      "split": "dev",
       "quick": false,
       "path": "tasks/v1_ds_algo_007"
     },
@@ -561,7 +257,8 @@
       "title": "Rank products 008",
       "category": "ds_algo",
       "difficulty": "hard",
-      "split": "train",
+      "family_id": "45a1a0aea83b2d8265005d9654d07d6ba8395ad14fb6b42b1c8c265893b280f6",
+      "split": "dev",
       "quick": false,
       "path": "tasks/v1_ds_algo_008"
     },
@@ -570,8 +267,9 @@
       "title": "Rank products 009",
       "category": "ds_algo",
       "difficulty": "easy",
-      "split": "train",
-      "quick": false,
+      "family_id": "f2c8bfee0c1f399a518af8ff49fdeeefa31ab885caf318e5f43e58f520b021b2",
+      "split": "dev",
+      "quick": true,
       "path": "tasks/v1_ds_algo_009"
     },
     {
@@ -579,8 +277,9 @@
       "title": "Rank products 010",
       "category": "ds_algo",
       "difficulty": "medium",
+      "family_id": "aa218379806fe1cf81e64f62f1214d096e45351295285d921f679f6ba6f73a0b",
       "split": "test",
-      "quick": true,
+      "quick": false,
       "path": "tasks/v1_ds_algo_010"
     },
     {
@@ -588,6 +287,7 @@
       "title": "Rank products 011",
       "category": "ds_algo",
       "difficulty": "hard",
+      "family_id": "54236afd6948389014db421f02a819f41888af141b20de376aae6098bffdc0e2",
       "split": "train",
       "quick": false,
       "path": "tasks/v1_ds_algo_011"
@@ -597,6 +297,7 @@
       "title": "Rank products 012",
       "category": "ds_algo",
       "difficulty": "hard",
+      "family_id": "db6b9a35d96be0d22e9281ac83ef7dc8a2dde812f558c9294d26f8d7940fe57d",
       "split": "train",
       "quick": false,
       "path": "tasks/v1_ds_algo_012"
@@ -606,6 +307,7 @@
       "title": "Rank products 013",
       "category": "ds_algo",
       "difficulty": "easy",
+      "family_id": "4f52da4b7e15b59b4a43534bcc1a6a3afb83132d88bd1340fd782a6aba7aa56a",
       "split": "train",
       "quick": false,
       "path": "tasks/v1_ds_algo_013"
@@ -615,6 +317,7 @@
       "title": "Rank products 014",
       "category": "ds_algo",
       "difficulty": "medium",
+      "family_id": "2eecef46c5b0f879e9300cf263169c1eb865ac15c6cd05010f770ed0b2a1687b",
       "split": "train",
       "quick": false,
       "path": "tasks/v1_ds_algo_014"
@@ -624,7 +327,8 @@
       "title": "Rank products 015",
       "category": "ds_algo",
       "difficulty": "medium",
-      "split": "train",
+      "family_id": "4b97d9cd9e3afd7e88a3655f35cc384441c207f39fc567413cb3c277f274667f",
+      "split": "test",
       "quick": false,
       "path": "tasks/v1_ds_algo_015"
     },
@@ -633,7 +337,8 @@
       "title": "Rank products 016",
       "category": "ds_algo",
       "difficulty": "hard",
-      "split": "dev",
+      "family_id": "02b9c4ab2a19e059a13942898dbadd01718c19332230d4b6fa933f7074b94ff1",
+      "split": "train",
       "quick": false,
       "path": "tasks/v1_ds_algo_016"
     },
@@ -642,7 +347,8 @@
       "title": "Rank products 017",
       "category": "ds_algo",
       "difficulty": "medium",
-      "split": "train",
+      "family_id": "6872335c01343f34eaa590bbca0ff435cc68d61e39ff2a675e2ed806460bd9a5",
+      "split": "dev",
       "quick": false,
       "path": "tasks/v1_ds_algo_017"
     },
@@ -651,7 +357,8 @@
       "title": "Rank products 018",
       "category": "ds_algo",
       "difficulty": "hard",
-      "split": "train",
+      "family_id": "6e75c3a5086b7927d686039661b70f4569a74e0155fd9a10021e36b0912c2d29",
+      "split": "dev",
       "quick": false,
       "path": "tasks/v1_ds_algo_018"
     },
@@ -660,6 +367,7 @@
       "title": "Rank products 019",
       "category": "ds_algo",
       "difficulty": "medium",
+      "family_id": "b87c58b1e289652a03e5607700c281aeb453b6b67fcfa9f58e138eced2ae0e49",
       "split": "train",
       "quick": false,
       "path": "tasks/v1_ds_algo_019"
@@ -669,6 +377,7 @@
       "title": "Rank products 020",
       "category": "ds_algo",
       "difficulty": "hard",
+      "family_id": "73427c8b211e193ed0842c50f763f89e264cc3a24bc751abbe7419de714d5790",
       "split": "train",
       "quick": false,
       "path": "tasks/v1_ds_algo_020"
@@ -678,7 +387,8 @@
       "title": "Rank products 021",
       "category": "ds_algo",
       "difficulty": "hard",
-      "split": "train",
+      "family_id": "d9e15d3b6ffd4a65c2c9f92005155b2f0e98b72e4f15c687c8cd4040827c7b01",
+      "split": "dev",
       "quick": false,
       "path": "tasks/v1_ds_algo_021"
     },
@@ -687,7 +397,8 @@
       "title": "Rank products 022",
       "category": "ds_algo",
       "difficulty": "medium",
-      "split": "train",
+      "family_id": "922c8a4ec74dee9b5cf62ea5a474d9d2de62c536ab90365f16d94abe06c10d29",
+      "split": "test",
       "quick": false,
       "path": "tasks/v1_ds_algo_022"
     },
@@ -696,6 +407,7 @@
       "title": "Rank products 023",
       "category": "ds_algo",
       "difficulty": "medium",
+      "family_id": "ca3890439ed89c2a96417d8e34d85e59f5c66df656f5d2fc1389b5b8570b27cb",
       "split": "train",
       "quick": false,
       "path": "tasks/v1_ds_algo_023"
@@ -705,6 +417,7 @@
       "title": "Rank products 024",
       "category": "ds_algo",
       "difficulty": "medium",
+      "family_id": "053f70b65a11b8c839567a1eb706f04c7eee0089639cf211f02b8979db8b8af2",
       "split": "train",
       "quick": false,
       "path": "tasks/v1_ds_algo_024"
@@ -714,6 +427,7 @@
       "title": "Rank products 025",
       "category": "ds_algo",
       "difficulty": "easy",
+      "family_id": "a4f271638990d82f7d58f4d3e4cdd51bec1cd08d3e363144765215c50bcc61b1",
       "split": "train",
       "quick": false,
       "path": "tasks/v1_ds_algo_025"
@@ -723,7 +437,8 @@
       "title": "Rank products 026",
       "category": "ds_algo",
       "difficulty": "easy",
-      "split": "dev",
+      "family_id": "0c38b6fa8aa5ef9eddbf741e1189be0f2876935d730408d7ce65e86a2c9e3eeb",
+      "split": "train",
       "quick": false,
       "path": "tasks/v1_ds_algo_026"
     },
@@ -732,7 +447,8 @@
       "title": "Rank products 027",
       "category": "ds_algo",
       "difficulty": "medium",
-      "split": "train",
+      "family_id": "19fa52bebabee29c173e4d81eb2d8710dc3f08459c3a163c2f3d44bf52f1e36a",
+      "split": "test",
       "quick": false,
       "path": "tasks/v1_ds_algo_027"
     },
@@ -741,6 +457,7 @@
       "title": "Rank products 028",
       "category": "ds_algo",
       "difficulty": "hard",
+      "family_id": "c74997561fbed663be1d9f8050ae8ca8c44a02839ceed0244dad74040b85b278",
       "split": "train",
       "quick": false,
       "path": "tasks/v1_ds_algo_028"
@@ -750,7 +467,8 @@
       "title": "Rank products 029",
       "category": "ds_algo",
       "difficulty": "easy",
-      "split": "dev",
+      "family_id": "3e4f1727a6d0c52e99bbafe2a850c2a43b708adea97527fd6efe49890b58c376",
+      "split": "test",
       "quick": false,
       "path": "tasks/v1_ds_algo_029"
     },
@@ -759,7 +477,8 @@
       "title": "Rank products 030",
       "category": "ds_algo",
       "difficulty": "medium",
-      "split": "train",
+      "family_id": "125561bbe931e1b24e0713178d4523629606470c2ec5f08ce3c1cddbee874db3",
+      "split": "dev",
       "quick": false,
       "path": "tasks/v1_ds_algo_030"
     },
@@ -768,7 +487,8 @@
       "title": "Rank products 031",
       "category": "ds_algo",
       "difficulty": "easy",
-      "split": "train",
+      "family_id": "94924c2f7ff35c241f09245c84baa1a974bc1f67e991b94866d15d133d2316e2",
+      "split": "dev",
       "quick": false,
       "path": "tasks/v1_ds_algo_031"
     },
@@ -777,6 +497,7 @@
       "title": "Rank products 032",
       "category": "ds_algo",
       "difficulty": "medium",
+      "family_id": "1fc53c06955370547518ed8734d17d2172b513e020bc14aaafc8b1ca59eac20d",
       "split": "train",
       "quick": false,
       "path": "tasks/v1_ds_algo_032"
@@ -786,7 +507,8 @@
       "title": "Rank products 033",
       "category": "ds_algo",
       "difficulty": "easy",
-      "split": "train",
+      "family_id": "0ce30fdc32d27c3bd49f0d34473c3b10b15dbefcdf46611cf5fe65a7cd1e3408",
+      "split": "test",
       "quick": false,
       "path": "tasks/v1_ds_algo_033"
     },
@@ -795,7 +517,8 @@
       "title": "Rank products 034",
       "category": "ds_algo",
       "difficulty": "easy",
-      "split": "test",
+      "family_id": "9bcb2d0dcd9be62466c8a676167fb9b0ddbf6b2e08f21749ade540eff7594fbd",
+      "split": "dev",
       "quick": false,
       "path": "tasks/v1_ds_algo_034"
     },
@@ -804,6 +527,7 @@
       "title": "Rank products 035",
       "category": "ds_algo",
       "difficulty": "medium",
+      "family_id": "b1b821c37603721440260e2ed2db00271b24222d9637e2f540b0812b971138b7",
       "split": "train",
       "quick": false,
       "path": "tasks/v1_ds_algo_035"
@@ -813,7 +537,8 @@
       "title": "Rank products 036",
       "category": "ds_algo",
       "difficulty": "hard",
-      "split": "train",
+      "family_id": "da69ca045e62c0804e9a6c096def3e2147de956ebb2c6d33fff16b9e4732eec0",
+      "split": "test",
       "quick": false,
       "path": "tasks/v1_ds_algo_036"
     },
@@ -822,7 +547,8 @@
       "title": "Rank products 037",
       "category": "ds_algo",
       "difficulty": "easy",
-      "split": "test",
+      "family_id": "629b5f44b8b959e1cf3aca863bdbc0c51a6626eae4899a9f73a8cf25b3268398",
+      "split": "train",
       "quick": false,
       "path": "tasks/v1_ds_algo_037"
     },
@@ -831,6 +557,7 @@
       "title": "Rank products 038",
       "category": "ds_algo",
       "difficulty": "easy",
+      "family_id": "58773907879d48e6be93f8a908c10140175644288613acee7c158f12518a4783",
       "split": "train",
       "quick": false,
       "path": "tasks/v1_ds_algo_038"
@@ -840,6 +567,7 @@
       "title": "Rank products 039",
       "category": "ds_algo",
       "difficulty": "easy",
+      "family_id": "543362b6804843920df0c659e8bdfc83845c199d51c912b3e1914c8c3e657ae0",
       "split": "train",
       "quick": false,
       "path": "tasks/v1_ds_algo_039"
@@ -849,6 +577,7 @@
       "title": "Rank products 040",
       "category": "ds_algo",
       "difficulty": "easy",
+      "family_id": "c63a89d31d53e36e614cfef541de8fea139f258810f8abb6b467877bb8782f27",
       "split": "train",
       "quick": false,
       "path": "tasks/v1_ds_algo_040"
@@ -858,6 +587,7 @@
       "title": "Rank products 041",
       "category": "ds_algo",
       "difficulty": "medium",
+      "family_id": "7a33fcc99d2596d953112fa73e18b0ac047623b7c1c316228c5be47ffdc33609",
       "split": "train",
       "quick": false,
       "path": "tasks/v1_ds_algo_041"
@@ -867,8 +597,9 @@
       "title": "Rank products 042",
       "category": "ds_algo",
       "difficulty": "hard",
+      "family_id": "026213b6707fa98a26c52f96bcb21ee90f55914923d3f3ec43f7fabade38ddc0",
       "split": "dev",
-      "quick": false,
+      "quick": true,
       "path": "tasks/v1_ds_algo_042"
     },
     {
@@ -876,6 +607,7 @@
       "title": "Rank products 043",
       "category": "ds_algo",
       "difficulty": "easy",
+      "family_id": "ef49e8b5077391828ef4e6500648991a30111c64c8ce7d18ab7549959549877b",
       "split": "train",
       "quick": false,
       "path": "tasks/v1_ds_algo_043"
@@ -885,8 +617,9 @@
       "title": "Rank products 044",
       "category": "ds_algo",
       "difficulty": "easy",
-      "split": "dev",
-      "quick": true,
+      "family_id": "1eb16a6e4a68523ec9ed08f8815e5e32518b924f05aec7d476ba7e15b0d9d600",
+      "split": "train",
+      "quick": false,
       "path": "tasks/v1_ds_algo_044"
     },
     {
@@ -894,7 +627,8 @@
       "title": "Rank products 045",
       "category": "ds_algo",
       "difficulty": "medium",
-      "split": "train",
+      "family_id": "09ff4cce0001373057fd7e571039f9ab3734b9b0b39a72b3951ac4430eb1903c",
+      "split": "test",
       "quick": false,
       "path": "tasks/v1_ds_algo_045"
     },
@@ -903,6 +637,7 @@
       "title": "Rank products 046",
       "category": "ds_algo",
       "difficulty": "hard",
+      "family_id": "90681ae8156d462e7f11a660687fdc68b80ffa7012af473503505924f4bd4f96",
       "split": "train",
       "quick": false,
       "path": "tasks/v1_ds_algo_046"
@@ -912,7 +647,8 @@
       "title": "Rank products 047",
       "category": "ds_algo",
       "difficulty": "medium",
-      "split": "train",
+      "family_id": "d55296e2b9abccc024b92ff0e68cfc1b96a1485e7904893e948fbe17dfafb1ba",
+      "split": "test",
       "quick": false,
       "path": "tasks/v1_ds_algo_047"
     },
@@ -921,6 +657,7 @@
       "title": "Rank products 048",
       "category": "ds_algo",
       "difficulty": "easy",
+      "family_id": "d0d2ca5e3a5f43bf50b01b72c688cdedf610cfa91013f9bf553bcf888c3162d6",
       "split": "dev",
       "quick": false,
       "path": "tasks/v1_ds_algo_048"
@@ -930,6 +667,7 @@
       "title": "Rank products 049",
       "category": "ds_algo",
       "difficulty": "medium",
+      "family_id": "70c5d6f2b4f6d7cf21aa06a3f430452796446dc42ea410a66c0dc2067f26ba18",
       "split": "train",
       "quick": false,
       "path": "tasks/v1_ds_algo_049"
@@ -939,8 +677,9 @@
       "title": "CSV summary 000",
       "category": "file_io_serialization",
       "difficulty": "hard",
-      "split": "dev",
-      "quick": true,
+      "family_id": "f141dc60a6954074b6cf67fd45efcb24139e603bb7d25e6494831ba637e79761",
+      "split": "test",
+      "quick": false,
       "path": "tasks/v1_file_io_serialization_000"
     },
     {
@@ -948,6 +687,7 @@
       "title": "CSV summary 001",
       "category": "file_io_serialization",
       "difficulty": "medium",
+      "family_id": "7ea1e10bd285943fe27bead8617af1a101c7f3f7e7ab918ab49bd0e5fbc08bd3",
       "split": "train",
       "quick": false,
       "path": "tasks/v1_file_io_serialization_001"
@@ -957,7 +697,8 @@
       "title": "CSV summary 002",
       "category": "file_io_serialization",
       "difficulty": "hard",
-      "split": "test",
+      "family_id": "4536ecb81f32f82371fa0ab0f700b1635896815f15ce56ac1480b7471258fd18",
+      "split": "train",
       "quick": false,
       "path": "tasks/v1_file_io_serialization_002"
     },
@@ -966,8 +707,9 @@
       "title": "CSV summary 003",
       "category": "file_io_serialization",
       "difficulty": "medium",
-      "split": "train",
-      "quick": false,
+      "family_id": "caeab279f4450924939f889bfb8edaa1ae075ef992ecda489636cde13fc5f34a",
+      "split": "test",
+      "quick": true,
       "path": "tasks/v1_file_io_serialization_003"
     },
     {
@@ -975,7 +717,8 @@
       "title": "CSV summary 004",
       "category": "file_io_serialization",
       "difficulty": "easy",
-      "split": "test",
+      "family_id": "ab79d4d82e629f3d8a8de8d6ebb0822c121156660d42353be4fa1e9fc5ab8108",
+      "split": "train",
       "quick": false,
       "path": "tasks/v1_file_io_serialization_004"
     },
@@ -984,7 +727,8 @@
       "title": "CSV summary 005",
       "category": "file_io_serialization",
       "difficulty": "medium",
-      "split": "train",
+      "family_id": "ff981e65fc7eca52a8a245c7ac16129fb2e8b60eb62ff90183602aaea09396e6",
+      "split": "dev",
       "quick": false,
       "path": "tasks/v1_file_io_serialization_005"
     },
@@ -993,7 +737,8 @@
       "title": "CSV summary 006",
       "category": "file_io_serialization",
       "difficulty": "easy",
-      "split": "dev",
+      "family_id": "6698aa16ee5bf0aa469e21081d0ad7cc9ef1d94dfa9666c74ef3adb7be59291c",
+      "split": "test",
       "quick": false,
       "path": "tasks/v1_file_io_serialization_006"
     },
@@ -1002,6 +747,7 @@
       "title": "CSV summary 007",
       "category": "file_io_serialization",
       "difficulty": "easy",
+      "family_id": "134e6b47fe15b19cd18f9b1a05d11b518ea00a93eb04598f41c62dd95b7d591e",
       "split": "train",
       "quick": false,
       "path": "tasks/v1_file_io_serialization_007"
@@ -1011,7 +757,8 @@
       "title": "CSV summary 008",
       "category": "file_io_serialization",
       "difficulty": "medium",
-      "split": "train",
+      "family_id": "df06b2798c7930a06c530954ea5beea2b9f938afdd722d025b1992847be8bed5",
+      "split": "test",
       "quick": false,
       "path": "tasks/v1_file_io_serialization_008"
     },
@@ -1020,7 +767,8 @@
       "title": "CSV summary 009",
       "category": "file_io_serialization",
       "difficulty": "hard",
-      "split": "dev",
+      "family_id": "a73e80d869dccf4e64171bb17f0c55cbc4bed37ac8d64ccafb4bae3b5ad3db29",
+      "split": "train",
       "quick": false,
       "path": "tasks/v1_file_io_serialization_009"
     },
@@ -1029,6 +777,7 @@
       "title": "CSV summary 010",
       "category": "file_io_serialization",
       "difficulty": "easy",
+      "family_id": "15c5654ab75066059086b02370ad63eb1da91711a20ffd1055b34cadf1457e6e",
       "split": "train",
       "quick": false,
       "path": "tasks/v1_file_io_serialization_010"
@@ -1038,6 +787,7 @@
       "title": "CSV summary 011",
       "category": "file_io_serialization",
       "difficulty": "hard",
+      "family_id": "b299119e804803c3bb1b156bf571a77e88784cd50bb8ae896275deed656a3106",
       "split": "train",
       "quick": false,
       "path": "tasks/v1_file_io_serialization_011"
@@ -1047,7 +797,8 @@
       "title": "CSV summary 012",
       "category": "file_io_serialization",
       "difficulty": "medium",
-      "split": "train",
+      "family_id": "df676b1a432cd7c8c911448545e6a00cb7f23a4472753770f8321c298ecb465f",
+      "split": "test",
       "quick": false,
       "path": "tasks/v1_file_io_serialization_012"
     },
@@ -1056,6 +807,7 @@
       "title": "CSV summary 013",
       "category": "file_io_serialization",
       "difficulty": "hard",
+      "family_id": "8fd0ddf7a4504a4dc83a67897129eff4920b8c4c82d7a17f0310cda658a17224",
       "split": "train",
       "quick": false,
       "path": "tasks/v1_file_io_serialization_013"
@@ -1065,6 +817,7 @@
       "title": "CSV summary 014",
       "category": "file_io_serialization",
       "difficulty": "medium",
+      "family_id": "22e0d787ed0bbd88391ff01cd45a391c909415722d0e127a24aecd4926df7492",
       "split": "train",
       "quick": false,
       "path": "tasks/v1_file_io_serialization_014"
@@ -1074,7 +827,8 @@
       "title": "CSV summary 015",
       "category": "file_io_serialization",
       "difficulty": "easy",
-      "split": "train",
+      "family_id": "3583a876a2b4132d95b7174c5f9cdf2ab86bbd5d577b6fb15a75a53ba65354ee",
+      "split": "test",
       "quick": false,
       "path": "tasks/v1_file_io_serialization_015"
     },
@@ -1083,7 +837,8 @@
       "title": "CSV summary 016",
       "category": "file_io_serialization",
       "difficulty": "hard",
-      "split": "train",
+      "family_id": "3ebe28e24c8acefdc35a2a4c43547b3da3d8794285935f2da8d5d127320dfeaf",
+      "split": "dev",
       "quick": false,
       "path": "tasks/v1_file_io_serialization_016"
     },
@@ -1092,6 +847,7 @@
       "title": "CSV summary 017",
       "category": "file_io_serialization",
       "difficulty": "easy",
+      "family_id": "afdae4dcf1f01379e5585c827de7da02522ab8e610fc53612f434fa722202cdf",
       "split": "dev",
       "quick": false,
       "path": "tasks/v1_file_io_serialization_017"
@@ -1101,7 +857,8 @@
       "title": "CSV summary 018",
       "category": "file_io_serialization",
       "difficulty": "medium",
-      "split": "train",
+      "family_id": "b3e05c721303b4e5bc144e199b89afef9cc31817dcba07da231921177e2843a7",
+      "split": "test",
       "quick": false,
       "path": "tasks/v1_file_io_serialization_018"
     },
@@ -1110,6 +867,7 @@
       "title": "CSV summary 019",
       "category": "file_io_serialization",
       "difficulty": "medium",
+      "family_id": "0da821bab97e5bc480db17a009bdf8c0fee55efd5fad67787edd5159e43816a2",
       "split": "train",
       "quick": false,
       "path": "tasks/v1_file_io_serialization_019"
@@ -1119,6 +877,7 @@
       "title": "CSV summary 020",
       "category": "file_io_serialization",
       "difficulty": "easy",
+      "family_id": "af1f8c8ee50a1cf5152ee9fec1975f04676fafba8a1346b84f748fb0e3d67d37",
       "split": "train",
       "quick": false,
       "path": "tasks/v1_file_io_serialization_020"
@@ -1128,6 +887,7 @@
       "title": "CSV summary 021",
       "category": "file_io_serialization",
       "difficulty": "medium",
+      "family_id": "bbdd344b4ce0b0a22016cf1d5b220c409f49282f7d4a80b8c6f754e9e6c49f33",
       "split": "train",
       "quick": false,
       "path": "tasks/v1_file_io_serialization_021"
@@ -1137,6 +897,7 @@
       "title": "CSV summary 022",
       "category": "file_io_serialization",
       "difficulty": "medium",
+      "family_id": "1d2b000963d253ec399a542de53312619014793ae97e806f266a21c26092c96a",
       "split": "train",
       "quick": false,
       "path": "tasks/v1_file_io_serialization_022"
@@ -1146,6 +907,7 @@
       "title": "CSV summary 023",
       "category": "file_io_serialization",
       "difficulty": "easy",
+      "family_id": "140432ac1e44c265b48e8e348ce64535535c51e8b78733d407b7cf34b983dbad",
       "split": "train",
       "quick": false,
       "path": "tasks/v1_file_io_serialization_023"
@@ -1155,8 +917,9 @@
       "title": "CSV summary 024",
       "category": "file_io_serialization",
       "difficulty": "easy",
-      "split": "train",
-      "quick": false,
+      "family_id": "735f89409efe91608f088df2804174af2b0bd3cf5e981b9b7ccea98b0f39d7c8",
+      "split": "dev",
+      "quick": true,
       "path": "tasks/v1_file_io_serialization_024"
     },
     {
@@ -1164,6 +927,7 @@
       "title": "CSV summary 025",
       "category": "file_io_serialization",
       "difficulty": "medium",
+      "family_id": "f815783acd8c5f602be0ecce429aae46892e5633d5c942a88d3ab103f549852d",
       "split": "train",
       "quick": false,
       "path": "tasks/v1_file_io_serialization_025"
@@ -1173,8 +937,9 @@
       "title": "CSV summary 026",
       "category": "file_io_serialization",
       "difficulty": "medium",
-      "split": "test",
-      "quick": false,
+      "family_id": "c2b69f220280fd02471fdcac6f961cec82639e382d3b35b87484b79fbf7e5a5d",
+      "split": "dev",
+      "quick": true,
       "path": "tasks/v1_file_io_serialization_026"
     },
     {
@@ -1182,7 +947,8 @@
       "title": "CSV summary 027",
       "category": "file_io_serialization",
       "difficulty": "easy",
-      "split": "train",
+      "family_id": "5187bc49e42283e72d866e03a38bf5acc0397acbc6c99a01af6fc29090c5259f",
+      "split": "dev",
       "quick": false,
       "path": "tasks/v1_file_io_serialization_027"
     },
@@ -1191,7 +957,8 @@
       "title": "CSV summary 028",
       "category": "file_io_serialization",
       "difficulty": "easy",
-      "split": "train",
+      "family_id": "fca13cd70be5bb8ab746111cf3c9d92782542e9c45fa797012b6fd2124264e70",
+      "split": "test",
       "quick": false,
       "path": "tasks/v1_file_io_serialization_028"
     },
@@ -1200,8 +967,9 @@
       "title": "CSV summary 029",
       "category": "file_io_serialization",
       "difficulty": "easy",
-      "split": "dev",
-      "quick": true,
+      "family_id": "57fbe6a5c73cc26037fd688639e0b1a0805544c32d4a173b1cc7601bf5339a4e",
+      "split": "train",
+      "quick": false,
       "path": "tasks/v1_file_io_serialization_029"
     },
     {
@@ -1209,6 +977,7 @@
       "title": "CSV summary 030",
       "category": "file_io_serialization",
       "difficulty": "medium",
+      "family_id": "6002c0880a4986d762e094ebd7774a6a94bad3cc8438a53403f7882668267d96",
       "split": "train",
       "quick": false,
       "path": "tasks/v1_file_io_serialization_030"
@@ -1218,7 +987,8 @@
       "title": "CSV summary 031",
       "category": "file_io_serialization",
       "difficulty": "hard",
-      "split": "dev",
+      "family_id": "df5a4b245215245784f07382bf394b7321c23efa4fb32aae0e7c1b7747561c9d",
+      "split": "train",
       "quick": false,
       "path": "tasks/v1_file_io_serialization_031"
     },
@@ -1227,6 +997,7 @@
       "title": "CSV summary 032",
       "category": "file_io_serialization",
       "difficulty": "easy",
+      "family_id": "ae0d475a647241407bef7b5c7171bcdab60b4bfbeefce6598ae89a255cd4fa13",
       "split": "train",
       "quick": false,
       "path": "tasks/v1_file_io_serialization_032"
@@ -1236,7 +1007,8 @@
       "title": "CSV summary 033",
       "category": "file_io_serialization",
       "difficulty": "hard",
-      "split": "train",
+      "family_id": "0c7d967d8062f4a5d950a95be9f83821ce360aded4c53310bfa13dade5957eca",
+      "split": "dev",
       "quick": false,
       "path": "tasks/v1_file_io_serialization_033"
     },
@@ -1245,6 +1017,7 @@
       "title": "CSV summary 034",
       "category": "file_io_serialization",
       "difficulty": "medium",
+      "family_id": "0531cf2970e0651c4a6595f8840e1e920b8c3d2f261a8ac6975e6f176d983ba9",
       "split": "dev",
       "quick": false,
       "path": "tasks/v1_file_io_serialization_034"
@@ -1254,7 +1027,8 @@
       "title": "CSV summary 035",
       "category": "file_io_serialization",
       "difficulty": "easy",
-      "split": "test",
+      "family_id": "45a53029b32cc2f138e9630455a53788746595d81b223d1c6850d1da21b6ae6a",
+      "split": "train",
       "quick": false,
       "path": "tasks/v1_file_io_serialization_035"
     },
@@ -1263,6 +1037,7 @@
       "title": "CSV summary 036",
       "category": "file_io_serialization",
       "difficulty": "easy",
+      "family_id": "7ddac7dfa0d0bb1b15db7a58aa06887ce6a89e8312261aae9848beeaf2503ee6",
       "split": "train",
       "quick": false,
       "path": "tasks/v1_file_io_serialization_036"
@@ -1272,7 +1047,8 @@
       "title": "CSV summary 037",
       "category": "file_io_serialization",
       "difficulty": "medium",
-      "split": "train",
+      "family_id": "d94c6db22e0ade3a625cec3c12d6b4b9f4a617a733e23b13d36bb75a3e5129ab",
+      "split": "test",
       "quick": false,
       "path": "tasks/v1_file_io_serialization_037"
     },
@@ -1281,7 +1057,8 @@
       "title": "CSV summary 038",
       "category": "file_io_serialization",
       "difficulty": "medium",
-      "split": "train",
+      "family_id": "edc2cd2421c03bc46b215b123e8110d810852d697f3da211391e2bba3c6a0425",
+      "split": "dev",
       "quick": false,
       "path": "tasks/v1_file_io_serialization_038"
     },
@@ -1290,6 +1067,7 @@
       "title": "CSV summary 039",
       "category": "file_io_serialization",
       "difficulty": "medium",
+      "family_id": "f90282f1610dfea96e8d4b6d25ef15d448b62d194dde26f4233c21f2b58ee09e",
       "split": "train",
       "quick": false,
       "path": "tasks/v1_file_io_serialization_039"
@@ -1299,7 +1077,8 @@
       "title": "CSV summary 040",
       "category": "file_io_serialization",
       "difficulty": "medium",
-      "split": "train",
+      "family_id": "650dd820e7b327a3691e4fc29f11b72de11b040dd42e7bf06ec2567141e245a7",
+      "split": "test",
       "quick": false,
       "path": "tasks/v1_file_io_serialization_040"
     },
@@ -1308,6 +1087,7 @@
       "title": "CSV summary 041",
       "category": "file_io_serialization",
       "difficulty": "medium",
+      "family_id": "3d93d94a0e992001b713cba5f82729e563b3240a747484426f3c2136b2737064",
       "split": "train",
       "quick": false,
       "path": "tasks/v1_file_io_serialization_041"
@@ -1317,6 +1097,7 @@
       "title": "CSV summary 042",
       "category": "file_io_serialization",
       "difficulty": "easy",
+      "family_id": "41cb2672e6dd0a90daacc561736ad8029c9e87c04af23bbf19d71c85c445a749",
       "split": "train",
       "quick": false,
       "path": "tasks/v1_file_io_serialization_042"
@@ -1326,7 +1107,8 @@
       "title": "CSV summary 043",
       "category": "file_io_serialization",
       "difficulty": "medium",
-      "split": "train",
+      "family_id": "1a9e17f492bfa431fff1f6ca647774747e74350cfd3c017b175d64e31ed1ac4a",
+      "split": "dev",
       "quick": false,
       "path": "tasks/v1_file_io_serialization_043"
     },
@@ -1335,6 +1117,7 @@
       "title": "CSV summary 044",
       "category": "file_io_serialization",
       "difficulty": "medium",
+      "family_id": "8a3bb84957263773fcdcfedcd198e94db895dfefa2d85eb3a1a792bbcc07cbb4",
       "split": "train",
       "quick": false,
       "path": "tasks/v1_file_io_serialization_044"
@@ -1344,8 +1127,9 @@
       "title": "CSV summary 045",
       "category": "file_io_serialization",
       "difficulty": "easy",
-      "split": "dev",
-      "quick": true,
+      "family_id": "f1deae7d9aaea2fc50b3514ed6a1026ea68872a200cace14a947d3996af385ca",
+      "split": "train",
+      "quick": false,
       "path": "tasks/v1_file_io_serialization_045"
     },
     {
@@ -1353,6 +1137,7 @@
       "title": "CSV summary 046",
       "category": "file_io_serialization",
       "difficulty": "hard",
+      "family_id": "a7f80909992ebd2ecdd1fca95d5c497f95bfc299b302ccebf64e2028b435bfbc",
       "split": "train",
       "quick": false,
       "path": "tasks/v1_file_io_serialization_046"
@@ -1362,7 +1147,8 @@
       "title": "CSV summary 047",
       "category": "file_io_serialization",
       "difficulty": "easy",
-      "split": "dev",
+      "family_id": "31f525cd25f182e3be67e4e50b24641b543b35c3b4b910fd00f6343451fe98f2",
+      "split": "train",
       "quick": false,
       "path": "tasks/v1_file_io_serialization_047"
     },
@@ -1371,7 +1157,8 @@
       "title": "CSV summary 048",
       "category": "file_io_serialization",
       "difficulty": "medium",
-      "split": "train",
+      "family_id": "1182cefe6a463ff2ca83db526356586841716d260d1dba77d858d42334d3398c",
+      "split": "test",
       "quick": false,
       "path": "tasks/v1_file_io_serialization_048"
     },
@@ -1380,7 +1167,8 @@
       "title": "CSV summary 049",
       "category": "file_io_serialization",
       "difficulty": "medium",
-      "split": "train",
+      "family_id": "326c4ee8de29b20e4fb790648898dadfb4f5b471808d82282ced68e2b613d461",
+      "split": "dev",
       "quick": false,
       "path": "tasks/v1_file_io_serialization_049"
     },
@@ -1389,7 +1177,8 @@
       "title": "Mini module pipeline 000",
       "category": "multi_file_mini_module",
       "difficulty": "easy",
-      "split": "train",
+      "family_id": "eb0a5eac7fcb6185ab59aaae022ec5ce66994e307a1a471a5fda56cbf4774cc3",
+      "split": "dev",
       "quick": false,
       "path": "tasks/v1_multi_file_mini_module_000"
     },
@@ -1398,7 +1187,8 @@
       "title": "Mini module pipeline 001",
       "category": "multi_file_mini_module",
       "difficulty": "hard",
-      "split": "train",
+      "family_id": "12873a1971b468b028be802044d32c65fd147337f200320b3acac0227bb2201c",
+      "split": "dev",
       "quick": false,
       "path": "tasks/v1_multi_file_mini_module_001"
     },
@@ -1407,8 +1197,9 @@
       "title": "Mini module pipeline 002",
       "category": "multi_file_mini_module",
       "difficulty": "medium",
-      "split": "train",
-      "quick": false,
+      "family_id": "661ba6822056dbbfbab41cb9aefe8335cb441cc989514163bb1196a284f6b443",
+      "split": "test",
+      "quick": true,
       "path": "tasks/v1_multi_file_mini_module_002"
     },
     {
@@ -1416,7 +1207,8 @@
       "title": "Mini module pipeline 003",
       "category": "multi_file_mini_module",
       "difficulty": "medium",
-      "split": "train",
+      "family_id": "bbcb7395adfdce415126b4bab617ff49e077b3f2af65383a1900d8a4bae68d9b",
+      "split": "test",
       "quick": false,
       "path": "tasks/v1_multi_file_mini_module_003"
     },
@@ -1425,6 +1217,7 @@
       "title": "Mini module pipeline 004",
       "category": "multi_file_mini_module",
       "difficulty": "hard",
+      "family_id": "c9749195ef215d5da798782b47cbd582fbfd9b28dcd6ae183c914a57aba49290",
       "split": "train",
       "quick": false,
       "path": "tasks/v1_multi_file_mini_module_004"
@@ -1434,6 +1227,7 @@
       "title": "Mini module pipeline 005",
       "category": "multi_file_mini_module",
       "difficulty": "easy",
+      "family_id": "37b886550da721b795d9d37ae87f30ee3d7a2e8645a4c9fb824728215f52a98d",
       "split": "train",
       "quick": false,
       "path": "tasks/v1_multi_file_mini_module_005"
@@ -1443,7 +1237,8 @@
       "title": "Mini module pipeline 006",
       "category": "multi_file_mini_module",
       "difficulty": "easy",
-      "split": "train",
+      "family_id": "0e7467e13b6cf7cb7462d8ef326092fcc733396f050a239be7d7a488c7bbc224",
+      "split": "test",
       "quick": false,
       "path": "tasks/v1_multi_file_mini_module_006"
     },
@@ -1452,7 +1247,8 @@
       "title": "Mini module pipeline 007",
       "category": "multi_file_mini_module",
       "difficulty": "easy",
-      "split": "test",
+      "family_id": "6d463774fe750cff1357b9442b4c52e1facbb58eb265edfa460e322fab157b4c",
+      "split": "train",
       "quick": false,
       "path": "tasks/v1_multi_file_mini_module_007"
     },
@@ -1461,6 +1257,7 @@
       "title": "Mini module pipeline 008",
       "category": "multi_file_mini_module",
       "difficulty": "medium",
+      "family_id": "e2c1a6b4491d40c9faa994c9b6fc97e5ebbc38d3fc9b10df078ff45738e17b20",
       "split": "train",
       "quick": false,
       "path": "tasks/v1_multi_file_mini_module_008"
@@ -1470,7 +1267,8 @@
       "title": "Mini module pipeline 009",
       "category": "multi_file_mini_module",
       "difficulty": "medium",
-      "split": "test",
+      "family_id": "199f7ba7391c28ef221265068b018be8824cd6e91fb0080294177a1ca4da1578",
+      "split": "train",
       "quick": false,
       "path": "tasks/v1_multi_file_mini_module_009"
     },
@@ -1479,7 +1277,8 @@
       "title": "Mini module pipeline 010",
       "category": "multi_file_mini_module",
       "difficulty": "hard",
-      "split": "test",
+      "family_id": "7508e1f68a160d35d8079d96788ae2c6ebf8e924890e83a4829d8c23950bd9fc",
+      "split": "train",
       "quick": false,
       "path": "tasks/v1_multi_file_mini_module_010"
     },
@@ -1488,7 +1287,8 @@
       "title": "Mini module pipeline 011",
       "category": "multi_file_mini_module",
       "difficulty": "medium",
-      "split": "dev",
+      "family_id": "2f864636f7e470cb6afc4ff4ccb7f51a71969279243b5f33d94b57a44927244c",
+      "split": "test",
       "quick": false,
       "path": "tasks/v1_multi_file_mini_module_011"
     },
@@ -1497,6 +1297,7 @@
       "title": "Mini module pipeline 012",
       "category": "multi_file_mini_module",
       "difficulty": "easy",
+      "family_id": "cc836282ede70707a753b3f57845fafed5f5770e7ed63312d83901a7177616d1",
       "split": "train",
       "quick": false,
       "path": "tasks/v1_multi_file_mini_module_012"
@@ -1506,6 +1307,7 @@
       "title": "Mini module pipeline 013",
       "category": "multi_file_mini_module",
       "difficulty": "medium",
+      "family_id": "0372e3ff71e6bd1a9ba6f66d584cafce1514adaecb05615355ea516519fe81ad",
       "split": "train",
       "quick": false,
       "path": "tasks/v1_multi_file_mini_module_013"
@@ -1515,6 +1317,7 @@
       "title": "Mini module pipeline 014",
       "category": "multi_file_mini_module",
       "difficulty": "medium",
+      "family_id": "ad4e300ab188e68cd9384c5729ad00ea022676a28a0f7b79850b3116f3584bf7",
       "split": "train",
       "quick": false,
       "path": "tasks/v1_multi_file_mini_module_014"
@@ -1524,7 +1327,8 @@
       "title": "Mini module pipeline 015",
       "category": "multi_file_mini_module",
       "difficulty": "easy",
-      "split": "train",
+      "family_id": "6f2755b7d9997f636e9eeaee253315ddc0d846215cff5f5cfd79f4898a43e20e",
+      "split": "test",
       "quick": false,
       "path": "tasks/v1_multi_file_mini_module_015"
     },
@@ -1533,6 +1337,7 @@
       "title": "Mini module pipeline 016",
       "category": "multi_file_mini_module",
       "difficulty": "easy",
+      "family_id": "f47e6828d759f997144b428bb1e93d44adfafc783e08d498e5ff9057421973ba",
       "split": "train",
       "quick": false,
       "path": "tasks/v1_multi_file_mini_module_016"
@@ -1542,8 +1347,9 @@
       "title": "Mini module pipeline 017",
       "category": "multi_file_mini_module",
       "difficulty": "easy",
-      "split": "train",
-      "quick": false,
+      "family_id": "ce865dcfaae28fd4df483b1e9ac86027aac3e8fcf8974fd2b62ae6ce371c5a89",
+      "split": "dev",
+      "quick": true,
       "path": "tasks/v1_multi_file_mini_module_017"
     },
     {
@@ -1551,7 +1357,8 @@
       "title": "Mini module pipeline 018",
       "category": "multi_file_mini_module",
       "difficulty": "medium",
-      "split": "train",
+      "family_id": "7ab0d491634c63280f76071d9b64903214c9df29ef181c595bf36a67d72cd025",
+      "split": "dev",
       "quick": false,
       "path": "tasks/v1_multi_file_mini_module_018"
     },
@@ -1560,7 +1367,8 @@
       "title": "Mini module pipeline 019",
       "category": "multi_file_mini_module",
       "difficulty": "medium",
-      "split": "train",
+      "family_id": "06098fe180c796d92f426418a7adc4ba1cc6458e0f1976ab57ff1028ebb5296a",
+      "split": "test",
       "quick": false,
       "path": "tasks/v1_multi_file_mini_module_019"
     },
@@ -1569,8 +1377,9 @@
       "title": "Mini module pipeline 020",
       "category": "multi_file_mini_module",
       "difficulty": "easy",
-      "split": "test",
-      "quick": true,
+      "family_id": "cea705afb714c49708cc89aa9d3db5955c4ea332744034fdcbc2d816e0f8ae55",
+      "split": "dev",
+      "quick": false,
       "path": "tasks/v1_multi_file_mini_module_020"
     },
     {
@@ -1578,7 +1387,8 @@
       "title": "Mini module pipeline 021",
       "category": "multi_file_mini_module",
       "difficulty": "hard",
-      "split": "train",
+      "family_id": "90e106b5e6ef5e06eff0dd7a0f01d5ac3b33ae672d0d35366e3e7f18362f62e6",
+      "split": "test",
       "quick": false,
       "path": "tasks/v1_multi_file_mini_module_021"
     },
@@ -1587,6 +1397,7 @@
       "title": "Mini module pipeline 022",
       "category": "multi_file_mini_module",
       "difficulty": "easy",
+      "family_id": "29371c2086e43218f2a7b880d9dec2fffec4e88628bddb5471a8dbf28bdcc886",
       "split": "train",
       "quick": false,
       "path": "tasks/v1_multi_file_mini_module_022"
@@ -1596,6 +1407,7 @@
       "title": "Mini module pipeline 023",
       "category": "multi_file_mini_module",
       "difficulty": "easy",
+      "family_id": "238bbeef4ecde5dbfb5fb3bd88b64274ec79828f67769281b0a5dae5c3414cc2",
       "split": "train",
       "quick": false,
       "path": "tasks/v1_multi_file_mini_module_023"
@@ -1605,8 +1417,9 @@
       "title": "Mini module pipeline 024",
       "category": "multi_file_mini_module",
       "difficulty": "medium",
-      "split": "train",
-      "quick": false,
+      "family_id": "e16ccdfc670b9a2e3bb0eedce9cb5b8c903522ed51d112f959411fe3dd4532a1",
+      "split": "dev",
+      "quick": true,
       "path": "tasks/v1_multi_file_mini_module_024"
     },
     {
@@ -1614,7 +1427,8 @@
       "title": "Mini module pipeline 025",
       "category": "multi_file_mini_module",
       "difficulty": "medium",
-      "split": "train",
+      "family_id": "10403cd1fec374aa999c2d70c1458796bfd577f2c6a58c3f92936806bae0da07",
+      "split": "dev",
       "quick": false,
       "path": "tasks/v1_multi_file_mini_module_025"
     },
@@ -1623,7 +1437,8 @@
       "title": "Mini module pipeline 026",
       "category": "multi_file_mini_module",
       "difficulty": "medium",
-      "split": "train",
+      "family_id": "e09464775daeab45c649cc13e8ed100025b113a46afece5071d618b54a049a01",
+      "split": "dev",
       "quick": false,
       "path": "tasks/v1_multi_file_mini_module_026"
     },
@@ -1632,7 +1447,8 @@
       "title": "Mini module pipeline 027",
       "category": "multi_file_mini_module",
       "difficulty": "hard",
-      "split": "dev",
+      "family_id": "559f7acba7d0b4b674e59c88218a38e7548e13b6a368ca63eca2b38476bd3e81",
+      "split": "train",
       "quick": false,
       "path": "tasks/v1_multi_file_mini_module_027"
     },
@@ -1641,7 +1457,8 @@
       "title": "Mini module pipeline 028",
       "category": "multi_file_mini_module",
       "difficulty": "medium",
-      "split": "test",
+      "family_id": "e7e499968beef559b059e3581a30531e1242d090b633ac6178d59d2b8229ab0f",
+      "split": "train",
       "quick": false,
       "path": "tasks/v1_multi_file_mini_module_028"
     },
@@ -1650,7 +1467,8 @@
       "title": "Mini module pipeline 029",
       "category": "multi_file_mini_module",
       "difficulty": "medium",
-      "split": "train",
+      "family_id": "db4cc65fd056ebbc0828cd99f5857b413fb99ba76c1007c4427ba38a841f1747",
+      "split": "test",
       "quick": false,
       "path": "tasks/v1_multi_file_mini_module_029"
     },
@@ -1659,7 +1477,8 @@
       "title": "Mini module pipeline 030",
       "category": "multi_file_mini_module",
       "difficulty": "easy",
-      "split": "test",
+      "family_id": "39e6c7c9633c5763d23d2879f3054984d0b6578023efead52401cfb621a6807b",
+      "split": "train",
       "quick": false,
       "path": "tasks/v1_multi_file_mini_module_030"
     },
@@ -1668,6 +1487,7 @@
       "title": "Mini module pipeline 031",
       "category": "multi_file_mini_module",
       "difficulty": "easy",
+      "family_id": "aabc8357bcc05aaeed480a04fff395f70c738f0987357dff42f03f7f282e6493",
       "split": "train",
       "quick": false,
       "path": "tasks/v1_multi_file_mini_module_031"
@@ -1677,7 +1497,8 @@
       "title": "Mini module pipeline 032",
       "category": "multi_file_mini_module",
       "difficulty": "medium",
-      "split": "train",
+      "family_id": "70c16ccd35e5b1473497f6bb9cc0f5f7610e0a1d1c4a73f4ba0f828f949bab25",
+      "split": "dev",
       "quick": false,
       "path": "tasks/v1_multi_file_mini_module_032"
     },
@@ -1686,6 +1507,7 @@
       "title": "Mini module pipeline 033",
       "category": "multi_file_mini_module",
       "difficulty": "medium",
+      "family_id": "a452a012d5d918f034418f9f0a2123f04d7dbbfd7bc5ab039c9d923dafed0f0c",
       "split": "train",
       "quick": false,
       "path": "tasks/v1_multi_file_mini_module_033"
@@ -1695,7 +1517,8 @@
       "title": "Mini module pipeline 034",
       "category": "multi_file_mini_module",
       "difficulty": "medium",
-      "split": "test",
+      "family_id": "621d247defe6711cf5f05f6692fcb3421fa1caa1c3ea35300c797309d719e8ac",
+      "split": "train",
       "quick": false,
       "path": "tasks/v1_multi_file_mini_module_034"
     },
@@ -1704,6 +1527,7 @@
       "title": "Mini module pipeline 035",
       "category": "multi_file_mini_module",
       "difficulty": "easy",
+      "family_id": "9f456bd5572ca2140262c775f8e8f8fcadca5259689ea38f07cac1a4f53241c8",
       "split": "train",
       "quick": false,
       "path": "tasks/v1_multi_file_mini_module_035"
@@ -1713,8 +1537,9 @@
       "title": "Mini module pipeline 036",
       "category": "multi_file_mini_module",
       "difficulty": "medium",
-      "split": "test",
-      "quick": true,
+      "family_id": "1a31f2624e2e3c99e88b51f1167a44a9937005e2ea6f76ca9dfa640e0d0f0fe2",
+      "split": "train",
+      "quick": false,
       "path": "tasks/v1_multi_file_mini_module_036"
     },
     {
@@ -1722,8 +1547,9 @@
       "title": "Mini module pipeline 037",
       "category": "multi_file_mini_module",
       "difficulty": "easy",
-      "split": "test",
-      "quick": true,
+      "family_id": "f6fe30a6867ad2168b9d0f8b5d86bd954d0d75677c81f77bfe5ca2ec10826255",
+      "split": "train",
+      "quick": false,
       "path": "tasks/v1_multi_file_mini_module_037"
     },
     {
@@ -1731,7 +1557,8 @@
       "title": "Mini module pipeline 038",
       "category": "multi_file_mini_module",
       "difficulty": "easy",
-      "split": "train",
+      "family_id": "af4c275bbb08f8441736275fa9d3ce5b05087ca8c75e1e4ca3c18dc8489b1cd8",
+      "split": "dev",
       "quick": false,
       "path": "tasks/v1_multi_file_mini_module_038"
     },
@@ -1740,6 +1567,7 @@
       "title": "Mini module pipeline 039",
       "category": "multi_file_mini_module",
       "difficulty": "easy",
+      "family_id": "7b5866be1628686bcc751000512806888f7c43d972f97dc93b0d7a5ac29c2d03",
       "split": "train",
       "quick": false,
       "path": "tasks/v1_multi_file_mini_module_039"
@@ -1749,7 +1577,8 @@
       "title": "Mini module pipeline 040",
       "category": "multi_file_mini_module",
       "difficulty": "medium",
-      "split": "train",
+      "family_id": "20f379103479aebd9939f8128b87b26facec4e6c5a6ca542fcb29d7574195115",
+      "split": "test",
       "quick": false,
       "path": "tasks/v1_multi_file_mini_module_040"
     },
@@ -1758,6 +1587,7 @@
       "title": "Mini module pipeline 041",
       "category": "multi_file_mini_module",
       "difficulty": "easy",
+      "family_id": "55243eed0f0e51845c829027fad16ac840787bf4cc538a4c65d6347fa35499c2",
       "split": "train",
       "quick": false,
       "path": "tasks/v1_multi_file_mini_module_041"
@@ -1767,6 +1597,7 @@
       "title": "Mini module pipeline 042",
       "category": "multi_file_mini_module",
       "difficulty": "medium",
+      "family_id": "24852e9676edb605e81010a67c81e9f6f94aa97afb8130f8512a71c1da9d984b",
       "split": "train",
       "quick": false,
       "path": "tasks/v1_multi_file_mini_module_042"
@@ -1776,7 +1607,8 @@
       "title": "Mini module pipeline 043",
       "category": "multi_file_mini_module",
       "difficulty": "medium",
-      "split": "train",
+      "family_id": "45baad2948f39337333879835dc8cd57370f4a89c202f794487e1cb56280018d",
+      "split": "test",
       "quick": false,
       "path": "tasks/v1_multi_file_mini_module_043"
     },
@@ -1785,7 +1617,8 @@
       "title": "Mini module pipeline 044",
       "category": "multi_file_mini_module",
       "difficulty": "easy",
-      "split": "dev",
+      "family_id": "921fad73ff13111b1030a938a26c2b22a0d67c0a2361f142901a59254d2d934a",
+      "split": "train",
       "quick": false,
       "path": "tasks/v1_multi_file_mini_module_044"
     },
@@ -1794,7 +1627,8 @@
       "title": "Mini module pipeline 045",
       "category": "multi_file_mini_module",
       "difficulty": "medium",
-      "split": "train",
+      "family_id": "afb6965f6afe55c2fa9b73ecea957d50e7388a4e5237829af459c4150a97dfc4",
+      "split": "dev",
       "quick": false,
       "path": "tasks/v1_multi_file_mini_module_045"
     },
@@ -1803,7 +1637,8 @@
       "title": "Mini module pipeline 046",
       "category": "multi_file_mini_module",
       "difficulty": "easy",
-      "split": "test",
+      "family_id": "c73b4737ce98a2c8abd4e3f6f1e49e3f9bc41a93d31a52910899f9ed13efca69",
+      "split": "train",
       "quick": false,
       "path": "tasks/v1_multi_file_mini_module_046"
     },
@@ -1812,6 +1647,7 @@
       "title": "Mini module pipeline 047",
       "category": "multi_file_mini_module",
       "difficulty": "medium",
+      "family_id": "2d7b8585c5cb1dc960078658d6dc8350b08c9a0a7a6628c139e49dae4851d351",
       "split": "train",
       "quick": false,
       "path": "tasks/v1_multi_file_mini_module_047"
@@ -1821,7 +1657,8 @@
       "title": "Mini module pipeline 048",
       "category": "multi_file_mini_module",
       "difficulty": "easy",
-      "split": "train",
+      "family_id": "694736a4d5b2df0fc7e33933dc445654f1f34816de9c8f153de5a97dc78fba04",
+      "split": "test",
       "quick": false,
       "path": "tasks/v1_multi_file_mini_module_048"
     },
@@ -1830,6 +1667,7 @@
       "title": "Mini module pipeline 049",
       "category": "multi_file_mini_module",
       "difficulty": "hard",
+      "family_id": "7bf4753d414dc75520458ca023c466c7e2c8bf6b0fdc02bba0a2f8b1f3db80e9",
       "split": "train",
       "quick": false,
       "path": "tasks/v1_multi_file_mini_module_049"
@@ -1839,8 +1677,9 @@
       "title": "Trimmed mean 000",
       "category": "numerical_edge_cases",
       "difficulty": "easy",
-      "split": "test",
-      "quick": true,
+      "family_id": "54f64c160579bcb55131fe28be865ac8cd54ea22f52ec6d456975733d2216518",
+      "split": "train",
+      "quick": false,
       "path": "tasks/v1_numerical_edge_cases_000"
     },
     {
@@ -1848,6 +1687,7 @@
       "title": "Trimmed mean 001",
       "category": "numerical_edge_cases",
       "difficulty": "medium",
+      "family_id": "44047a8dfbab1cebd483705663a2fbca4bc7bf10fd0830ea4258af12547580b1",
       "split": "train",
       "quick": false,
       "path": "tasks/v1_numerical_edge_cases_001"
@@ -1857,6 +1697,7 @@
       "title": "Trimmed mean 002",
       "category": "numerical_edge_cases",
       "difficulty": "easy",
+      "family_id": "802b89d8325c84a06e5438a6de223d69ccb599e63e60975dbbe5055d07f01b13",
       "split": "train",
       "quick": false,
       "path": "tasks/v1_numerical_edge_cases_002"
@@ -1866,6 +1707,7 @@
       "title": "Trimmed mean 003",
       "category": "numerical_edge_cases",
       "difficulty": "hard",
+      "family_id": "f16cd784af53af3e4b4d483e8c9e0cc786b296718359de1921d77a8beca40567",
       "split": "train",
       "quick": false,
       "path": "tasks/v1_numerical_edge_cases_003"
@@ -1875,6 +1717,7 @@
       "title": "Trimmed mean 004",
       "category": "numerical_edge_cases",
       "difficulty": "hard",
+      "family_id": "dd487d3b1627004ab1558aca1e9467ab7bf38e5f5a7d4107507e509f71e72c07",
       "split": "test",
       "quick": false,
       "path": "tasks/v1_numerical_edge_cases_004"
@@ -1884,6 +1727,7 @@
       "title": "Trimmed mean 005",
       "category": "numerical_edge_cases",
       "difficulty": "hard",
+      "family_id": "8ea02dea951c01a67db4de2979904ceefc5a82df7e7759f577a5a50efbc6fc29",
       "split": "train",
       "quick": false,
       "path": "tasks/v1_numerical_edge_cases_005"
@@ -1893,7 +1737,8 @@
       "title": "Trimmed mean 006",
       "category": "numerical_edge_cases",
       "difficulty": "hard",
-      "split": "test",
+      "family_id": "d75d9feb36ef30780b3522ec6991d8a07fe6dca2d58aa58805bf3bd0bcb162eb",
+      "split": "dev",
       "quick": false,
       "path": "tasks/v1_numerical_edge_cases_006"
     },
@@ -1902,8 +1747,9 @@
       "title": "Trimmed mean 007",
       "category": "numerical_edge_cases",
       "difficulty": "easy",
-      "split": "train",
-      "quick": false,
+      "family_id": "d0024c9029678cd8abed7be39cae9972e4718aa971ce0b40c60752cd39351e57",
+      "split": "dev",
+      "quick": true,
       "path": "tasks/v1_numerical_edge_cases_007"
     },
     {
@@ -1911,6 +1757,7 @@
       "title": "Trimmed mean 008",
       "category": "numerical_edge_cases",
       "difficulty": "medium",
+      "family_id": "1ebe01f806c992b262e684c53d273a1432f5125b3defd57dc4b9d45561f7fdd9",
       "split": "test",
       "quick": false,
       "path": "tasks/v1_numerical_edge_cases_008"
@@ -1920,7 +1767,8 @@
       "title": "Trimmed mean 009",
       "category": "numerical_edge_cases",
       "difficulty": "easy",
-      "split": "train",
+      "family_id": "833027c9f4841bb7337071252cb9bdd233eb52b8cda2e2de732c4b421fa2ae79",
+      "split": "test",
       "quick": false,
       "path": "tasks/v1_numerical_edge_cases_009"
     },
@@ -1929,6 +1777,7 @@
       "title": "Trimmed mean 010",
       "category": "numerical_edge_cases",
       "difficulty": "medium",
+      "family_id": "fecf27dc476ddaaae54232376d47c85720bf23ef85df4004f8bd4faf3c621f05",
       "split": "train",
       "quick": false,
       "path": "tasks/v1_numerical_edge_cases_010"
@@ -1938,6 +1787,7 @@
       "title": "Trimmed mean 011",
       "category": "numerical_edge_cases",
       "difficulty": "medium",
+      "family_id": "ab06f92be14516a077a26fdf7eca919c42f86f948804f485445d268f40893f23",
       "split": "train",
       "quick": false,
       "path": "tasks/v1_numerical_edge_cases_011"
@@ -1947,7 +1797,8 @@
       "title": "Trimmed mean 012",
       "category": "numerical_edge_cases",
       "difficulty": "hard",
-      "split": "train",
+      "family_id": "20dc6447c6b66d3ce73342d8d78c6c1debbcdd7c861c103e3b5c30e972bc612a",
+      "split": "dev",
       "quick": false,
       "path": "tasks/v1_numerical_edge_cases_012"
     },
@@ -1956,6 +1807,7 @@
       "title": "Trimmed mean 013",
       "category": "numerical_edge_cases",
       "difficulty": "medium",
+      "family_id": "a06afaa736407214e09c258510275340e8b6ca51cba2aad69407001c7e74b498",
       "split": "train",
       "quick": false,
       "path": "tasks/v1_numerical_edge_cases_013"
@@ -1965,6 +1817,7 @@
       "title": "Trimmed mean 014",
       "category": "numerical_edge_cases",
       "difficulty": "medium",
+      "family_id": "b399b5ab63c5044022cb794206417eadc7523c45904600f2f8ba0a74ddfbe660",
       "split": "train",
       "quick": false,
       "path": "tasks/v1_numerical_edge_cases_014"
@@ -1974,6 +1827,7 @@
       "title": "Trimmed mean 015",
       "category": "numerical_edge_cases",
       "difficulty": "medium",
+      "family_id": "9662a1464ef62c4a461f30c780cd943aa84ea1ee5a9d9f9140333bdc713128a7",
       "split": "train",
       "quick": false,
       "path": "tasks/v1_numerical_edge_cases_015"
@@ -1983,6 +1837,7 @@
       "title": "Trimmed mean 016",
       "category": "numerical_edge_cases",
       "difficulty": "easy",
+      "family_id": "214b0262a2e021bd3c6e6da63eab1e95b9dcca575bc50f04539eea79fad2cc1b",
       "split": "train",
       "quick": false,
       "path": "tasks/v1_numerical_edge_cases_016"
@@ -1992,7 +1847,8 @@
       "title": "Trimmed mean 017",
       "category": "numerical_edge_cases",
       "difficulty": "hard",
-      "split": "test",
+      "family_id": "7b9f9f9ed3d148ec62886814ddfbfd072aa7e7e9b754100eb5c526715d567251",
+      "split": "train",
       "quick": false,
       "path": "tasks/v1_numerical_edge_cases_017"
     },
@@ -2001,8 +1857,9 @@
       "title": "Trimmed mean 018",
       "category": "numerical_edge_cases",
       "difficulty": "medium",
-      "split": "dev",
-      "quick": true,
+      "family_id": "4d9394f479ddb43fdce87681c2aeee9279cdf419d64432522b7a2a9c0f0738e4",
+      "split": "test",
+      "quick": false,
       "path": "tasks/v1_numerical_edge_cases_018"
     },
     {
@@ -2010,7 +1867,8 @@
       "title": "Trimmed mean 019",
       "category": "numerical_edge_cases",
       "difficulty": "medium",
-      "split": "train",
+      "family_id": "dd8435dc40b23b6b96eedeaa11548b9f2a7e83e0891ceb99cd3fac17279ee83b",
+      "split": "test",
       "quick": false,
       "path": "tasks/v1_numerical_edge_cases_019"
     },
@@ -2019,7 +1877,8 @@
       "title": "Trimmed mean 020",
       "category": "numerical_edge_cases",
       "difficulty": "hard",
-      "split": "dev",
+      "family_id": "6b32b8756fb4d6ce08cfbc2e4856bb1f0758c5704ae2911a1c8d26e991379e5d",
+      "split": "train",
       "quick": false,
       "path": "tasks/v1_numerical_edge_cases_020"
     },
@@ -2028,6 +1887,7 @@
       "title": "Trimmed mean 021",
       "category": "numerical_edge_cases",
       "difficulty": "medium",
+      "family_id": "7ff30af13c54e17c8566d0ff678fb8b2989012f035c35460800240b6dcf06244",
       "split": "dev",
       "quick": false,
       "path": "tasks/v1_numerical_edge_cases_021"
@@ -2037,7 +1897,8 @@
       "title": "Trimmed mean 022",
       "category": "numerical_edge_cases",
       "difficulty": "medium",
-      "split": "train",
+      "family_id": "57125e607e55fe1c627f526263a732c798feb7e1089cee9b9c952a6a06eff767",
+      "split": "test",
       "quick": false,
       "path": "tasks/v1_numerical_edge_cases_022"
     },
@@ -2046,7 +1907,8 @@
       "title": "Trimmed mean 023",
       "category": "numerical_edge_cases",
       "difficulty": "hard",
-      "split": "train",
+      "family_id": "cf12bb07d5d6be0753e7745c75dace241111e87eef2ab5f1a929d806a7b6a37a",
+      "split": "test",
       "quick": false,
       "path": "tasks/v1_numerical_edge_cases_023"
     },
@@ -2055,8 +1917,9 @@
       "title": "Trimmed mean 024",
       "category": "numerical_edge_cases",
       "difficulty": "easy",
-      "split": "train",
-      "quick": false,
+      "family_id": "fc3f4c48c7aef391a770dec8d3cbc1d861f7c534ed37c44c405a451c70a6b49a",
+      "split": "test",
+      "quick": true,
       "path": "tasks/v1_numerical_edge_cases_024"
     },
     {
@@ -2064,7 +1927,8 @@
       "title": "Trimmed mean 025",
       "category": "numerical_edge_cases",
       "difficulty": "hard",
-      "split": "dev",
+      "family_id": "ef93429e6b54065be2a0e4b6e4bdcb9290c4e1b2d18bdb5920922fb323152c1d",
+      "split": "train",
       "quick": false,
       "path": "tasks/v1_numerical_edge_cases_025"
     },
@@ -2073,6 +1937,7 @@
       "title": "Trimmed mean 026",
       "category": "numerical_edge_cases",
       "difficulty": "medium",
+      "family_id": "d6dec08296f98bb01881076f730ab486b63d22f1d1c45037f103722a2e6fce93",
       "split": "train",
       "quick": false,
       "path": "tasks/v1_numerical_edge_cases_026"
@@ -2082,7 +1947,8 @@
       "title": "Trimmed mean 027",
       "category": "numerical_edge_cases",
       "difficulty": "medium",
-      "split": "train",
+      "family_id": "060c54cf7a01d230938feb744d7615390ea40bf6c73deab59d8177bb941e98f1",
+      "split": "test",
       "quick": false,
       "path": "tasks/v1_numerical_edge_cases_027"
     },
@@ -2091,7 +1957,8 @@
       "title": "Trimmed mean 028",
       "category": "numerical_edge_cases",
       "difficulty": "hard",
-      "split": "train",
+      "family_id": "7e4007fe4a20595dc41c30578c30ca2ac638d45175c1909305cf028d36a6dcc7",
+      "split": "dev",
       "quick": false,
       "path": "tasks/v1_numerical_edge_cases_028"
     },
@@ -2100,6 +1967,7 @@
       "title": "Trimmed mean 029",
       "category": "numerical_edge_cases",
       "difficulty": "hard",
+      "family_id": "fdf27afcbf2f59816317a77fb9e068d1d34fe38387d39f8f9af4b6b5e349a37f",
       "split": "train",
       "quick": false,
       "path": "tasks/v1_numerical_edge_cases_029"
@@ -2109,8 +1977,9 @@
       "title": "Trimmed mean 030",
       "category": "numerical_edge_cases",
       "difficulty": "hard",
-      "split": "train",
-      "quick": false,
+      "family_id": "45ddcac9bec0a07dda115915e2849b5ebdd61f4c3b2462fe35fb35f0dbf44938",
+      "split": "dev",
+      "quick": true,
       "path": "tasks/v1_numerical_edge_cases_030"
     },
     {
@@ -2118,7 +1987,8 @@
       "title": "Trimmed mean 031",
       "category": "numerical_edge_cases",
       "difficulty": "medium",
-      "split": "dev",
+      "family_id": "69ae825cd498431149b8adc512ce27e6a7cbbb8df18dd70255eb70fe8868818b",
+      "split": "train",
       "quick": false,
       "path": "tasks/v1_numerical_edge_cases_031"
     },
@@ -2127,6 +1997,7 @@
       "title": "Trimmed mean 032",
       "category": "numerical_edge_cases",
       "difficulty": "medium",
+      "family_id": "459501a9d7d58bcb73292da7fe7b236259d9081d646e3ca93533b2855d303802",
       "split": "train",
       "quick": false,
       "path": "tasks/v1_numerical_edge_cases_032"
@@ -2136,6 +2007,7 @@
       "title": "Trimmed mean 033",
       "category": "numerical_edge_cases",
       "difficulty": "medium",
+      "family_id": "10f9e65dc9a1f709482831fbda26af55bd2c45fbf56ae04040ef8fe3968f1738",
       "split": "dev",
       "quick": false,
       "path": "tasks/v1_numerical_edge_cases_033"
@@ -2145,7 +2017,8 @@
       "title": "Trimmed mean 034",
       "category": "numerical_edge_cases",
       "difficulty": "easy",
-      "split": "test",
+      "family_id": "08b95974676fa0925b3d9654d186d0429a9aa32507401542ac2d2afdb5451590",
+      "split": "train",
       "quick": false,
       "path": "tasks/v1_numerical_edge_cases_034"
     },
@@ -2154,7 +2027,8 @@
       "title": "Trimmed mean 035",
       "category": "numerical_edge_cases",
       "difficulty": "easy",
-      "split": "test",
+      "family_id": "de08a71a74cb1e64ab4b7cf6b640455b839c577e08db2f27dba679263e040163",
+      "split": "dev",
       "quick": false,
       "path": "tasks/v1_numerical_edge_cases_035"
     },
@@ -2163,8 +2037,9 @@
       "title": "Trimmed mean 036",
       "category": "numerical_edge_cases",
       "difficulty": "medium",
-      "split": "dev",
-      "quick": true,
+      "family_id": "37377dac07c51cb7a18fca85b89e08a14962bc2c299c468617a89e68b76bcbe7",
+      "split": "train",
+      "quick": false,
       "path": "tasks/v1_numerical_edge_cases_036"
     },
     {
@@ -2172,7 +2047,8 @@
       "title": "Trimmed mean 037",
       "category": "numerical_edge_cases",
       "difficulty": "medium",
-      "split": "train",
+      "family_id": "03d60a6c999a0050375cb887b92492ad6fc0c124da1938fb7d9bf0c554e60806",
+      "split": "test",
       "quick": false,
       "path": "tasks/v1_numerical_edge_cases_037"
     },
@@ -2181,6 +2057,7 @@
       "title": "Trimmed mean 038",
       "category": "numerical_edge_cases",
       "difficulty": "medium",
+      "family_id": "c7652383cc29b0c5c65ca5393eb04a4eccb02a15cd22bc947215439cb4aa6540",
       "split": "train",
       "quick": false,
       "path": "tasks/v1_numerical_edge_cases_038"
@@ -2190,7 +2067,8 @@
       "title": "Trimmed mean 039",
       "category": "numerical_edge_cases",
       "difficulty": "easy",
-      "split": "train",
+      "family_id": "16d2ac32490a0fe9563f734d091b0aa79d76974d94ee0a79cfa412d4b7d4a8c7",
+      "split": "dev",
       "quick": false,
       "path": "tasks/v1_numerical_edge_cases_039"
     },
@@ -2199,6 +2077,7 @@
       "title": "Trimmed mean 040",
       "category": "numerical_edge_cases",
       "difficulty": "easy",
+      "family_id": "25c95ecfbd8350017114434c4f48f8dd3fd0a807fc00a6cf3b310a31ce4e5ebd",
       "split": "train",
       "quick": false,
       "path": "tasks/v1_numerical_edge_cases_040"
@@ -2208,7 +2087,8 @@
       "title": "Trimmed mean 041",
       "category": "numerical_edge_cases",
       "difficulty": "hard",
-      "split": "train",
+      "family_id": "d2904028418d156be58573d2c3550f0e6f10421258e7b75ad199c2bdc23740eb",
+      "split": "dev",
       "quick": false,
       "path": "tasks/v1_numerical_edge_cases_041"
     },
@@ -2217,6 +2097,7 @@
       "title": "Trimmed mean 042",
       "category": "numerical_edge_cases",
       "difficulty": "medium",
+      "family_id": "1989ac31dffe5ae1fcc4921f6eb341215d61c8eba36a85951306c36234527386",
       "split": "train",
       "quick": false,
       "path": "tasks/v1_numerical_edge_cases_042"
@@ -2226,6 +2107,7 @@
       "title": "Trimmed mean 043",
       "category": "numerical_edge_cases",
       "difficulty": "easy",
+      "family_id": "e3be051a9c6ddc61e7044fbd1fffc7408da161251382c5e7458611a103ede288",
       "split": "train",
       "quick": false,
       "path": "tasks/v1_numerical_edge_cases_043"
@@ -2235,6 +2117,7 @@
       "title": "Trimmed mean 044",
       "category": "numerical_edge_cases",
       "difficulty": "medium",
+      "family_id": "59a9c3f08ae12cdf00655435ffb0176fda4c8482f458320b015ad971b0c97f42",
       "split": "train",
       "quick": false,
       "path": "tasks/v1_numerical_edge_cases_044"
@@ -2244,6 +2127,7 @@
       "title": "Trimmed mean 045",
       "category": "numerical_edge_cases",
       "difficulty": "medium",
+      "family_id": "3aa998927c5abbc8816864af13f552195d366fb335c803aca5c9375eac6bdf26",
       "split": "train",
       "quick": false,
       "path": "tasks/v1_numerical_edge_cases_045"
@@ -2253,7 +2137,8 @@
       "title": "Trimmed mean 046",
       "category": "numerical_edge_cases",
       "difficulty": "easy",
-      "split": "train",
+      "family_id": "618456800e9af915ab4742e2ea4dbc72d73a573da2091ca669fd1ecc784ee227",
+      "split": "test",
       "quick": false,
       "path": "tasks/v1_numerical_edge_cases_046"
     },
@@ -2262,6 +2147,7 @@
       "title": "Trimmed mean 047",
       "category": "numerical_edge_cases",
       "difficulty": "medium",
+      "family_id": "1ffbc1ad7fcb9ef5260d0e3865127c34eac4cc64b0fcb37713615e47fc45c01d",
       "split": "train",
       "quick": false,
       "path": "tasks/v1_numerical_edge_cases_047"
@@ -2271,6 +2157,7 @@
       "title": "Trimmed mean 048",
       "category": "numerical_edge_cases",
       "difficulty": "easy",
+      "family_id": "c420770116caabef12feadf5aec8bcb8362cb768e7389680ed4551434123559c",
       "split": "train",
       "quick": false,
       "path": "tasks/v1_numerical_edge_cases_048"
@@ -2280,6 +2167,7 @@
       "title": "Trimmed mean 049",
       "category": "numerical_edge_cases",
       "difficulty": "easy",
+      "family_id": "985fae2d0e98ea808018331a94120121fc45ce2ceea577519f2ccb5562596452",
       "split": "dev",
       "quick": false,
       "path": "tasks/v1_numerical_edge_cases_049"
@@ -2289,6 +2177,7 @@
       "title": "Extract markers 000",
       "category": "string_regex_parsing",
       "difficulty": "easy",
+      "family_id": "63fd24f4c1785f545455306af26716f978e2a2d5f1a665f05f1e846ce5b103c9",
       "split": "train",
       "quick": false,
       "path": "tasks/v1_string_regex_parsing_000"
@@ -2298,6 +2187,7 @@
       "title": "Extract markers 001",
       "category": "string_regex_parsing",
       "difficulty": "easy",
+      "family_id": "10bdfdbfd7a4b5b146c29fb58a9a41dc3a9402201c540d1b70f8f1aef25d3f4d",
       "split": "train",
       "quick": false,
       "path": "tasks/v1_string_regex_parsing_001"
@@ -2307,6 +2197,7 @@
       "title": "Extract markers 002",
       "category": "string_regex_parsing",
       "difficulty": "medium",
+      "family_id": "b39e6ee2417ed93e5fb2b7b846cfb6b43547b222543bc529f1999563137b9962",
       "split": "train",
       "quick": false,
       "path": "tasks/v1_string_regex_parsing_002"
@@ -2316,6 +2207,7 @@
       "title": "Extract markers 003",
       "category": "string_regex_parsing",
       "difficulty": "medium",
+      "family_id": "0c99e255a02614f95be92ebf37828804c28a5840ec9a71e599e51416a8ddd4ed",
       "split": "dev",
       "quick": false,
       "path": "tasks/v1_string_regex_parsing_003"
@@ -2325,8 +2217,9 @@
       "title": "Extract markers 004",
       "category": "string_regex_parsing",
       "difficulty": "hard",
-      "split": "train",
-      "quick": false,
+      "family_id": "33669c10b048d5a8a33114e399d91e29ba175bc5230f02e519d9fc9ac6df3efd",
+      "split": "dev",
+      "quick": true,
       "path": "tasks/v1_string_regex_parsing_004"
     },
     {
@@ -2334,7 +2227,8 @@
       "title": "Extract markers 005",
       "category": "string_regex_parsing",
       "difficulty": "easy",
-      "split": "train",
+      "family_id": "09fc1ceb01edd2af8c95c559b28a756a08c1fc164cc2c99dd7de108431da7d0c",
+      "split": "test",
       "quick": false,
       "path": "tasks/v1_string_regex_parsing_005"
     },
@@ -2343,6 +2237,7 @@
       "title": "Extract markers 006",
       "category": "string_regex_parsing",
       "difficulty": "medium",
+      "family_id": "a2fc1b6d92b48b8ba02b5cf9125e088a1644a34af3a50e36547d954e1066821c",
       "split": "train",
       "quick": false,
       "path": "tasks/v1_string_regex_parsing_006"
@@ -2352,6 +2247,7 @@
       "title": "Extract markers 007",
       "category": "string_regex_parsing",
       "difficulty": "medium",
+      "family_id": "a020eb475aca54296ef336cf2471b42eefa0396cc39768a1e2248a74346a0b15",
       "split": "train",
       "quick": false,
       "path": "tasks/v1_string_regex_parsing_007"
@@ -2361,7 +2257,8 @@
       "title": "Extract markers 008",
       "category": "string_regex_parsing",
       "difficulty": "medium",
-      "split": "test",
+      "family_id": "dbf6d949ca102266666d27c8521f009296f2df9b9e4ae1d6233135b0c1bf1eee",
+      "split": "train",
       "quick": false,
       "path": "tasks/v1_string_regex_parsing_008"
     },
@@ -2370,6 +2267,7 @@
       "title": "Extract markers 009",
       "category": "string_regex_parsing",
       "difficulty": "easy",
+      "family_id": "7dc08b9e798839e4fc2d2aa6487264bcdd6b476957da28d3253ffc467fb76c30",
       "split": "train",
       "quick": false,
       "path": "tasks/v1_string_regex_parsing_009"
@@ -2379,6 +2277,7 @@
       "title": "Extract markers 010",
       "category": "string_regex_parsing",
       "difficulty": "easy",
+      "family_id": "3d45845cf759148521947bc4534f86b4ef95b7c356021b31514d9a702209d544",
       "split": "train",
       "quick": false,
       "path": "tasks/v1_string_regex_parsing_010"
@@ -2388,7 +2287,8 @@
       "title": "Extract markers 011",
       "category": "string_regex_parsing",
       "difficulty": "medium",
-      "split": "train",
+      "family_id": "549a0a96689a2142a16776991ba7c0cf85a9311d15c3a5bfe3be288f12aeb75f",
+      "split": "test",
       "quick": false,
       "path": "tasks/v1_string_regex_parsing_011"
     },
@@ -2397,7 +2297,8 @@
       "title": "Extract markers 012",
       "category": "string_regex_parsing",
       "difficulty": "medium",
-      "split": "train",
+      "family_id": "ca4a02529015fe5ccd551c0a674990f7d266e9b12d43331c94352e44bf6fbc3b",
+      "split": "test",
       "quick": false,
       "path": "tasks/v1_string_regex_parsing_012"
     },
@@ -2406,6 +2307,7 @@
       "title": "Extract markers 013",
       "category": "string_regex_parsing",
       "difficulty": "medium",
+      "family_id": "227f0005fe30867c66a3ec1ad6c9a038ac3ef2b793aef4ef162283fb330ade6b",
       "split": "train",
       "quick": false,
       "path": "tasks/v1_string_regex_parsing_013"
@@ -2415,7 +2317,8 @@
       "title": "Extract markers 014",
       "category": "string_regex_parsing",
       "difficulty": "hard",
-      "split": "train",
+      "family_id": "d36b1ab371f5c06bdc5715167e958d49e76562adbfa74d0de104ea19a249b6b2",
+      "split": "dev",
       "quick": false,
       "path": "tasks/v1_string_regex_parsing_014"
     },
@@ -2424,6 +2327,7 @@
       "title": "Extract markers 015",
       "category": "string_regex_parsing",
       "difficulty": "medium",
+      "family_id": "4e395af25dd0f29471925eb469f72f12da3dfd6ad4efa8072a7460128e696c1a",
       "split": "train",
       "quick": false,
       "path": "tasks/v1_string_regex_parsing_015"
@@ -2433,6 +2337,7 @@
       "title": "Extract markers 016",
       "category": "string_regex_parsing",
       "difficulty": "hard",
+      "family_id": "6bac7525f8c5e376889974eea8a530e07d32d00a15bb6f9bc05df04da1ad751e",
       "split": "train",
       "quick": false,
       "path": "tasks/v1_string_regex_parsing_016"
@@ -2442,7 +2347,8 @@
       "title": "Extract markers 017",
       "category": "string_regex_parsing",
       "difficulty": "easy",
-      "split": "dev",
+      "family_id": "dfa7d9c758642256c822bf506749efd9d17ff3b016a100c096d5331bec72c5c4",
+      "split": "test",
       "quick": false,
       "path": "tasks/v1_string_regex_parsing_017"
     },
@@ -2451,7 +2357,8 @@
       "title": "Extract markers 018",
       "category": "string_regex_parsing",
       "difficulty": "hard",
-      "split": "train",
+      "family_id": "b8da5a7f927cd5e89ac149dacfe1f0c1db728bdf104e1d99ed9fa9a28e043ead",
+      "split": "dev",
       "quick": false,
       "path": "tasks/v1_string_regex_parsing_018"
     },
@@ -2460,6 +2367,7 @@
       "title": "Extract markers 019",
       "category": "string_regex_parsing",
       "difficulty": "hard",
+      "family_id": "c4779a619c8db45b408868b867e8680c5a6cf28fe09509c41f719ed3e9b996a7",
       "split": "test",
       "quick": false,
       "path": "tasks/v1_string_regex_parsing_019"
@@ -2469,6 +2377,7 @@
       "title": "Extract markers 020",
       "category": "string_regex_parsing",
       "difficulty": "easy",
+      "family_id": "0bfcd5fd2fea5d86d6971df6d5bcf239c41839ac0834d09c9dbd0f59f4ac5d45",
       "split": "dev",
       "quick": false,
       "path": "tasks/v1_string_regex_parsing_020"
@@ -2478,6 +2387,7 @@
       "title": "Extract markers 021",
       "category": "string_regex_parsing",
       "difficulty": "medium",
+      "family_id": "49a771ba8ce3c54c607847309ba8ce0f8fcf0d7422704cb52c8264a193cf9f8a",
       "split": "train",
       "quick": false,
       "path": "tasks/v1_string_regex_parsing_021"
@@ -2487,7 +2397,8 @@
       "title": "Extract markers 022",
       "category": "string_regex_parsing",
       "difficulty": "medium",
-      "split": "train",
+      "family_id": "94d39046174c321f0d23cd8b1813cfcb7d7928a207a817cefc4e078bafbfba89",
+      "split": "test",
       "quick": false,
       "path": "tasks/v1_string_regex_parsing_022"
     },
@@ -2496,7 +2407,8 @@
       "title": "Extract markers 023",
       "category": "string_regex_parsing",
       "difficulty": "easy",
-      "split": "test",
+      "family_id": "bcc00accf525a32f113d8df6998ca45bebc609a356cf805fb6eb65fd20a83e4b",
+      "split": "train",
       "quick": false,
       "path": "tasks/v1_string_regex_parsing_023"
     },
@@ -2505,6 +2417,7 @@
       "title": "Extract markers 024",
       "category": "string_regex_parsing",
       "difficulty": "hard",
+      "family_id": "1c20484b3e2cc34662e34732241099d2d95d7ea1b90ab7c560a01c69dd1b7ef0",
       "split": "train",
       "quick": false,
       "path": "tasks/v1_string_regex_parsing_024"
@@ -2514,7 +2427,8 @@
       "title": "Extract markers 025",
       "category": "string_regex_parsing",
       "difficulty": "medium",
-      "split": "train",
+      "family_id": "622353c8a99a3f74e605437ba922cee26e5ad13e3a1449beec9c939e49977282",
+      "split": "dev",
       "quick": false,
       "path": "tasks/v1_string_regex_parsing_025"
     },
@@ -2523,8 +2437,9 @@
       "title": "Extract markers 026",
       "category": "string_regex_parsing",
       "difficulty": "easy",
+      "family_id": "c75d7fe29233538ab95c367f6efb617b18632c12023dbad78df0e4459d8b924e",
       "split": "dev",
-      "quick": true,
+      "quick": false,
       "path": "tasks/v1_string_regex_parsing_026"
     },
     {
@@ -2532,7 +2447,8 @@
       "title": "Extract markers 027",
       "category": "string_regex_parsing",
       "difficulty": "easy",
-      "split": "dev",
+      "family_id": "917496d50d65c6fc7cb1702c4328a297e830654fe6e58af243ac9adf3573eaab",
+      "split": "train",
       "quick": false,
       "path": "tasks/v1_string_regex_parsing_027"
     },
@@ -2541,6 +2457,7 @@
       "title": "Extract markers 028",
       "category": "string_regex_parsing",
       "difficulty": "easy",
+      "family_id": "a6a444c260dd3ba85b8e9b1d5b86bb053d36e5d3fd9cbb50cdd62753823fbe01",
       "split": "train",
       "quick": false,
       "path": "tasks/v1_string_regex_parsing_028"
@@ -2550,6 +2467,7 @@
       "title": "Extract markers 029",
       "category": "string_regex_parsing",
       "difficulty": "medium",
+      "family_id": "58889c8d9b04f6cfed1c9485a3979c2f31c618fda52eed3f35153d7085bbd9ff",
       "split": "train",
       "quick": false,
       "path": "tasks/v1_string_regex_parsing_029"
@@ -2559,8 +2477,9 @@
       "title": "Extract markers 030",
       "category": "string_regex_parsing",
       "difficulty": "medium",
+      "family_id": "8a7fe66ec7b1bb4cdc6f03fe20ca3ce0b0c8ed7576bcf9fc0543de6fbdde668a",
       "split": "test",
-      "quick": false,
+      "quick": true,
       "path": "tasks/v1_string_regex_parsing_030"
     },
     {
@@ -2568,7 +2487,8 @@
       "title": "Extract markers 031",
       "category": "string_regex_parsing",
       "difficulty": "medium",
-      "split": "dev",
+      "family_id": "7f36c25b1bf1a7a1c1d7dca4feb19dd3a2d7bc143301ec692c88fd46a1705819",
+      "split": "test",
       "quick": false,
       "path": "tasks/v1_string_regex_parsing_031"
     },
@@ -2577,6 +2497,7 @@
       "title": "Extract markers 032",
       "category": "string_regex_parsing",
       "difficulty": "medium",
+      "family_id": "14dabc08b0cf99726703c4aa10230b55ee7d28b42b41c4a1d61facdc9b1a748d",
       "split": "train",
       "quick": false,
       "path": "tasks/v1_string_regex_parsing_032"
@@ -2586,8 +2507,9 @@
       "title": "Extract markers 033",
       "category": "string_regex_parsing",
       "difficulty": "medium",
-      "split": "dev",
-      "quick": true,
+      "family_id": "faa2880785fdd90987cfcc090bb6cc5e45b8b07661a5ede81981b02306984cf3",
+      "split": "train",
+      "quick": false,
       "path": "tasks/v1_string_regex_parsing_033"
     },
     {
@@ -2595,7 +2517,8 @@
       "title": "Extract markers 034",
       "category": "string_regex_parsing",
       "difficulty": "hard",
-      "split": "dev",
+      "family_id": "2624cc461ea434d3a0ab8be8043b45465e408fef6cee9e93b3038066b7fba50e",
+      "split": "test",
       "quick": false,
       "path": "tasks/v1_string_regex_parsing_034"
     },
@@ -2604,6 +2527,7 @@
       "title": "Extract markers 035",
       "category": "string_regex_parsing",
       "difficulty": "easy",
+      "family_id": "b2e6cdd95f5fe83f505d9909381d2147615d127fb0a7ef0d14b2feb1c7b3c1cd",
       "split": "dev",
       "quick": false,
       "path": "tasks/v1_string_regex_parsing_035"
@@ -2613,7 +2537,8 @@
       "title": "Extract markers 036",
       "category": "string_regex_parsing",
       "difficulty": "hard",
-      "split": "train",
+      "family_id": "a2f3b5687de3c2ce3aa9fa74b19fc2a5991c6c92f344e66873a1f37f050e9bb2",
+      "split": "test",
       "quick": false,
       "path": "tasks/v1_string_regex_parsing_036"
     },
@@ -2622,6 +2547,7 @@
       "title": "Extract markers 037",
       "category": "string_regex_parsing",
       "difficulty": "hard",
+      "family_id": "10d27d0cb1984bba9c979db023f1bec8e3ab0937c1d2eea5a7cd5e5bcc53ad90",
       "split": "train",
       "quick": false,
       "path": "tasks/v1_string_regex_parsing_037"
@@ -2631,6 +2557,7 @@
       "title": "Extract markers 038",
       "category": "string_regex_parsing",
       "difficulty": "medium",
+      "family_id": "8218d9dc6a659fad5257913055cc69ce47742848cf98021311dd322750117110",
       "split": "train",
       "quick": false,
       "path": "tasks/v1_string_regex_parsing_038"
@@ -2640,6 +2567,7 @@
       "title": "Extract markers 039",
       "category": "string_regex_parsing",
       "difficulty": "medium",
+      "family_id": "2f318f01fa0153bc74808f6dac35a982bb3aa1e9b54e72cd87e6ab55adb252d7",
       "split": "train",
       "quick": false,
       "path": "tasks/v1_string_regex_parsing_039"
@@ -2649,8 +2577,9 @@
       "title": "Extract markers 040",
       "category": "string_regex_parsing",
       "difficulty": "medium",
-      "split": "train",
-      "quick": false,
+      "family_id": "6e4cb88058e8e43d63416eeaf1d3a3a42f2bfc61877752015bb556dbfaea5dca",
+      "split": "dev",
+      "quick": true,
       "path": "tasks/v1_string_regex_parsing_040"
     },
     {
@@ -2658,8 +2587,9 @@
       "title": "Extract markers 041",
       "category": "string_regex_parsing",
       "difficulty": "easy",
-      "split": "dev",
-      "quick": true,
+      "family_id": "47b84ffb6aa40098722b18d5af212e5715c8ce50d5b8be7ef965dc94301dafad",
+      "split": "train",
+      "quick": false,
       "path": "tasks/v1_string_regex_parsing_041"
     },
     {
@@ -2667,6 +2597,7 @@
       "title": "Extract markers 042",
       "category": "string_regex_parsing",
       "difficulty": "easy",
+      "family_id": "b3d3652fc9fff3eb81c4d2a139f5214cc94f173a07e6a9ca8a0253fa559594c3",
       "split": "test",
       "quick": false,
       "path": "tasks/v1_string_regex_parsing_042"
@@ -2676,6 +2607,7 @@
       "title": "Extract markers 043",
       "category": "string_regex_parsing",
       "difficulty": "easy",
+      "family_id": "3b743f65192e2601d1a8d1a7d3f29c90aa474eab632517673a2c567c4b72b195",
       "split": "train",
       "quick": false,
       "path": "tasks/v1_string_regex_parsing_043"
@@ -2685,6 +2617,7 @@
       "title": "Extract markers 044",
       "category": "string_regex_parsing",
       "difficulty": "easy",
+      "family_id": "8d64704cf3c7245f9c30943d7adaaace45202f7243db8bf29c930f62a14c3ebe",
       "split": "train",
       "quick": false,
       "path": "tasks/v1_string_regex_parsing_044"
@@ -2694,7 +2627,8 @@
       "title": "Extract markers 045",
       "category": "string_regex_parsing",
       "difficulty": "medium",
-      "split": "test",
+      "family_id": "446ddb5e3137708f41c184e74f4e660368388f379b3889179b7e70bd6ecaee26",
+      "split": "train",
       "quick": false,
       "path": "tasks/v1_string_regex_parsing_045"
     },
@@ -2703,6 +2637,7 @@
       "title": "Extract markers 046",
       "category": "string_regex_parsing",
       "difficulty": "hard",
+      "family_id": "c510b329e53755c718f691738bd653d6329f08688eef4baf1fb23d4c12e66685",
       "split": "train",
       "quick": false,
       "path": "tasks/v1_string_regex_parsing_046"
@@ -2712,7 +2647,8 @@
       "title": "Extract markers 047",
       "category": "string_regex_parsing",
       "difficulty": "easy",
-      "split": "train",
+      "family_id": "169c9cfeb016bdd5b07491fe1d9d259b5e964aade9acc755e7a223d562a59c72",
+      "split": "dev",
       "quick": false,
       "path": "tasks/v1_string_regex_parsing_047"
     },
@@ -2721,7 +2657,8 @@
       "title": "Extract markers 048",
       "category": "string_regex_parsing",
       "difficulty": "easy",
-      "split": "dev",
+      "family_id": "33c59c4e23313bc0464f893390feae0992d4c54aafbd22e21126ec0fd5d721f1",
+      "split": "train",
       "quick": false,
       "path": "tasks/v1_string_regex_parsing_048"
     },
@@ -2730,7 +2667,8 @@
       "title": "Extract markers 049",
       "category": "string_regex_parsing",
       "difficulty": "medium",
-      "split": "test",
+      "family_id": "044bb876a9ba49056bdd33f98583f0e3d7ff5671697206452602c6d890ec00ee",
+      "split": "dev",
       "quick": false,
       "path": "tasks/v1_string_regex_parsing_049"
     },
@@ -2739,6 +2677,7 @@
       "title": "Mini bugfix 000",
       "category": "mini_repo_bugfix",
       "difficulty": "easy",
+      "family_id": "fb57e0ec4d002ebbd91894a588b7a46a0885dd589db11f8cef615ea616ee5302",
       "split": "train",
       "quick": false,
       "path": "tasks/v2_mini_bugfix_000"
@@ -2748,6 +2687,7 @@
       "title": "Mini bugfix 001",
       "category": "mini_repo_bugfix",
       "difficulty": "easy",
+      "family_id": "56396b14271929a0ac56c7ec8b09106f80c83dff93ea431b20c43f7668dc5097",
       "split": "train",
       "quick": false,
       "path": "tasks/v2_mini_bugfix_001"
@@ -2757,6 +2697,7 @@
       "title": "Mini bugfix 002",
       "category": "mini_repo_bugfix",
       "difficulty": "medium",
+      "family_id": "1331e7c955ebc18e1d5c3cf0bea4cf4cbc8fe89f948c4a69c7b67ae8c569361a",
       "split": "train",
       "quick": false,
       "path": "tasks/v2_mini_bugfix_002"
@@ -2766,7 +2707,8 @@
       "title": "Mini bugfix 003",
       "category": "mini_repo_bugfix",
       "difficulty": "easy",
-      "split": "train",
+      "family_id": "47a33918583813dc70b2da6957c5e95c12ad307b9691fccffe4c6d3ffb785289",
+      "split": "dev",
       "quick": false,
       "path": "tasks/v2_mini_bugfix_003"
     },
@@ -2775,6 +2717,7 @@
       "title": "Mini bugfix 004",
       "category": "mini_repo_bugfix",
       "difficulty": "hard",
+      "family_id": "378e9aad5b5d5382c7e6499ab8c75398f95e429b2c6c044bfbed88b1f3615df4",
       "split": "test",
       "quick": false,
       "path": "tasks/v2_mini_bugfix_004"
@@ -2784,6 +2727,7 @@
       "title": "Mini bugfix 005",
       "category": "mini_repo_bugfix",
       "difficulty": "medium",
+      "family_id": "840db1ca5c32686350a528eb3c586ffdc2f7af55f3f17a150a39cf487e92160b",
       "split": "train",
       "quick": false,
       "path": "tasks/v2_mini_bugfix_005"
@@ -2793,6 +2737,7 @@
       "title": "Mini bugfix 006",
       "category": "mini_repo_bugfix",
       "difficulty": "easy",
+      "family_id": "c84c23b2d80c3fbfffe3b07107876c2d23bebaa6940a02b00fa7f0190a293e19",
       "split": "train",
       "quick": false,
       "path": "tasks/v2_mini_bugfix_006"
@@ -2802,7 +2747,8 @@
       "title": "Mini bugfix 007",
       "category": "mini_repo_bugfix",
       "difficulty": "medium",
-      "split": "train",
+      "family_id": "fa5ab02edd8b4c7bcfd2f18cb90e23fe35e5fb562dbdc3608e04d8db2a7170e4",
+      "split": "test",
       "quick": false,
       "path": "tasks/v2_mini_bugfix_007"
     },
@@ -2811,7 +2757,8 @@
       "title": "Mini bugfix 008",
       "category": "mini_repo_bugfix",
       "difficulty": "medium",
-      "split": "test",
+      "family_id": "fd95de8509985eb57fbe39e2e95d5f5b72c65e3a392e4cd800dbaf04e1be0de0",
+      "split": "train",
       "quick": false,
       "path": "tasks/v2_mini_bugfix_008"
     },
@@ -2820,8 +2767,9 @@
       "title": "Mini bugfix 009",
       "category": "mini_repo_bugfix",
       "difficulty": "medium",
-      "split": "test",
-      "quick": true,
+      "family_id": "93839416c3d390323f1d32b8e016f42674377c41604e5c846be686790b054db8",
+      "split": "dev",
+      "quick": false,
       "path": "tasks/v2_mini_bugfix_009"
     },
     {
@@ -2829,8 +2777,9 @@
       "title": "Mini bugfix 010",
       "category": "mini_repo_bugfix",
       "difficulty": "hard",
-      "split": "dev",
-      "quick": true,
+      "family_id": "48c5ce59fdaecfbd1c36fdce7f777402b0963454a38f22fce55353a879414b66",
+      "split": "train",
+      "quick": false,
       "path": "tasks/v2_mini_bugfix_010"
     },
     {
@@ -2838,7 +2787,8 @@
       "title": "Mini bugfix 011",
       "category": "mini_repo_bugfix",
       "difficulty": "hard",
-      "split": "train",
+      "family_id": "131514a51de2b5293b0f7ec60e9e4bd1faf9f3e21fdaac6e76743729e7311c2c",
+      "split": "test",
       "quick": false,
       "path": "tasks/v2_mini_bugfix_011"
     },
@@ -2847,7 +2797,8 @@
       "title": "Mini bugfix 012",
       "category": "mini_repo_bugfix",
       "difficulty": "easy",
-      "split": "dev",
+      "family_id": "c31ed52e210b1b829c989766fee3dbc233d3936cc9abc2951c534868b117e4f1",
+      "split": "train",
       "quick": false,
       "path": "tasks/v2_mini_bugfix_012"
     },
@@ -2856,7 +2807,8 @@
       "title": "Mini bugfix 013",
       "category": "mini_repo_bugfix",
       "difficulty": "hard",
-      "split": "dev",
+      "family_id": "640b85e7ececcc8e75da393b7e7e7366edce1f8c4b4e64175a0e0723b2321f17",
+      "split": "train",
       "quick": false,
       "path": "tasks/v2_mini_bugfix_013"
     },
@@ -2865,6 +2817,7 @@
       "title": "Mini bugfix 014",
       "category": "mini_repo_bugfix",
       "difficulty": "medium",
+      "family_id": "070511d9721585ca4fcb58cabf9800a567e5ff8595414f247b6ccb62c627d894",
       "split": "train",
       "quick": false,
       "path": "tasks/v2_mini_bugfix_014"
@@ -2874,7 +2827,8 @@
       "title": "Mini bugfix 015",
       "category": "mini_repo_bugfix",
       "difficulty": "easy",
-      "split": "train",
+      "family_id": "ae84adfc063d29782c0bba476d1b83fedc1e15b9bb16ffd7e8ed886f49c0a21f",
+      "split": "test",
       "quick": false,
       "path": "tasks/v2_mini_bugfix_015"
     },
@@ -2883,7 +2837,8 @@
       "title": "Mini bugfix 016",
       "category": "mini_repo_bugfix",
       "difficulty": "easy",
-      "split": "test",
+      "family_id": "11bb5a3e6739842c17ec46a73face5e169a87256c0e8bac72a42107223325626",
+      "split": "train",
       "quick": false,
       "path": "tasks/v2_mini_bugfix_016"
     },
@@ -2892,8 +2847,9 @@
       "title": "Mini bugfix 017",
       "category": "mini_repo_bugfix",
       "difficulty": "easy",
+      "family_id": "ecc9badff22422f97057da5e439e3d0bee672c00d10d77eb21ed84ec1c8d3059",
       "split": "test",
-      "quick": false,
+      "quick": true,
       "path": "tasks/v2_mini_bugfix_017"
     },
     {
@@ -2901,6 +2857,7 @@
       "title": "Mini bugfix 018",
       "category": "mini_repo_bugfix",
       "difficulty": "easy",
+      "family_id": "a784c9b866f7b17d8ce2541309ccc80ec6e5936b8a245c1052175a1af0ecc3b8",
       "split": "train",
       "quick": false,
       "path": "tasks/v2_mini_bugfix_018"
@@ -2910,7 +2867,8 @@
       "title": "Mini bugfix 019",
       "category": "mini_repo_bugfix",
       "difficulty": "medium",
-      "split": "train",
+      "family_id": "83dcb916de42e03ff30c5246803e9afd3074825b1615db4219ff3d084b4f9a7b",
+      "split": "test",
       "quick": false,
       "path": "tasks/v2_mini_bugfix_019"
     },
@@ -2919,7 +2877,8 @@
       "title": "Mini bugfix 020",
       "category": "mini_repo_bugfix",
       "difficulty": "medium",
-      "split": "train",
+      "family_id": "6e025683448cebe36ac580321bc9ec28bb9fa8e57d6f577f7090cea70da4ea07",
+      "split": "dev",
       "quick": false,
       "path": "tasks/v2_mini_bugfix_020"
     },
@@ -2928,7 +2887,8 @@
       "title": "Mini bugfix 021",
       "category": "mini_repo_bugfix",
       "difficulty": "easy",
-      "split": "train",
+      "family_id": "ccac44444e8aea5aebf83c8eb125db4064a336b24b2d161fbe82715292eec011",
+      "split": "dev",
       "quick": false,
       "path": "tasks/v2_mini_bugfix_021"
     },
@@ -2937,6 +2897,7 @@
       "title": "Mini bugfix 022",
       "category": "mini_repo_bugfix",
       "difficulty": "medium",
+      "family_id": "b40d112f2be111916123f0f113cdf5a8b779cae76b402a332e7faa2b5bb9dc71",
       "split": "train",
       "quick": false,
       "path": "tasks/v2_mini_bugfix_022"
@@ -2946,6 +2907,7 @@
       "title": "Mini bugfix 023",
       "category": "mini_repo_bugfix",
       "difficulty": "easy",
+      "family_id": "4b7e416d96d280a46dfbcdac4e93c6eaa387bb336fa5d1a6e18da70efcc3e84c",
       "split": "train",
       "quick": false,
       "path": "tasks/v2_mini_bugfix_023"
@@ -2955,7 +2917,8 @@
       "title": "Mini bugfix 024",
       "category": "mini_repo_bugfix",
       "difficulty": "medium",
-      "split": "dev",
+      "family_id": "64a78e02ad5036ff75892e84166d1e248f1b89f8213927a9b56b2d7f0a29e935",
+      "split": "train",
       "quick": false,
       "path": "tasks/v2_mini_bugfix_024"
     },
@@ -2964,7 +2927,8 @@
       "title": "Mini bugfix 025",
       "category": "mini_repo_bugfix",
       "difficulty": "medium",
-      "split": "test",
+      "family_id": "1887ff79a33be232e79c60db28cede758ed99e73e73d307ef9932749cdc09af8",
+      "split": "train",
       "quick": false,
       "path": "tasks/v2_mini_bugfix_025"
     },
@@ -2973,7 +2937,8 @@
       "title": "Mini bugfix 026",
       "category": "mini_repo_bugfix",
       "difficulty": "easy",
-      "split": "test",
+      "family_id": "83095e4a79ff0cf4f287c0d83205bdd142ffcb006afc728ad1471041672d62ff",
+      "split": "train",
       "quick": false,
       "path": "tasks/v2_mini_bugfix_026"
     },
@@ -2982,6 +2947,7 @@
       "title": "Mini bugfix 027",
       "category": "mini_repo_bugfix",
       "difficulty": "easy",
+      "family_id": "be6c58f64f9ca8673f94e68291305ad1006bfb794a5ae67aa2b1b1f65a5e6579",
       "split": "train",
       "quick": false,
       "path": "tasks/v2_mini_bugfix_027"
@@ -2991,7 +2957,8 @@
       "title": "Mini bugfix 028",
       "category": "mini_repo_bugfix",
       "difficulty": "hard",
-      "split": "train",
+      "family_id": "bf78fc82f0a0b33372b7d898fe1178e6cc052857936c9c021e321c6e6e157368",
+      "split": "dev",
       "quick": false,
       "path": "tasks/v2_mini_bugfix_028"
     },
@@ -3000,6 +2967,7 @@
       "title": "Mini bugfix 029",
       "category": "mini_repo_bugfix",
       "difficulty": "medium",
+      "family_id": "ba3fca652d12a974a7d59706f24490ab964c35a1bcdc788b0d67e02e454f967f",
       "split": "train",
       "quick": false,
       "path": "tasks/v2_mini_bugfix_029"
@@ -3009,7 +2977,8 @@
       "title": "Mini bugfix 030",
       "category": "mini_repo_bugfix",
       "difficulty": "easy",
-      "split": "dev",
+      "family_id": "d9aa894fc939392161be3243cab3b137a28abe8441b34182080085a75d60716e",
+      "split": "train",
       "quick": false,
       "path": "tasks/v2_mini_bugfix_030"
     },
@@ -3018,6 +2987,7 @@
       "title": "Mini bugfix 031",
       "category": "mini_repo_bugfix",
       "difficulty": "easy",
+      "family_id": "07de55d58f3c987c30d127d13202f8c24e6e6e83d4c317be21f4950d8fa61312",
       "split": "train",
       "quick": false,
       "path": "tasks/v2_mini_bugfix_031"
@@ -3027,6 +2997,7 @@
       "title": "Mini bugfix 032",
       "category": "mini_repo_bugfix",
       "difficulty": "hard",
+      "family_id": "31b34c66d93967b7c43d261bf2322959f0afc4d863dd0a3adc83cf78adcaf965",
       "split": "train",
       "quick": false,
       "path": "tasks/v2_mini_bugfix_032"
@@ -3036,6 +3007,7 @@
       "title": "Mini bugfix 033",
       "category": "mini_repo_bugfix",
       "difficulty": "medium",
+      "family_id": "7769e6791a046af1092f1f98eba95ded84369883d3d3dca259b7cde773119ada",
       "split": "train",
       "quick": false,
       "path": "tasks/v2_mini_bugfix_033"
@@ -3045,7 +3017,8 @@
       "title": "Mini bugfix 034",
       "category": "mini_repo_bugfix",
       "difficulty": "easy",
-      "split": "test",
+      "family_id": "bdb7cdc7308054efc493c3b636d9f2d8f6b8120d39db20eea91b0d9d683a170e",
+      "split": "train",
       "quick": false,
       "path": "tasks/v2_mini_bugfix_034"
     },
@@ -3054,6 +3027,7 @@
       "title": "Mini bugfix 035",
       "category": "mini_repo_bugfix",
       "difficulty": "hard",
+      "family_id": "9c5c64431c3a5d73ca33a1dd3f8676004f36961d7f1c5fe4f5bd73438e2b55b6",
       "split": "train",
       "quick": false,
       "path": "tasks/v2_mini_bugfix_035"
@@ -3063,7 +3037,8 @@
       "title": "Mini bugfix 036",
       "category": "mini_repo_bugfix",
       "difficulty": "easy",
-      "split": "test",
+      "family_id": "d16580dc8f92744305bec532a6e111c70c44e757711b40caa76a3b9928ade62d",
+      "split": "dev",
       "quick": false,
       "path": "tasks/v2_mini_bugfix_036"
     },
@@ -3072,7 +3047,8 @@
       "title": "Mini bugfix 037",
       "category": "mini_repo_bugfix",
       "difficulty": "medium",
-      "split": "train",
+      "family_id": "1132b7d584a886851907608289a2f1138f514fd7039b72772bd56fbb1281d54b",
+      "split": "test",
       "quick": false,
       "path": "tasks/v2_mini_bugfix_037"
     },
@@ -3081,7 +3057,8 @@
       "title": "Mini bugfix 038",
       "category": "mini_repo_bugfix",
       "difficulty": "medium",
-      "split": "train",
+      "family_id": "bc1ad772c0cc8321d1bc16de4cd8c3368ec05d0a1311551bc9558bbc8828f445",
+      "split": "dev",
       "quick": false,
       "path": "tasks/v2_mini_bugfix_038"
     },
@@ -3090,6 +3067,7 @@
       "title": "Mini bugfix 039",
       "category": "mini_repo_bugfix",
       "difficulty": "hard",
+      "family_id": "21c74b7f5a37c513c8b1251b9e33dcba84d265e6861457f9994c8b6c4f32dad7",
       "split": "test",
       "quick": false,
       "path": "tasks/v2_mini_bugfix_039"
@@ -3099,7 +3077,8 @@
       "title": "Mini bugfix 040",
       "category": "mini_repo_bugfix",
       "difficulty": "hard",
-      "split": "train",
+      "family_id": "9c90b629c55eda6f9debb103d51be67af0f5227473b1679ca125fc937ecaa461",
+      "split": "test",
       "quick": false,
       "path": "tasks/v2_mini_bugfix_040"
     },
@@ -3108,7 +3087,8 @@
       "title": "Mini bugfix 041",
       "category": "mini_repo_bugfix",
       "difficulty": "medium",
-      "split": "train",
+      "family_id": "8c20e068cb12455b669e7900429c69b9e9aa7818f1ea752f03172fa161c1008b",
+      "split": "test",
       "quick": false,
       "path": "tasks/v2_mini_bugfix_041"
     },
@@ -3117,7 +3097,8 @@
       "title": "Mini bugfix 042",
       "category": "mini_repo_bugfix",
       "difficulty": "medium",
-      "split": "test",
+      "family_id": "501d3a0b5e52ff223cb29a2599f6300a1946172204fcf26d1ef9098c32ae47f9",
+      "split": "train",
       "quick": false,
       "path": "tasks/v2_mini_bugfix_042"
     },
@@ -3126,7 +3107,8 @@
       "title": "Mini bugfix 043",
       "category": "mini_repo_bugfix",
       "difficulty": "easy",
-      "split": "train",
+      "family_id": "44cb232b6b15de1ecd2a3f50c50c90def5b490c8d7156a4687378bb3e9625cea",
+      "split": "test",
       "quick": false,
       "path": "tasks/v2_mini_bugfix_043"
     },
@@ -3135,7 +3117,8 @@
       "title": "Mini bugfix 044",
       "category": "mini_repo_bugfix",
       "difficulty": "medium",
-      "split": "train",
+      "family_id": "553d0938ab8bfad316353a9b381607b198d316c9121dd80cdf6317828d3f101f",
+      "split": "test",
       "quick": false,
       "path": "tasks/v2_mini_bugfix_044"
     },
@@ -3144,6 +3127,7 @@
       "title": "Mini bugfix 045",
       "category": "mini_repo_bugfix",
       "difficulty": "medium",
+      "family_id": "7034ffbd9955aed6f15a04abeca91ab4ed3b1b8034b48bb7be8a4dcf2f8f7124",
       "split": "test",
       "quick": false,
       "path": "tasks/v2_mini_bugfix_045"
@@ -3153,8 +3137,9 @@
       "title": "Mini bugfix 046",
       "category": "mini_repo_bugfix",
       "difficulty": "medium",
-      "split": "train",
-      "quick": false,
+      "family_id": "197e13ef6efae93400092b28d0d42a967eebfc29ef5023cc53a9f495c7129fd4",
+      "split": "test",
+      "quick": true,
       "path": "tasks/v2_mini_bugfix_046"
     },
     {
@@ -3162,8 +3147,9 @@
       "title": "Mini bugfix 047",
       "category": "mini_repo_bugfix",
       "difficulty": "hard",
-      "split": "test",
-      "quick": true,
+      "family_id": "efe8cc48338c8a9a2d999b2ae5972272e98ecaba1ee7049293e9722316936e0f",
+      "split": "dev",
+      "quick": false,
       "path": "tasks/v2_mini_bugfix_047"
     },
     {
@@ -3171,6 +3157,7 @@
       "title": "Mini bugfix 048",
       "category": "mini_repo_bugfix",
       "difficulty": "medium",
+      "family_id": "158f89cc6deb3cfc26440b9d69ca66d0071aac6f9689c29e95ef9f5f210cfc34",
       "split": "train",
       "quick": false,
       "path": "tasks/v2_mini_bugfix_048"
@@ -3180,15 +3167,397 @@
       "title": "Mini bugfix 049",
       "category": "mini_repo_bugfix",
       "difficulty": "medium",
-      "split": "train",
+      "family_id": "126d8d2cd08f1c84c85b10924a934351a4c68a9cb69e88b7bb0cfd04c1b97216",
+      "split": "test",
       "quick": false,
       "path": "tasks/v2_mini_bugfix_049"
+    },
+    {
+      "task_id": "v2_mini_bugfix_050",
+      "title": "Mini bugfix 050",
+      "category": "mini_repo_bugfix",
+      "difficulty": "medium",
+      "family_id": "90f226a5c609bac9579ddd182d3ceb5701d4e1d3b8f10f8e1f33e078d11895b1",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_bugfix_050"
+    },
+    {
+      "task_id": "v2_mini_bugfix_051",
+      "title": "Mini bugfix 051",
+      "category": "mini_repo_bugfix",
+      "difficulty": "easy",
+      "family_id": "42d0935b70d0901b5da2de039d13e147d62de77f360c1b0eb55422343b8eadc3",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_bugfix_051"
+    },
+    {
+      "task_id": "v2_mini_bugfix_052",
+      "title": "Mini bugfix 052",
+      "category": "mini_repo_bugfix",
+      "difficulty": "medium",
+      "family_id": "6293f9210f9d8959c97770b87acef801b5f74e222d06eed6087ad9836c93e7bb",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_bugfix_052"
+    },
+    {
+      "task_id": "v2_mini_bugfix_053",
+      "title": "Mini bugfix 053",
+      "category": "mini_repo_bugfix",
+      "difficulty": "medium",
+      "family_id": "15895e1576cdbe651d8cf06399121ee1c4c8902967b02b913f97af30ca52b92a",
+      "split": "dev",
+      "quick": false,
+      "path": "tasks/v2_mini_bugfix_053"
+    },
+    {
+      "task_id": "v2_mini_bugfix_054",
+      "title": "Mini bugfix 054",
+      "category": "mini_repo_bugfix",
+      "difficulty": "medium",
+      "family_id": "1b25bdb7440e7dcc5e71cc1e94a250a7073056811957299bc195f407c5b53f9f",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_bugfix_054"
+    },
+    {
+      "task_id": "v2_mini_bugfix_055",
+      "title": "Mini bugfix 055",
+      "category": "mini_repo_bugfix",
+      "difficulty": "medium",
+      "family_id": "dce07a8e930b82f60d17507f622c9e6871be8bdcc659200d14a4843cfdd5ee90",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_bugfix_055"
+    },
+    {
+      "task_id": "v2_mini_bugfix_056",
+      "title": "Mini bugfix 056",
+      "category": "mini_repo_bugfix",
+      "difficulty": "hard",
+      "family_id": "1b2ed1e63bda47b055be56227ba5f3a49981b6e39ae34426d0ee845c1ef26592",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_bugfix_056"
+    },
+    {
+      "task_id": "v2_mini_bugfix_057",
+      "title": "Mini bugfix 057",
+      "category": "mini_repo_bugfix",
+      "difficulty": "hard",
+      "family_id": "68650171d3d0b48dd2f51b74f2759a0ab9ad2ce77d779aaca5d810efdf4e9bdb",
+      "split": "dev",
+      "quick": false,
+      "path": "tasks/v2_mini_bugfix_057"
+    },
+    {
+      "task_id": "v2_mini_bugfix_058",
+      "title": "Mini bugfix 058",
+      "category": "mini_repo_bugfix",
+      "difficulty": "easy",
+      "family_id": "177a3828eca8d1df1d9b2bc68e177b33d536cc7bc80a32960935c9087a4a2901",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_bugfix_058"
+    },
+    {
+      "task_id": "v2_mini_bugfix_059",
+      "title": "Mini bugfix 059",
+      "category": "mini_repo_bugfix",
+      "difficulty": "medium",
+      "family_id": "6e9f9b995e73018636f7f212261ded54d417a68d03134a2fd392c7b99e53d8bd",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_bugfix_059"
+    },
+    {
+      "task_id": "v2_mini_bugfix_060",
+      "title": "Mini bugfix 060",
+      "category": "mini_repo_bugfix",
+      "difficulty": "hard",
+      "family_id": "8d436ecbb4eb094f5a79160186e2b931dd3b7d224fc61b803516cb9829769805",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_bugfix_060"
+    },
+    {
+      "task_id": "v2_mini_bugfix_061",
+      "title": "Mini bugfix 061",
+      "category": "mini_repo_bugfix",
+      "difficulty": "medium",
+      "family_id": "153e9915e84215802bb5b492624908e515dde3aacbbb6d0006a65eeeb5b95875",
+      "split": "dev",
+      "quick": false,
+      "path": "tasks/v2_mini_bugfix_061"
+    },
+    {
+      "task_id": "v2_mini_bugfix_062",
+      "title": "Mini bugfix 062",
+      "category": "mini_repo_bugfix",
+      "difficulty": "easy",
+      "family_id": "6fff8acf667ede0390d8431679787416c6f12ee65c0a47f3abf5ce57a9a7fe9c",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_bugfix_062"
+    },
+    {
+      "task_id": "v2_mini_bugfix_063",
+      "title": "Mini bugfix 063",
+      "category": "mini_repo_bugfix",
+      "difficulty": "easy",
+      "family_id": "03f880d52e890a8af1609dedb061ce01178e6c8781035b5befec5880969d3a77",
+      "split": "test",
+      "quick": false,
+      "path": "tasks/v2_mini_bugfix_063"
+    },
+    {
+      "task_id": "v2_mini_bugfix_064",
+      "title": "Mini bugfix 064",
+      "category": "mini_repo_bugfix",
+      "difficulty": "easy",
+      "family_id": "9714b08212b7d10ac4ba6ffbd5767626e675bc09395b45fea8388809052fa854",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_bugfix_064"
+    },
+    {
+      "task_id": "v2_mini_bugfix_065",
+      "title": "Mini bugfix 065",
+      "category": "mini_repo_bugfix",
+      "difficulty": "easy",
+      "family_id": "3c8199d7b3e3d3ae3ef06e3d529d1a2f032e4fa116f9540ae4ba61ef1f7bd09d",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_bugfix_065"
+    },
+    {
+      "task_id": "v2_mini_bugfix_066",
+      "title": "Mini bugfix 066",
+      "category": "mini_repo_bugfix",
+      "difficulty": "medium",
+      "family_id": "0f2cf6368ae9cd7092424cd9ae74c509435aa1ecc4cb5c6c769f8857060613cd",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_bugfix_066"
+    },
+    {
+      "task_id": "v2_mini_bugfix_067",
+      "title": "Mini bugfix 067",
+      "category": "mini_repo_bugfix",
+      "difficulty": "easy",
+      "family_id": "2c284a3f39985939b46cc83c5d7042dbe4a57584b029cc013f2f544bf679f7ba",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_bugfix_067"
+    },
+    {
+      "task_id": "v2_mini_bugfix_068",
+      "title": "Mini bugfix 068",
+      "category": "mini_repo_bugfix",
+      "difficulty": "hard",
+      "family_id": "c525963e6fb8676dae58b8780b0c4377d2057aa83c7c4ce035c544dea5939d79",
+      "split": "test",
+      "quick": false,
+      "path": "tasks/v2_mini_bugfix_068"
+    },
+    {
+      "task_id": "v2_mini_bugfix_069",
+      "title": "Mini bugfix 069",
+      "category": "mini_repo_bugfix",
+      "difficulty": "hard",
+      "family_id": "29037febc54d339242ed3e3268029a5f639c702c33cf309d2095d7f6a0d6404b",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_bugfix_069"
+    },
+    {
+      "task_id": "v2_mini_bugfix_070",
+      "title": "Mini bugfix 070",
+      "category": "mini_repo_bugfix",
+      "difficulty": "medium",
+      "family_id": "f89bd8525a89c3d301f0fcf17c83f96a39bec1e832006c925832e4a58889384f",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_bugfix_070"
+    },
+    {
+      "task_id": "v2_mini_bugfix_071",
+      "title": "Mini bugfix 071",
+      "category": "mini_repo_bugfix",
+      "difficulty": "medium",
+      "family_id": "4a56d73200a20fb5c035535e53bd1a1375cf3aa69d40a38672916a5f7cd545b0",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_bugfix_071"
+    },
+    {
+      "task_id": "v2_mini_bugfix_072",
+      "title": "Mini bugfix 072",
+      "category": "mini_repo_bugfix",
+      "difficulty": "hard",
+      "family_id": "708c50fd218d7796ca63f5445e1dd1779f52a4a3478442fb2f343690a39154ed",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_bugfix_072"
+    },
+    {
+      "task_id": "v2_mini_bugfix_073",
+      "title": "Mini bugfix 073",
+      "category": "mini_repo_bugfix",
+      "difficulty": "easy",
+      "family_id": "109087bbe70747e9c9ffbf611e2b5166eb8d5c1fb88f28535061d683c51bb9a6",
+      "split": "dev",
+      "quick": false,
+      "path": "tasks/v2_mini_bugfix_073"
+    },
+    {
+      "task_id": "v2_mini_bugfix_074",
+      "title": "Mini bugfix 074",
+      "category": "mini_repo_bugfix",
+      "difficulty": "medium",
+      "family_id": "fe60b4c8331e5066e5e01961612e081bc1de7c7582c3f64bd69de44b55bd20dc",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_bugfix_074"
+    },
+    {
+      "task_id": "v2_mini_bugfix_075",
+      "title": "Mini bugfix 075",
+      "category": "mini_repo_bugfix",
+      "difficulty": "easy",
+      "family_id": "23224e1ecf140594e91eeb6c63eb0f8947f18d3c20d7ae4df7d2c0af69c2c255",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_bugfix_075"
+    },
+    {
+      "task_id": "v2_mini_bugfix_076",
+      "title": "Mini bugfix 076",
+      "category": "mini_repo_bugfix",
+      "difficulty": "medium",
+      "family_id": "ad45f3bda6038a7ae0203c4bcc3bc4a160b5a263840e6185cc2ba768487ef220",
+      "split": "test",
+      "quick": false,
+      "path": "tasks/v2_mini_bugfix_076"
+    },
+    {
+      "task_id": "v2_mini_bugfix_077",
+      "title": "Mini bugfix 077",
+      "category": "mini_repo_bugfix",
+      "difficulty": "easy",
+      "family_id": "1743b4892654867a794fcc10a504c9840c8e3e4f2f7068acd821cdb243ccb089",
+      "split": "dev",
+      "quick": false,
+      "path": "tasks/v2_mini_bugfix_077"
+    },
+    {
+      "task_id": "v2_mini_bugfix_078",
+      "title": "Mini bugfix 078",
+      "category": "mini_repo_bugfix",
+      "difficulty": "medium",
+      "family_id": "7f3c929fc450e59b1b0db43dc1d4c75fa095c8479d525fad78f2bc7ff838ccd9",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_bugfix_078"
+    },
+    {
+      "task_id": "v2_mini_bugfix_079",
+      "title": "Mini bugfix 079",
+      "category": "mini_repo_bugfix",
+      "difficulty": "hard",
+      "family_id": "718795b3490fb939e524d25b8c2f371ab69d984e407e7459cbfefaa2f3b21244",
+      "split": "dev",
+      "quick": false,
+      "path": "tasks/v2_mini_bugfix_079"
+    },
+    {
+      "task_id": "v2_mini_bugfix_080",
+      "title": "Mini bugfix 080",
+      "category": "mini_repo_bugfix",
+      "difficulty": "easy",
+      "family_id": "da782cfcdd3d6769c67d51087cb51967639227af0c3c5239ba8d06ddd3e06c0d",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_bugfix_080"
+    },
+    {
+      "task_id": "v2_mini_bugfix_081",
+      "title": "Mini bugfix 081",
+      "category": "mini_repo_bugfix",
+      "difficulty": "medium",
+      "family_id": "da10a1f3a93aba55a833e97e9f9a2ab23d10cde6cb32bedc16797641f1f9225e",
+      "split": "dev",
+      "quick": false,
+      "path": "tasks/v2_mini_bugfix_081"
+    },
+    {
+      "task_id": "v2_mini_bugfix_082",
+      "title": "Mini bugfix 082",
+      "category": "mini_repo_bugfix",
+      "difficulty": "easy",
+      "family_id": "1076a6e943ce66679b7a4f28f770e4b6867f3d1bc1a5441d42504e269d093354",
+      "split": "dev",
+      "quick": true,
+      "path": "tasks/v2_mini_bugfix_082"
+    },
+    {
+      "task_id": "v2_mini_bugfix_083",
+      "title": "Mini bugfix 083",
+      "category": "mini_repo_bugfix",
+      "difficulty": "easy",
+      "family_id": "7dd7d1a9c5c439a824f8f27f1c62ff2bf754572cbcbc568b0c8d81c748e4878f",
+      "split": "dev",
+      "quick": false,
+      "path": "tasks/v2_mini_bugfix_083"
+    },
+    {
+      "task_id": "v2_mini_bugfix_084",
+      "title": "Mini bugfix 084",
+      "category": "mini_repo_bugfix",
+      "difficulty": "medium",
+      "family_id": "4f79179a1afed71b08dd258c635c68d8f319ed1b5c3dec826cc42d0ddf9130d7",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_bugfix_084"
+    },
+    {
+      "task_id": "v2_mini_bugfix_085",
+      "title": "Mini bugfix 085",
+      "category": "mini_repo_bugfix",
+      "difficulty": "medium",
+      "family_id": "c4548f646328dbee1aebce118c1655221b9ca72310cbae1707305f2da08669d7",
+      "split": "test",
+      "quick": false,
+      "path": "tasks/v2_mini_bugfix_085"
+    },
+    {
+      "task_id": "v2_mini_bugfix_086",
+      "title": "Mini bugfix 086",
+      "category": "mini_repo_bugfix",
+      "difficulty": "hard",
+      "family_id": "8d4bd80c3b621031b47b6a55ef0d8e72b07d6bd3ec1c8ffefe9112e8209dc615",
+      "split": "dev",
+      "quick": false,
+      "path": "tasks/v2_mini_bugfix_086"
+    },
+    {
+      "task_id": "v2_mini_bugfix_087",
+      "title": "Mini bugfix 087",
+      "category": "mini_repo_bugfix",
+      "difficulty": "medium",
+      "family_id": "ee4c1749d2c688b2ddb32a3e4fb91b3c81955c28820c77a8cd24ab3f7f2fa607",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_bugfix_087"
     },
     {
       "task_id": "v2_mini_cli_000",
       "title": "Mini cli 000",
       "category": "mini_repo_cli",
       "difficulty": "easy",
+      "family_id": "bfc4063aa3ec9f74b574cc1192251a6e89d93afda087d3429260c499a0d56332",
       "split": "dev",
       "quick": true,
       "path": "tasks/v2_mini_cli_000"
@@ -3198,7 +3567,8 @@
       "title": "Mini cli 001",
       "category": "mini_repo_cli",
       "difficulty": "medium",
-      "split": "train",
+      "family_id": "7244e5b5e20936cdedaf7d7e81b39c884f2aa62abef0696de2a8630906aa60d4",
+      "split": "test",
       "quick": false,
       "path": "tasks/v2_mini_cli_001"
     },
@@ -3207,7 +3577,8 @@
       "title": "Mini cli 002",
       "category": "mini_repo_cli",
       "difficulty": "medium",
-      "split": "train",
+      "family_id": "373905e55adc3a95cca61f6b990dfc872658a5754dbb6fa8a681d4734c4af5f8",
+      "split": "test",
       "quick": false,
       "path": "tasks/v2_mini_cli_002"
     },
@@ -3216,7 +3587,8 @@
       "title": "Mini cli 003",
       "category": "mini_repo_cli",
       "difficulty": "easy",
-      "split": "train",
+      "family_id": "ea37bdf97ecf2f98d172129ba3ac49b921052c59e25c4f89e2d939e94d5256dd",
+      "split": "dev",
       "quick": false,
       "path": "tasks/v2_mini_cli_003"
     },
@@ -3225,8 +3597,9 @@
       "title": "Mini cli 004",
       "category": "mini_repo_cli",
       "difficulty": "easy",
-      "split": "test",
-      "quick": true,
+      "family_id": "7c412862142b0d154f83bb838db460de74b5b73a0b2950f4edf9b50bcc318ae2",
+      "split": "train",
+      "quick": false,
       "path": "tasks/v2_mini_cli_004"
     },
     {
@@ -3234,6 +3607,7 @@
       "title": "Mini cli 005",
       "category": "mini_repo_cli",
       "difficulty": "hard",
+      "family_id": "19e188eef55374b4d9557d2d0d799d870f132887ace22bc0ded044fdedeeb2fa",
       "split": "train",
       "quick": false,
       "path": "tasks/v2_mini_cli_005"
@@ -3243,7 +3617,8 @@
       "title": "Mini cli 006",
       "category": "mini_repo_cli",
       "difficulty": "medium",
-      "split": "train",
+      "family_id": "1c001848078cc2c1f786a1ede165f6a659dd619f08378957c37b809bc119e2bd",
+      "split": "dev",
       "quick": false,
       "path": "tasks/v2_mini_cli_006"
     },
@@ -3252,7 +3627,8 @@
       "title": "Mini cli 007",
       "category": "mini_repo_cli",
       "difficulty": "easy",
-      "split": "test",
+      "family_id": "c12006174c2214aad48dbb0cdf294a4c58c258f8dde7f706d58c6e3ba3a0d890",
+      "split": "dev",
       "quick": false,
       "path": "tasks/v2_mini_cli_007"
     },
@@ -3261,8 +3637,9 @@
       "title": "Mini cli 008",
       "category": "mini_repo_cli",
       "difficulty": "medium",
-      "split": "dev",
-      "quick": true,
+      "family_id": "852910c453f590ef508cc713024e473649a6b24eb43f01d9ecb19835f16e2151",
+      "split": "test",
+      "quick": false,
       "path": "tasks/v2_mini_cli_008"
     },
     {
@@ -3270,7 +3647,8 @@
       "title": "Mini cli 009",
       "category": "mini_repo_cli",
       "difficulty": "medium",
-      "split": "test",
+      "family_id": "d488eb4a23f708a9934fa81daed7dc90957d758a86e4f9dd3738ea42eccd510b",
+      "split": "train",
       "quick": false,
       "path": "tasks/v2_mini_cli_009"
     },
@@ -3279,7 +3657,8 @@
       "title": "Mini cli 010",
       "category": "mini_repo_cli",
       "difficulty": "easy",
-      "split": "test",
+      "family_id": "e996b1950768d58c21c69d7eada2c795f5096f84069ea20ab9252f3073cf7050",
+      "split": "train",
       "quick": false,
       "path": "tasks/v2_mini_cli_010"
     },
@@ -3288,7 +3667,8 @@
       "title": "Mini cli 011",
       "category": "mini_repo_cli",
       "difficulty": "medium",
-      "split": "test",
+      "family_id": "849cace9efa32f338fabba5f4a922bb93f367684bfe38cbfc0786d487a23011a",
+      "split": "train",
       "quick": false,
       "path": "tasks/v2_mini_cli_011"
     },
@@ -3297,6 +3677,7 @@
       "title": "Mini cli 012",
       "category": "mini_repo_cli",
       "difficulty": "medium",
+      "family_id": "5dd368a838eb625513a4787677345a7cd1c26dd56ec3111721b29a016ad6c084",
       "split": "train",
       "quick": false,
       "path": "tasks/v2_mini_cli_012"
@@ -3306,24 +3687,17 @@
       "title": "Mini cli 013",
       "category": "mini_repo_cli",
       "difficulty": "easy",
-      "split": "train",
+      "family_id": "2b4b7970f0a629fb65d4ac1567d711cb8f5b61977b6c565ec14446dc3a29f810",
+      "split": "dev",
       "quick": false,
       "path": "tasks/v2_mini_cli_013"
-    },
-    {
-      "task_id": "v2_mini_cli_014",
-      "title": "Mini cli 014",
-      "category": "mini_repo_cli",
-      "difficulty": "medium",
-      "split": "train",
-      "quick": false,
-      "path": "tasks/v2_mini_cli_014"
     },
     {
       "task_id": "v2_mini_cli_015",
       "title": "Mini cli 015",
       "category": "mini_repo_cli",
       "difficulty": "hard",
+      "family_id": "bf5d16572b172de32040f7e84b7bf9b4d1666af501e3a5b1664eb1165c16bb15",
       "split": "train",
       "quick": false,
       "path": "tasks/v2_mini_cli_015"
@@ -3333,6 +3707,7 @@
       "title": "Mini cli 016",
       "category": "mini_repo_cli",
       "difficulty": "medium",
+      "family_id": "27bf02c67b2d70945fb1229d57bdcca188a914395d921f1984aad235bc577228",
       "split": "train",
       "quick": false,
       "path": "tasks/v2_mini_cli_016"
@@ -3342,25 +3717,18 @@
       "title": "Mini cli 017",
       "category": "mini_repo_cli",
       "difficulty": "medium",
-      "split": "train",
-      "quick": false,
-      "path": "tasks/v2_mini_cli_017"
-    },
-    {
-      "task_id": "v2_mini_cli_018",
-      "title": "Mini cli 018",
-      "category": "mini_repo_cli",
-      "difficulty": "medium",
+      "family_id": "a2745f2bf8738f6a9340c9bd0e1d315d82e0f13498997bf8b82b2c72d144cbca",
       "split": "dev",
       "quick": false,
-      "path": "tasks/v2_mini_cli_018"
+      "path": "tasks/v2_mini_cli_017"
     },
     {
       "task_id": "v2_mini_cli_019",
       "title": "Mini cli 019",
       "category": "mini_repo_cli",
       "difficulty": "hard",
-      "split": "dev",
+      "family_id": "80a2d0c80a0b80446671a282569fed0ae47fd179b2c54d60550535465b9e9a0e",
+      "split": "train",
       "quick": false,
       "path": "tasks/v2_mini_cli_019"
     },
@@ -3369,6 +3737,7 @@
       "title": "Mini cli 020",
       "category": "mini_repo_cli",
       "difficulty": "hard",
+      "family_id": "ab27f35eb11f4ec540ac2e087415aab07f621778688130f55b29e4b36efcace2",
       "split": "test",
       "quick": false,
       "path": "tasks/v2_mini_cli_020"
@@ -3378,8 +3747,9 @@
       "title": "Mini cli 021",
       "category": "mini_repo_cli",
       "difficulty": "easy",
-      "split": "train",
-      "quick": false,
+      "family_id": "b3c49dae1530b6cbb50efc2c1cda709dcc737b06b22994874b4214ea3da236ce",
+      "split": "test",
+      "quick": true,
       "path": "tasks/v2_mini_cli_021"
     },
     {
@@ -3387,6 +3757,7 @@
       "title": "Mini cli 022",
       "category": "mini_repo_cli",
       "difficulty": "medium",
+      "family_id": "5f4597bd77036a1b8bfbcc27b5ebd5c37fcb9dded318a8206f1354ebc911cf82",
       "split": "test",
       "quick": false,
       "path": "tasks/v2_mini_cli_022"
@@ -3396,51 +3767,17 @@
       "title": "Mini cli 023",
       "category": "mini_repo_cli",
       "difficulty": "easy",
-      "split": "dev",
+      "family_id": "b083ab6bec1f392165c932268bc53718097270f61831afbd0996bc705391c0da",
+      "split": "train",
       "quick": false,
       "path": "tasks/v2_mini_cli_023"
-    },
-    {
-      "task_id": "v2_mini_cli_024",
-      "title": "Mini cli 024",
-      "category": "mini_repo_cli",
-      "difficulty": "easy",
-      "split": "train",
-      "quick": false,
-      "path": "tasks/v2_mini_cli_024"
-    },
-    {
-      "task_id": "v2_mini_cli_025",
-      "title": "Mini cli 025",
-      "category": "mini_repo_cli",
-      "difficulty": "easy",
-      "split": "dev",
-      "quick": false,
-      "path": "tasks/v2_mini_cli_025"
-    },
-    {
-      "task_id": "v2_mini_cli_026",
-      "title": "Mini cli 026",
-      "category": "mini_repo_cli",
-      "difficulty": "medium",
-      "split": "test",
-      "quick": false,
-      "path": "tasks/v2_mini_cli_026"
-    },
-    {
-      "task_id": "v2_mini_cli_027",
-      "title": "Mini cli 027",
-      "category": "mini_repo_cli",
-      "difficulty": "easy",
-      "split": "train",
-      "quick": false,
-      "path": "tasks/v2_mini_cli_027"
     },
     {
       "task_id": "v2_mini_cli_028",
       "title": "Mini cli 028",
       "category": "mini_repo_cli",
       "difficulty": "hard",
+      "family_id": "d9ef066f86a850b14cdf1751389b8a4f25a99cac7e205941c2f7def75c62ea08",
       "split": "train",
       "quick": false,
       "path": "tasks/v2_mini_cli_028"
@@ -3450,6 +3787,7 @@
       "title": "Mini cli 029",
       "category": "mini_repo_cli",
       "difficulty": "easy",
+      "family_id": "ffa38fe2eb9ae8fd1ff867f7254c3523f4ff8a55a3f37def84d7308e60e8b90c",
       "split": "train",
       "quick": false,
       "path": "tasks/v2_mini_cli_029"
@@ -3459,7 +3797,8 @@
       "title": "Mini cli 030",
       "category": "mini_repo_cli",
       "difficulty": "easy",
-      "split": "train",
+      "family_id": "eaef56de53c7ebeb1b768c966126af75f89b7f4075e461b4952c54ffa3c105a7",
+      "split": "test",
       "quick": false,
       "path": "tasks/v2_mini_cli_030"
     },
@@ -3468,177 +3807,87 @@
       "title": "Mini cli 031",
       "category": "mini_repo_cli",
       "difficulty": "medium",
+      "family_id": "76b38377aa48b38601c4d8b164121969b5bc6f7dd4fc94bdf407bac21f7bea1b",
       "split": "train",
       "quick": false,
       "path": "tasks/v2_mini_cli_031"
-    },
-    {
-      "task_id": "v2_mini_cli_032",
-      "title": "Mini cli 032",
-      "category": "mini_repo_cli",
-      "difficulty": "medium",
-      "split": "dev",
-      "quick": false,
-      "path": "tasks/v2_mini_cli_032"
     },
     {
       "task_id": "v2_mini_cli_033",
       "title": "Mini cli 033",
       "category": "mini_repo_cli",
       "difficulty": "hard",
-      "split": "train",
-      "quick": false,
-      "path": "tasks/v2_mini_cli_033"
-    },
-    {
-      "task_id": "v2_mini_cli_034",
-      "title": "Mini cli 034",
-      "category": "mini_repo_cli",
-      "difficulty": "easy",
-      "split": "dev",
-      "quick": false,
-      "path": "tasks/v2_mini_cli_034"
-    },
-    {
-      "task_id": "v2_mini_cli_035",
-      "title": "Mini cli 035",
-      "category": "mini_repo_cli",
-      "difficulty": "medium",
-      "split": "train",
-      "quick": false,
-      "path": "tasks/v2_mini_cli_035"
-    },
-    {
-      "task_id": "v2_mini_cli_036",
-      "title": "Mini cli 036",
-      "category": "mini_repo_cli",
-      "difficulty": "medium",
+      "family_id": "e3b554e1aebc831efe3823d3ec7e2c49051c5727afadf8e0958e962fadcb7e46",
       "split": "test",
       "quick": false,
-      "path": "tasks/v2_mini_cli_036"
+      "path": "tasks/v2_mini_cli_033"
     },
     {
       "task_id": "v2_mini_cli_037",
       "title": "Mini cli 037",
       "category": "mini_repo_cli",
       "difficulty": "hard",
-      "split": "dev",
+      "family_id": "40c476befc3f4f6d4ef9c942d5e51cf84d1dc97b8673d6f00b03d051b7b7ce9c",
+      "split": "train",
       "quick": false,
       "path": "tasks/v2_mini_cli_037"
     },
     {
-      "task_id": "v2_mini_cli_038",
-      "title": "Mini cli 038",
-      "category": "mini_repo_cli",
-      "difficulty": "medium",
-      "split": "train",
-      "quick": false,
-      "path": "tasks/v2_mini_cli_038"
-    },
-    {
-      "task_id": "v2_mini_cli_039",
-      "title": "Mini cli 039",
-      "category": "mini_repo_cli",
-      "difficulty": "hard",
-      "split": "train",
-      "quick": false,
-      "path": "tasks/v2_mini_cli_039"
-    },
-    {
-      "task_id": "v2_mini_cli_040",
-      "title": "Mini cli 040",
-      "category": "mini_repo_cli",
-      "difficulty": "medium",
-      "split": "train",
-      "quick": false,
-      "path": "tasks/v2_mini_cli_040"
-    },
-    {
-      "task_id": "v2_mini_cli_041",
-      "title": "Mini cli 041",
+      "task_id": "v2_mini_cli_050",
+      "title": "Mini cli 050",
       "category": "mini_repo_cli",
       "difficulty": "easy",
+      "family_id": "dcd4eab44b9dc4d37f69ee3034adf002df51f37ec9f9aa9bf573c9755584672c",
       "split": "train",
       "quick": false,
-      "path": "tasks/v2_mini_cli_041"
+      "path": "tasks/v2_mini_cli_050"
     },
     {
-      "task_id": "v2_mini_cli_042",
-      "title": "Mini cli 042",
+      "task_id": "v2_mini_cli_056",
+      "title": "Mini cli 056",
       "category": "mini_repo_cli",
       "difficulty": "easy",
-      "split": "test",
+      "family_id": "888bc9f2fed7f3bdd0c3a7859f033585aeb4cbce114ec7ed2b6748d9bbd455a8",
+      "split": "train",
       "quick": false,
-      "path": "tasks/v2_mini_cli_042"
+      "path": "tasks/v2_mini_cli_056"
     },
     {
-      "task_id": "v2_mini_cli_043",
-      "title": "Mini cli 043",
+      "task_id": "v2_mini_cli_062",
+      "title": "Mini cli 062",
       "category": "mini_repo_cli",
       "difficulty": "hard",
+      "family_id": "f60925c4ef76ab177d9251d25b601a82be1259dc8f62cf40c26b732534b258d6",
       "split": "train",
       "quick": false,
-      "path": "tasks/v2_mini_cli_043"
+      "path": "tasks/v2_mini_cli_062"
     },
     {
-      "task_id": "v2_mini_cli_044",
-      "title": "Mini cli 044",
+      "task_id": "v2_mini_cli_063",
+      "title": "Mini cli 063",
       "category": "mini_repo_cli",
       "difficulty": "medium",
-      "split": "dev",
-      "quick": false,
-      "path": "tasks/v2_mini_cli_044"
-    },
-    {
-      "task_id": "v2_mini_cli_045",
-      "title": "Mini cli 045",
-      "category": "mini_repo_cli",
-      "difficulty": "medium",
+      "family_id": "f662bb1772c1ca19a50713f20395be3e53d5cc0c78cdf8d363e288c9eabb2f66",
       "split": "train",
       "quick": false,
-      "path": "tasks/v2_mini_cli_045"
+      "path": "tasks/v2_mini_cli_063"
     },
     {
-      "task_id": "v2_mini_cli_046",
-      "title": "Mini cli 046",
-      "category": "mini_repo_cli",
-      "difficulty": "medium",
-      "split": "dev",
-      "quick": false,
-      "path": "tasks/v2_mini_cli_046"
-    },
-    {
-      "task_id": "v2_mini_cli_047",
-      "title": "Mini cli 047",
-      "category": "mini_repo_cli",
-      "difficulty": "easy",
-      "split": "dev",
-      "quick": false,
-      "path": "tasks/v2_mini_cli_047"
-    },
-    {
-      "task_id": "v2_mini_cli_048",
-      "title": "Mini cli 048",
-      "category": "mini_repo_cli",
-      "difficulty": "medium",
-      "split": "train",
-      "quick": false,
-      "path": "tasks/v2_mini_cli_048"
-    },
-    {
-      "task_id": "v2_mini_cli_049",
-      "title": "Mini cli 049",
+      "task_id": "v2_mini_cli_071",
+      "title": "Mini cli 071",
       "category": "mini_repo_cli",
       "difficulty": "hard",
-      "split": "train",
-      "quick": false,
-      "path": "tasks/v2_mini_cli_049"
+      "family_id": "bf2f072c7e340bd5c049bcfc1b60cbed9b39bf62f88e1c792cd3832407a2eb35",
+      "split": "dev",
+      "quick": true,
+      "path": "tasks/v2_mini_cli_071"
     },
     {
       "task_id": "v2_mini_feature_000",
       "title": "Mini feature 000",
       "category": "mini_repo_feature",
       "difficulty": "easy",
+      "family_id": "52f1a4d3917bdb299c34c2723b0a92e9156388d0f2f8f54ad73ca8e80ed8710f",
       "split": "train",
       "quick": false,
       "path": "tasks/v2_mini_feature_000"
@@ -3648,7 +3897,8 @@
       "title": "Mini feature 001",
       "category": "mini_repo_feature",
       "difficulty": "hard",
-      "split": "train",
+      "family_id": "63d454eb4c321907f71873cc02f5aadef11f75da9399d0768be078ad7bc22f05",
+      "split": "dev",
       "quick": false,
       "path": "tasks/v2_mini_feature_001"
     },
@@ -3657,6 +3907,7 @@
       "title": "Mini feature 002",
       "category": "mini_repo_feature",
       "difficulty": "easy",
+      "family_id": "82ea3339aba62f5ffbaa81e76bd84d979e18f2a4ad4700ea0ebfde11d4e62b83",
       "split": "train",
       "quick": false,
       "path": "tasks/v2_mini_feature_002"
@@ -3666,6 +3917,7 @@
       "title": "Mini feature 003",
       "category": "mini_repo_feature",
       "difficulty": "hard",
+      "family_id": "edfac0e04c6446e7545430fa1f4758e836ae70bf90b109b1fabe783f07693e57",
       "split": "test",
       "quick": false,
       "path": "tasks/v2_mini_feature_003"
@@ -3675,6 +3927,7 @@
       "title": "Mini feature 004",
       "category": "mini_repo_feature",
       "difficulty": "medium",
+      "family_id": "5f377dc2d9450816f56643d12b47b12512aab764c365085fa6b248bd30c17fbc",
       "split": "train",
       "quick": false,
       "path": "tasks/v2_mini_feature_004"
@@ -3684,6 +3937,7 @@
       "title": "Mini feature 005",
       "category": "mini_repo_feature",
       "difficulty": "easy",
+      "family_id": "aa9532cc4c95ca35840a59212e361851cca5e76aa50f91a84593b4c6182d45b2",
       "split": "train",
       "quick": false,
       "path": "tasks/v2_mini_feature_005"
@@ -3693,6 +3947,7 @@
       "title": "Mini feature 006",
       "category": "mini_repo_feature",
       "difficulty": "easy",
+      "family_id": "8f64395fd6816d6518def4ed6b326d83e00ef0095f6efcbcaab18dc830f6b7da",
       "split": "test",
       "quick": false,
       "path": "tasks/v2_mini_feature_006"
@@ -3702,7 +3957,8 @@
       "title": "Mini feature 007",
       "category": "mini_repo_feature",
       "difficulty": "medium",
-      "split": "test",
+      "family_id": "c7042d2b9fb0eaab84ae648eb33f17144e7cedba0e215af2742dc5c831161062",
+      "split": "train",
       "quick": false,
       "path": "tasks/v2_mini_feature_007"
     },
@@ -3711,6 +3967,7 @@
       "title": "Mini feature 008",
       "category": "mini_repo_feature",
       "difficulty": "medium",
+      "family_id": "75ba1317d1bbd746d7c0ba619730903f2538b6a658c14a76167668951f92a340",
       "split": "train",
       "quick": false,
       "path": "tasks/v2_mini_feature_008"
@@ -3720,6 +3977,7 @@
       "title": "Mini feature 009",
       "category": "mini_repo_feature",
       "difficulty": "hard",
+      "family_id": "f0d26e905d0d1e09c8aa81c76f12caf71d3a26294480ae897fb45e470510d106",
       "split": "train",
       "quick": false,
       "path": "tasks/v2_mini_feature_009"
@@ -3729,6 +3987,7 @@
       "title": "Mini feature 010",
       "category": "mini_repo_feature",
       "difficulty": "medium",
+      "family_id": "2486fc308aed8427c40de098c737a5b3a0e006ad457316c643a85b88549781ef",
       "split": "dev",
       "quick": false,
       "path": "tasks/v2_mini_feature_010"
@@ -3738,6 +3997,7 @@
       "title": "Mini feature 011",
       "category": "mini_repo_feature",
       "difficulty": "hard",
+      "family_id": "52ec2ff8f77e6574628761a9bb589c57066519fc6f018a76e9edda573244e894",
       "split": "train",
       "quick": false,
       "path": "tasks/v2_mini_feature_011"
@@ -3747,7 +4007,8 @@
       "title": "Mini feature 012",
       "category": "mini_repo_feature",
       "difficulty": "medium",
-      "split": "dev",
+      "family_id": "405260e8ed4a06da110890f4f27800aee0bf60e20de06c167200db846bc47bd1",
+      "split": "train",
       "quick": false,
       "path": "tasks/v2_mini_feature_012"
     },
@@ -3756,7 +4017,8 @@
       "title": "Mini feature 013",
       "category": "mini_repo_feature",
       "difficulty": "easy",
-      "split": "test",
+      "family_id": "0fd957733a141cab50c7b428c8b5180a341aef0b59fc01b546d64f6927a9912c",
+      "split": "dev",
       "quick": true,
       "path": "tasks/v2_mini_feature_013"
     },
@@ -3765,6 +4027,7 @@
       "title": "Mini feature 014",
       "category": "mini_repo_feature",
       "difficulty": "easy",
+      "family_id": "e3a3c47397cc1fd137719e163c3043a1f8eb7bb302995acb72b13d8d23524dee",
       "split": "train",
       "quick": false,
       "path": "tasks/v2_mini_feature_014"
@@ -3774,6 +4037,7 @@
       "title": "Mini feature 015",
       "category": "mini_repo_feature",
       "difficulty": "medium",
+      "family_id": "781f8e5c2bff8f6e378418fc25ba1d01140eb75830db0de7eee7446984d42b08",
       "split": "train",
       "quick": false,
       "path": "tasks/v2_mini_feature_015"
@@ -3783,7 +4047,8 @@
       "title": "Mini feature 016",
       "category": "mini_repo_feature",
       "difficulty": "medium",
-      "split": "train",
+      "family_id": "87cb3475c6a97ea52949f8d94809c9c74d16ee1adfef1df9696da59faafd34c1",
+      "split": "dev",
       "quick": false,
       "path": "tasks/v2_mini_feature_016"
     },
@@ -3792,6 +4057,7 @@
       "title": "Mini feature 017",
       "category": "mini_repo_feature",
       "difficulty": "hard",
+      "family_id": "9a174b6be241ea0257cf63d5a2f77d95a002e4f38fb976a2e849554568066dc0",
       "split": "train",
       "quick": false,
       "path": "tasks/v2_mini_feature_017"
@@ -3801,7 +4067,8 @@
       "title": "Mini feature 018",
       "category": "mini_repo_feature",
       "difficulty": "medium",
-      "split": "train",
+      "family_id": "07266ef08a4e6f71639f57e2c157535b85ebe4fdb3737ff0a1771a08665d33e3",
+      "split": "test",
       "quick": false,
       "path": "tasks/v2_mini_feature_018"
     },
@@ -3810,6 +4077,7 @@
       "title": "Mini feature 019",
       "category": "mini_repo_feature",
       "difficulty": "easy",
+      "family_id": "bdc2a570fb1a6b011e75ddba36d1cce37735da00279906e7b7e7aa3bfa6b5a2c",
       "split": "train",
       "quick": false,
       "path": "tasks/v2_mini_feature_019"
@@ -3819,6 +4087,7 @@
       "title": "Mini feature 020",
       "category": "mini_repo_feature",
       "difficulty": "easy",
+      "family_id": "e8ec4046165f04caeff993283b94c6766bf2a1a44a9c44a7e891edc8b05d4505",
       "split": "train",
       "quick": false,
       "path": "tasks/v2_mini_feature_020"
@@ -3828,7 +4097,8 @@
       "title": "Mini feature 021",
       "category": "mini_repo_feature",
       "difficulty": "easy",
-      "split": "dev",
+      "family_id": "7436ff904f1142ab912fdd70aeb8c5d9988f45ee047d5d67c8b785c11f019210",
+      "split": "train",
       "quick": false,
       "path": "tasks/v2_mini_feature_021"
     },
@@ -3837,6 +4107,7 @@
       "title": "Mini feature 022",
       "category": "mini_repo_feature",
       "difficulty": "medium",
+      "family_id": "a52ef19becb2e8e5ac177c3e2e0b22ef5d8b875520d619d5c60bec1a94f65211",
       "split": "train",
       "quick": false,
       "path": "tasks/v2_mini_feature_022"
@@ -3846,8 +4117,9 @@
       "title": "Mini feature 023",
       "category": "mini_repo_feature",
       "difficulty": "easy",
+      "family_id": "75ac7fe234817509a9b3e7c490d92179ba3476a05b45a4ce217c8b53b06f38cf",
       "split": "dev",
-      "quick": true,
+      "quick": false,
       "path": "tasks/v2_mini_feature_023"
     },
     {
@@ -3855,7 +4127,8 @@
       "title": "Mini feature 024",
       "category": "mini_repo_feature",
       "difficulty": "easy",
-      "split": "test",
+      "family_id": "0b5887b18f3ba128188836c6120855e4e9a1a62269c327bb145b7ec3d27ebe1c",
+      "split": "train",
       "quick": false,
       "path": "tasks/v2_mini_feature_024"
     },
@@ -3864,7 +4137,8 @@
       "title": "Mini feature 025",
       "category": "mini_repo_feature",
       "difficulty": "medium",
-      "split": "train",
+      "family_id": "5ab3fa1061e66231463055681e552ee75015c5de9304671717097a5ceefd754c",
+      "split": "test",
       "quick": false,
       "path": "tasks/v2_mini_feature_025"
     },
@@ -3873,6 +4147,7 @@
       "title": "Mini feature 026",
       "category": "mini_repo_feature",
       "difficulty": "medium",
+      "family_id": "0009c69a1e156f0124a85dc4b5fe1d37f07e90e7fce655f4caf4403a44833d0f",
       "split": "train",
       "quick": false,
       "path": "tasks/v2_mini_feature_026"
@@ -3882,7 +4157,8 @@
       "title": "Mini feature 027",
       "category": "mini_repo_feature",
       "difficulty": "easy",
-      "split": "test",
+      "family_id": "773d1e10356b677c51a0abc91029aa684e38d4884d1d1760e34ea3f40d13c882",
+      "split": "train",
       "quick": false,
       "path": "tasks/v2_mini_feature_027"
     },
@@ -3891,6 +4167,7 @@
       "title": "Mini feature 028",
       "category": "mini_repo_feature",
       "difficulty": "easy",
+      "family_id": "2d92da6ed423a07fce3086a21d229fcd51d3b6f5cad3cba75a725178b9a5e17e",
       "split": "train",
       "quick": false,
       "path": "tasks/v2_mini_feature_028"
@@ -3900,7 +4177,8 @@
       "title": "Mini feature 029",
       "category": "mini_repo_feature",
       "difficulty": "hard",
-      "split": "train",
+      "family_id": "40b3aa6ccc8578d449d2d2c606b326cfba053619320a5648d400254e2f5ce6d8",
+      "split": "test",
       "quick": false,
       "path": "tasks/v2_mini_feature_029"
     },
@@ -3909,6 +4187,7 @@
       "title": "Mini feature 030",
       "category": "mini_repo_feature",
       "difficulty": "easy",
+      "family_id": "fc3d6a5821b18cda9b4b938d27081346258886b80d58ba1e8d22a22777def66f",
       "split": "train",
       "quick": false,
       "path": "tasks/v2_mini_feature_030"
@@ -3918,7 +4197,8 @@
       "title": "Mini feature 031",
       "category": "mini_repo_feature",
       "difficulty": "medium",
-      "split": "train",
+      "family_id": "b3d3a38451f099ea536d67e8b7e49f65f1c821d929d2b68d1d7cfff400cb491a",
+      "split": "dev",
       "quick": false,
       "path": "tasks/v2_mini_feature_031"
     },
@@ -3927,7 +4207,8 @@
       "title": "Mini feature 032",
       "category": "mini_repo_feature",
       "difficulty": "medium",
-      "split": "dev",
+      "family_id": "bbe5afa8785fa82fd75a485ba973cf2970a5810e41e11423da2b990ab69b1b09",
+      "split": "train",
       "quick": false,
       "path": "tasks/v2_mini_feature_032"
     },
@@ -3936,8 +4217,9 @@
       "title": "Mini feature 033",
       "category": "mini_repo_feature",
       "difficulty": "medium",
-      "split": "dev",
-      "quick": true,
+      "family_id": "83817e93ff5fa2397cfe84cb4441fc171e770211d3e5f38b5d2728af67f0558c",
+      "split": "train",
+      "quick": false,
       "path": "tasks/v2_mini_feature_033"
     },
     {
@@ -3945,6 +4227,7 @@
       "title": "Mini feature 034",
       "category": "mini_repo_feature",
       "difficulty": "hard",
+      "family_id": "7400c98dcf6d2e87458f8f49e40a7f18c2fbbc89f1ea4666cecfe663ea660c94",
       "split": "train",
       "quick": false,
       "path": "tasks/v2_mini_feature_034"
@@ -3954,6 +4237,7 @@
       "title": "Mini feature 035",
       "category": "mini_repo_feature",
       "difficulty": "hard",
+      "family_id": "8bc8cc13798cb9b57636bd27b59663d6dae1355dab417e4f77ce12080f2a393b",
       "split": "train",
       "quick": false,
       "path": "tasks/v2_mini_feature_035"
@@ -3963,7 +4247,8 @@
       "title": "Mini feature 036",
       "category": "mini_repo_feature",
       "difficulty": "medium",
-      "split": "train",
+      "family_id": "646409f0a571f0b2510ebfbf9eb895e9df39800c21781617c51909e6a4b12f04",
+      "split": "test",
       "quick": false,
       "path": "tasks/v2_mini_feature_036"
     },
@@ -3972,6 +4257,7 @@
       "title": "Mini feature 037",
       "category": "mini_repo_feature",
       "difficulty": "medium",
+      "family_id": "448dd474e3f42e469fe96f61793f00e42ba589234df93d8154e4ef5b40b2e380",
       "split": "train",
       "quick": false,
       "path": "tasks/v2_mini_feature_037"
@@ -3981,7 +4267,8 @@
       "title": "Mini feature 038",
       "category": "mini_repo_feature",
       "difficulty": "medium",
-      "split": "train",
+      "family_id": "792130ec52b6aacca7663e87bd02356406946e84287e453a5e3785f2ac428cd1",
+      "split": "test",
       "quick": false,
       "path": "tasks/v2_mini_feature_038"
     },
@@ -3990,7 +4277,8 @@
       "title": "Mini feature 039",
       "category": "mini_repo_feature",
       "difficulty": "easy",
-      "split": "test",
+      "family_id": "b940b56e4992ff694eb43ff8ab60cadbe3c7b6c370a4bd22fec4ba2007989fa6",
+      "split": "train",
       "quick": false,
       "path": "tasks/v2_mini_feature_039"
     },
@@ -3999,7 +4287,8 @@
       "title": "Mini feature 040",
       "category": "mini_repo_feature",
       "difficulty": "easy",
-      "split": "train",
+      "family_id": "3dd50383318e9010f757364cb04e32f304755758a70438f91ab102481202ee96",
+      "split": "test",
       "quick": false,
       "path": "tasks/v2_mini_feature_040"
     },
@@ -4008,8 +4297,9 @@
       "title": "Mini feature 041",
       "category": "mini_repo_feature",
       "difficulty": "easy",
-      "split": "train",
-      "quick": false,
+      "family_id": "6608c3f0af297fe9485f3ae45c062075cabf0a5e45763a1018e3f3d7b10fcf48",
+      "split": "dev",
+      "quick": true,
       "path": "tasks/v2_mini_feature_041"
     },
     {
@@ -4017,7 +4307,8 @@
       "title": "Mini feature 042",
       "category": "mini_repo_feature",
       "difficulty": "medium",
-      "split": "dev",
+      "family_id": "25318fcecafa7932bc7311edcc741808086dd6b9dc03329011437cc0cf0493b7",
+      "split": "test",
       "quick": false,
       "path": "tasks/v2_mini_feature_042"
     },
@@ -4026,6 +4317,7 @@
       "title": "Mini feature 043",
       "category": "mini_repo_feature",
       "difficulty": "medium",
+      "family_id": "37f50a4c728fc60f8c9893d23e88316d63c82d80e23e670cc772a72ee0dcfe48",
       "split": "train",
       "quick": false,
       "path": "tasks/v2_mini_feature_043"
@@ -4035,6 +4327,7 @@
       "title": "Mini feature 044",
       "category": "mini_repo_feature",
       "difficulty": "medium",
+      "family_id": "7d433c5fc346038b6358bda3853dc5b4c057876d8ee553a4d51934c9dc8e8fd8",
       "split": "train",
       "quick": false,
       "path": "tasks/v2_mini_feature_044"
@@ -4044,6 +4337,7 @@
       "title": "Mini feature 045",
       "category": "mini_repo_feature",
       "difficulty": "hard",
+      "family_id": "cce832a45ad93471b993c3c8bb245e8c64fe517800459ed14a388a4e209c9c69",
       "split": "train",
       "quick": false,
       "path": "tasks/v2_mini_feature_045"
@@ -4053,6 +4347,7 @@
       "title": "Mini feature 046",
       "category": "mini_repo_feature",
       "difficulty": "medium",
+      "family_id": "5c0b7446f81327109f2e6e557b40cbe06f690523b60bfd28baebb3810f35eeea",
       "split": "test",
       "quick": false,
       "path": "tasks/v2_mini_feature_046"
@@ -4062,7 +4357,8 @@
       "title": "Mini feature 047",
       "category": "mini_repo_feature",
       "difficulty": "hard",
-      "split": "dev",
+      "family_id": "0918960d050d136d4b39c1ee939e84a4cf7c0247eef80d2af157bee4afa0e6a7",
+      "split": "train",
       "quick": false,
       "path": "tasks/v2_mini_feature_047"
     },
@@ -4071,7 +4367,8 @@
       "title": "Mini feature 048",
       "category": "mini_repo_feature",
       "difficulty": "medium",
-      "split": "train",
+      "family_id": "e661bb1395eb08b068efc7455d4cb2ac02e09f5a8c7ea858e5bd4c5ff01061ec",
+      "split": "test",
       "quick": false,
       "path": "tasks/v2_mini_feature_048"
     },
@@ -4080,17 +4377,399 @@
       "title": "Mini feature 049",
       "category": "mini_repo_feature",
       "difficulty": "easy",
+      "family_id": "3c74095bd784a44eae058a0b8bc26c8e547cf60c2da54d678c7d79b0981817d6",
       "split": "train",
       "quick": false,
       "path": "tasks/v2_mini_feature_049"
+    },
+    {
+      "task_id": "v2_mini_feature_050",
+      "title": "Mini feature 050",
+      "category": "mini_repo_feature",
+      "difficulty": "medium",
+      "family_id": "7629749601f0a243160045cc1bf7ee8d271c5d3efb514696c59e9c43e01b9f9e",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_feature_050"
+    },
+    {
+      "task_id": "v2_mini_feature_051",
+      "title": "Mini feature 051",
+      "category": "mini_repo_feature",
+      "difficulty": "medium",
+      "family_id": "e473e669991e003878ec3d2c359653d8bb5e00f21f8622128a4d5909914ccf5d",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_feature_051"
+    },
+    {
+      "task_id": "v2_mini_feature_052",
+      "title": "Mini feature 052",
+      "category": "mini_repo_feature",
+      "difficulty": "easy",
+      "family_id": "c1c0f7c200f09fac70ddd2952737ad48e2aa67bec9c3108719dc48f230c49a4c",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_feature_052"
+    },
+    {
+      "task_id": "v2_mini_feature_053",
+      "title": "Mini feature 053",
+      "category": "mini_repo_feature",
+      "difficulty": "easy",
+      "family_id": "4d75b14bc2b4aeb6d9758e9472202ee80f8769ea8fbe5ba6ce1e4cd2a765d3cc",
+      "split": "dev",
+      "quick": false,
+      "path": "tasks/v2_mini_feature_053"
+    },
+    {
+      "task_id": "v2_mini_feature_054",
+      "title": "Mini feature 054",
+      "category": "mini_repo_feature",
+      "difficulty": "hard",
+      "family_id": "08979f1551b8d8862b47a0b4ea1302679303561971d957213e420b44168f4848",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_feature_054"
+    },
+    {
+      "task_id": "v2_mini_feature_055",
+      "title": "Mini feature 055",
+      "category": "mini_repo_feature",
+      "difficulty": "easy",
+      "family_id": "da867b6632554c066e78b850a70b2780359f991a121bb3deb7cb38aff7b716ab",
+      "split": "test",
+      "quick": false,
+      "path": "tasks/v2_mini_feature_055"
+    },
+    {
+      "task_id": "v2_mini_feature_056",
+      "title": "Mini feature 056",
+      "category": "mini_repo_feature",
+      "difficulty": "medium",
+      "family_id": "db211a742dafae6510c6af169d73e485eb89ab22c6b72b06ad6f84fed2ba815d",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_feature_056"
+    },
+    {
+      "task_id": "v2_mini_feature_057",
+      "title": "Mini feature 057",
+      "category": "mini_repo_feature",
+      "difficulty": "easy",
+      "family_id": "c9c3146839b4eecddd96c729e77c0e6aaaefce38b4b6963ec06d5f3ad9767c3e",
+      "split": "dev",
+      "quick": false,
+      "path": "tasks/v2_mini_feature_057"
+    },
+    {
+      "task_id": "v2_mini_feature_058",
+      "title": "Mini feature 058",
+      "category": "mini_repo_feature",
+      "difficulty": "hard",
+      "family_id": "47931cdff9df55f1e6b60a573ec22b24bbf7eaec7ff0526a47c0e34073933aa6",
+      "split": "dev",
+      "quick": true,
+      "path": "tasks/v2_mini_feature_058"
+    },
+    {
+      "task_id": "v2_mini_feature_059",
+      "title": "Mini feature 059",
+      "category": "mini_repo_feature",
+      "difficulty": "medium",
+      "family_id": "319093e346bb2ebd72ce62f052a462e551e6cef0b0a8d7fdc94b3a35ab62d7ed",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_feature_059"
+    },
+    {
+      "task_id": "v2_mini_feature_060",
+      "title": "Mini feature 060",
+      "category": "mini_repo_feature",
+      "difficulty": "hard",
+      "family_id": "f1011500fee5c4689916a3f2e059cc7ff2cd12485c135ee2011ce7553a0382fc",
+      "split": "test",
+      "quick": false,
+      "path": "tasks/v2_mini_feature_060"
+    },
+    {
+      "task_id": "v2_mini_feature_061",
+      "title": "Mini feature 061",
+      "category": "mini_repo_feature",
+      "difficulty": "hard",
+      "family_id": "fcb01ce6d6914ac739821ee00a71e8d876b5adc6f99d461c10c4d9c6dccfe5ca",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_feature_061"
+    },
+    {
+      "task_id": "v2_mini_feature_062",
+      "title": "Mini feature 062",
+      "category": "mini_repo_feature",
+      "difficulty": "medium",
+      "family_id": "eb205d2acd60fe75006a56b2ba669bd2aa8cd286adba55e4b2933efbcd0eb5cd",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_feature_062"
+    },
+    {
+      "task_id": "v2_mini_feature_063",
+      "title": "Mini feature 063",
+      "category": "mini_repo_feature",
+      "difficulty": "medium",
+      "family_id": "579bb0f221fcca13e2e6204208142029765c65fbfcdd0f93d4fb12b256ff38df",
+      "split": "dev",
+      "quick": false,
+      "path": "tasks/v2_mini_feature_063"
+    },
+    {
+      "task_id": "v2_mini_feature_064",
+      "title": "Mini feature 064",
+      "category": "mini_repo_feature",
+      "difficulty": "medium",
+      "family_id": "229a757bad456dccdadefda45f3051c43fa2428e42ec0747fe9dab6869351ffc",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_feature_064"
+    },
+    {
+      "task_id": "v2_mini_feature_065",
+      "title": "Mini feature 065",
+      "category": "mini_repo_feature",
+      "difficulty": "easy",
+      "family_id": "0f4f11629c8191fcd5864ed9225508fb13a10f67f4f4017bb917bc7602623f0d",
+      "split": "dev",
+      "quick": false,
+      "path": "tasks/v2_mini_feature_065"
+    },
+    {
+      "task_id": "v2_mini_feature_066",
+      "title": "Mini feature 066",
+      "category": "mini_repo_feature",
+      "difficulty": "easy",
+      "family_id": "cf7f72d0bcab2e7c81850dd2be199f68a61896208305b37acfeeca32c5fefd1e",
+      "split": "test",
+      "quick": false,
+      "path": "tasks/v2_mini_feature_066"
+    },
+    {
+      "task_id": "v2_mini_feature_067",
+      "title": "Mini feature 067",
+      "category": "mini_repo_feature",
+      "difficulty": "easy",
+      "family_id": "6ae99d667845e6383e2b605c0261d90a77188910019ce15001d310fbed4e4fa4",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_feature_067"
+    },
+    {
+      "task_id": "v2_mini_feature_068",
+      "title": "Mini feature 068",
+      "category": "mini_repo_feature",
+      "difficulty": "medium",
+      "family_id": "631c728753cbf656de878f9d33d4303c0207deef61c108e78c72107481596291",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_feature_068"
+    },
+    {
+      "task_id": "v2_mini_feature_069",
+      "title": "Mini feature 069",
+      "category": "mini_repo_feature",
+      "difficulty": "easy",
+      "family_id": "ae230f7a72124b65487a70a03dea054b7d1a87b8fef0ee5acec8e12c4a0f835e",
+      "split": "test",
+      "quick": false,
+      "path": "tasks/v2_mini_feature_069"
+    },
+    {
+      "task_id": "v2_mini_feature_070",
+      "title": "Mini feature 070",
+      "category": "mini_repo_feature",
+      "difficulty": "hard",
+      "family_id": "9cc88d2508eb3175843a8f14923cd125f558d2b75f7a2035d9445b6585af7239",
+      "split": "dev",
+      "quick": false,
+      "path": "tasks/v2_mini_feature_070"
+    },
+    {
+      "task_id": "v2_mini_feature_071",
+      "title": "Mini feature 071",
+      "category": "mini_repo_feature",
+      "difficulty": "medium",
+      "family_id": "fe2e8b9e7b38b592be834d95414f08cf4b3ccbc235c8e7459f888e457c5c5bd7",
+      "split": "test",
+      "quick": false,
+      "path": "tasks/v2_mini_feature_071"
+    },
+    {
+      "task_id": "v2_mini_feature_072",
+      "title": "Mini feature 072",
+      "category": "mini_repo_feature",
+      "difficulty": "hard",
+      "family_id": "564bc095ce942f85ea17ecda2c25609160c264b377bca2a9a338c7601678d3a2",
+      "split": "dev",
+      "quick": false,
+      "path": "tasks/v2_mini_feature_072"
+    },
+    {
+      "task_id": "v2_mini_feature_073",
+      "title": "Mini feature 073",
+      "category": "mini_repo_feature",
+      "difficulty": "medium",
+      "family_id": "ae0ac2d5ca5750108d4ae8f9d28eaedf61d27e7f16633f8d7a746eb72f2ef7db",
+      "split": "test",
+      "quick": false,
+      "path": "tasks/v2_mini_feature_073"
+    },
+    {
+      "task_id": "v2_mini_feature_074",
+      "title": "Mini feature 074",
+      "category": "mini_repo_feature",
+      "difficulty": "hard",
+      "family_id": "bd07fbd4318c9a62e9b966ddce68b3ee3f8209284db73355c1b9b8cb998ef0e3",
+      "split": "dev",
+      "quick": false,
+      "path": "tasks/v2_mini_feature_074"
+    },
+    {
+      "task_id": "v2_mini_feature_075",
+      "title": "Mini feature 075",
+      "category": "mini_repo_feature",
+      "difficulty": "easy",
+      "family_id": "571456532b5ab8f0d7aeeacc2f0488638fb28ad707b3d37d9284d02206c18003",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_feature_075"
+    },
+    {
+      "task_id": "v2_mini_feature_076",
+      "title": "Mini feature 076",
+      "category": "mini_repo_feature",
+      "difficulty": "hard",
+      "family_id": "cf72b4230c740b4aa4f5179ec26c3a2d529347a1efc15f48d4b60a5fb65871a3",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_feature_076"
+    },
+    {
+      "task_id": "v2_mini_feature_077",
+      "title": "Mini feature 077",
+      "category": "mini_repo_feature",
+      "difficulty": "medium",
+      "family_id": "c61fcdd6f2532681bb690ca1f3256c20d8e068f2d937ae539cd608f8f5a72c5f",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_feature_077"
+    },
+    {
+      "task_id": "v2_mini_feature_078",
+      "title": "Mini feature 078",
+      "category": "mini_repo_feature",
+      "difficulty": "easy",
+      "family_id": "655ea37afebf2969d220b6b50b74fdb87701b2d2c61d3bcbb209274679c89a27",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_feature_078"
+    },
+    {
+      "task_id": "v2_mini_feature_079",
+      "title": "Mini feature 079",
+      "category": "mini_repo_feature",
+      "difficulty": "easy",
+      "family_id": "975c17c976d8adf67616648952446fa1a1b56d42cd552178e50d8af00d6906bf",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_feature_079"
+    },
+    {
+      "task_id": "v2_mini_feature_080",
+      "title": "Mini feature 080",
+      "category": "mini_repo_feature",
+      "difficulty": "medium",
+      "family_id": "a2eafe85db30564511b3b16ed6e8944f8bc9f320a4e6c8c6e97df4cf965c107b",
+      "split": "dev",
+      "quick": false,
+      "path": "tasks/v2_mini_feature_080"
+    },
+    {
+      "task_id": "v2_mini_feature_081",
+      "title": "Mini feature 081",
+      "category": "mini_repo_feature",
+      "difficulty": "easy",
+      "family_id": "28fad6583cf6cb03a914d5f7060348fec34443dc12c30d729ae56e12bba79b2d",
+      "split": "dev",
+      "quick": false,
+      "path": "tasks/v2_mini_feature_081"
+    },
+    {
+      "task_id": "v2_mini_feature_082",
+      "title": "Mini feature 082",
+      "category": "mini_repo_feature",
+      "difficulty": "medium",
+      "family_id": "ff4137fd860a2cf11ff50ab50c0672dd5012c434adae47246e627d9a36d2daeb",
+      "split": "test",
+      "quick": false,
+      "path": "tasks/v2_mini_feature_082"
+    },
+    {
+      "task_id": "v2_mini_feature_083",
+      "title": "Mini feature 083",
+      "category": "mini_repo_feature",
+      "difficulty": "easy",
+      "family_id": "9f95acbb0ed354c12accf37b7af3b967596e7a53869068bc6a1312facdd5cc91",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_feature_083"
+    },
+    {
+      "task_id": "v2_mini_feature_084",
+      "title": "Mini feature 084",
+      "category": "mini_repo_feature",
+      "difficulty": "medium",
+      "family_id": "d667eacefb9d49f4276416aaf2bad1056f290dd9678fa468f1a163ad7e38625a",
+      "split": "dev",
+      "quick": false,
+      "path": "tasks/v2_mini_feature_084"
+    },
+    {
+      "task_id": "v2_mini_feature_085",
+      "title": "Mini feature 085",
+      "category": "mini_repo_feature",
+      "difficulty": "medium",
+      "family_id": "f18fb50e655865502f9d9509ad14d9b63d8b45aa233b3e9798b03f8862491487",
+      "split": "dev",
+      "quick": false,
+      "path": "tasks/v2_mini_feature_085"
+    },
+    {
+      "task_id": "v2_mini_feature_086",
+      "title": "Mini feature 086",
+      "category": "mini_repo_feature",
+      "difficulty": "medium",
+      "family_id": "50a2055f62ba118e9242d57f6d1a31132651cb7b56b60ce8005b831950ad2f5d",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_feature_086"
+    },
+    {
+      "task_id": "v2_mini_feature_087",
+      "title": "Mini feature 087",
+      "category": "mini_repo_feature",
+      "difficulty": "medium",
+      "family_id": "c52f16da96c037e1af505809a850204d0f006149a5b6df14cd5a6c8ccacb70d1",
+      "split": "train",
+      "quick": false,
+      "path": "tasks/v2_mini_feature_087"
     },
     {
       "task_id": "v2_mini_tool_sim_000",
       "title": "Mini tool sim 000",
       "category": "mini_repo_tool_sim",
       "difficulty": "medium",
-      "split": "train",
-      "quick": false,
+      "family_id": "fbab32ccdb7bb812107663ce7ff85c6d3a028477ddaf0871e480ec904ebc52c7",
+      "split": "test",
+      "quick": true,
       "path": "tasks/v2_mini_tool_sim_000"
     },
     {
@@ -4098,441 +4777,20 @@
       "title": "Mini tool sim 001",
       "category": "mini_repo_tool_sim",
       "difficulty": "easy",
-      "split": "train",
-      "quick": false,
+      "family_id": "b18f2cb7b8a24b9ea96195dbd7ecd53113b48d8b70beeadb991e1dc3809555cf",
+      "split": "dev",
+      "quick": true,
       "path": "tasks/v2_mini_tool_sim_001"
-    },
-    {
-      "task_id": "v2_mini_tool_sim_002",
-      "title": "Mini tool sim 002",
-      "category": "mini_repo_tool_sim",
-      "difficulty": "easy",
-      "split": "dev",
-      "quick": false,
-      "path": "tasks/v2_mini_tool_sim_002"
-    },
-    {
-      "task_id": "v2_mini_tool_sim_003",
-      "title": "Mini tool sim 003",
-      "category": "mini_repo_tool_sim",
-      "difficulty": "medium",
-      "split": "train",
-      "quick": false,
-      "path": "tasks/v2_mini_tool_sim_003"
-    },
-    {
-      "task_id": "v2_mini_tool_sim_004",
-      "title": "Mini tool sim 004",
-      "category": "mini_repo_tool_sim",
-      "difficulty": "medium",
-      "split": "test",
-      "quick": false,
-      "path": "tasks/v2_mini_tool_sim_004"
-    },
-    {
-      "task_id": "v2_mini_tool_sim_005",
-      "title": "Mini tool sim 005",
-      "category": "mini_repo_tool_sim",
-      "difficulty": "easy",
-      "split": "dev",
-      "quick": false,
-      "path": "tasks/v2_mini_tool_sim_005"
-    },
-    {
-      "task_id": "v2_mini_tool_sim_006",
-      "title": "Mini tool sim 006",
-      "category": "mini_repo_tool_sim",
-      "difficulty": "medium",
-      "split": "train",
-      "quick": false,
-      "path": "tasks/v2_mini_tool_sim_006"
-    },
-    {
-      "task_id": "v2_mini_tool_sim_007",
-      "title": "Mini tool sim 007",
-      "category": "mini_repo_tool_sim",
-      "difficulty": "medium",
-      "split": "train",
-      "quick": false,
-      "path": "tasks/v2_mini_tool_sim_007"
-    },
-    {
-      "task_id": "v2_mini_tool_sim_008",
-      "title": "Mini tool sim 008",
-      "category": "mini_repo_tool_sim",
-      "difficulty": "medium",
-      "split": "dev",
-      "quick": false,
-      "path": "tasks/v2_mini_tool_sim_008"
-    },
-    {
-      "task_id": "v2_mini_tool_sim_009",
-      "title": "Mini tool sim 009",
-      "category": "mini_repo_tool_sim",
-      "difficulty": "medium",
-      "split": "train",
-      "quick": false,
-      "path": "tasks/v2_mini_tool_sim_009"
     },
     {
       "task_id": "v2_mini_tool_sim_010",
       "title": "Mini tool sim 010",
       "category": "mini_repo_tool_sim",
       "difficulty": "hard",
-      "split": "test",
-      "quick": false,
+      "family_id": "b7980dff39c6dff067b59278cab48b136c2c5e0d451555a4261c2707895cb901",
+      "split": "dev",
+      "quick": true,
       "path": "tasks/v2_mini_tool_sim_010"
-    },
-    {
-      "task_id": "v2_mini_tool_sim_011",
-      "title": "Mini tool sim 011",
-      "category": "mini_repo_tool_sim",
-      "difficulty": "hard",
-      "split": "test",
-      "quick": false,
-      "path": "tasks/v2_mini_tool_sim_011"
-    },
-    {
-      "task_id": "v2_mini_tool_sim_012",
-      "title": "Mini tool sim 012",
-      "category": "mini_repo_tool_sim",
-      "difficulty": "medium",
-      "split": "train",
-      "quick": false,
-      "path": "tasks/v2_mini_tool_sim_012"
-    },
-    {
-      "task_id": "v2_mini_tool_sim_013",
-      "title": "Mini tool sim 013",
-      "category": "mini_repo_tool_sim",
-      "difficulty": "hard",
-      "split": "dev",
-      "quick": false,
-      "path": "tasks/v2_mini_tool_sim_013"
-    },
-    {
-      "task_id": "v2_mini_tool_sim_014",
-      "title": "Mini tool sim 014",
-      "category": "mini_repo_tool_sim",
-      "difficulty": "easy",
-      "split": "train",
-      "quick": false,
-      "path": "tasks/v2_mini_tool_sim_014"
-    },
-    {
-      "task_id": "v2_mini_tool_sim_015",
-      "title": "Mini tool sim 015",
-      "category": "mini_repo_tool_sim",
-      "difficulty": "medium",
-      "split": "train",
-      "quick": false,
-      "path": "tasks/v2_mini_tool_sim_015"
-    },
-    {
-      "task_id": "v2_mini_tool_sim_016",
-      "title": "Mini tool sim 016",
-      "category": "mini_repo_tool_sim",
-      "difficulty": "easy",
-      "split": "train",
-      "quick": false,
-      "path": "tasks/v2_mini_tool_sim_016"
-    },
-    {
-      "task_id": "v2_mini_tool_sim_017",
-      "title": "Mini tool sim 017",
-      "category": "mini_repo_tool_sim",
-      "difficulty": "hard",
-      "split": "test",
-      "quick": false,
-      "path": "tasks/v2_mini_tool_sim_017"
-    },
-    {
-      "task_id": "v2_mini_tool_sim_018",
-      "title": "Mini tool sim 018",
-      "category": "mini_repo_tool_sim",
-      "difficulty": "hard",
-      "split": "train",
-      "quick": false,
-      "path": "tasks/v2_mini_tool_sim_018"
-    },
-    {
-      "task_id": "v2_mini_tool_sim_019",
-      "title": "Mini tool sim 019",
-      "category": "mini_repo_tool_sim",
-      "difficulty": "medium",
-      "split": "train",
-      "quick": false,
-      "path": "tasks/v2_mini_tool_sim_019"
-    },
-    {
-      "task_id": "v2_mini_tool_sim_020",
-      "title": "Mini tool sim 020",
-      "category": "mini_repo_tool_sim",
-      "difficulty": "easy",
-      "split": "test",
-      "quick": false,
-      "path": "tasks/v2_mini_tool_sim_020"
-    },
-    {
-      "task_id": "v2_mini_tool_sim_021",
-      "title": "Mini tool sim 021",
-      "category": "mini_repo_tool_sim",
-      "difficulty": "medium",
-      "split": "test",
-      "quick": false,
-      "path": "tasks/v2_mini_tool_sim_021"
-    },
-    {
-      "task_id": "v2_mini_tool_sim_022",
-      "title": "Mini tool sim 022",
-      "category": "mini_repo_tool_sim",
-      "difficulty": "medium",
-      "split": "train",
-      "quick": false,
-      "path": "tasks/v2_mini_tool_sim_022"
-    },
-    {
-      "task_id": "v2_mini_tool_sim_023",
-      "title": "Mini tool sim 023",
-      "category": "mini_repo_tool_sim",
-      "difficulty": "medium",
-      "split": "test",
-      "quick": true,
-      "path": "tasks/v2_mini_tool_sim_023"
-    },
-    {
-      "task_id": "v2_mini_tool_sim_024",
-      "title": "Mini tool sim 024",
-      "category": "mini_repo_tool_sim",
-      "difficulty": "easy",
-      "split": "train",
-      "quick": false,
-      "path": "tasks/v2_mini_tool_sim_024"
-    },
-    {
-      "task_id": "v2_mini_tool_sim_025",
-      "title": "Mini tool sim 025",
-      "category": "mini_repo_tool_sim",
-      "difficulty": "medium",
-      "split": "train",
-      "quick": false,
-      "path": "tasks/v2_mini_tool_sim_025"
-    },
-    {
-      "task_id": "v2_mini_tool_sim_026",
-      "title": "Mini tool sim 026",
-      "category": "mini_repo_tool_sim",
-      "difficulty": "easy",
-      "split": "train",
-      "quick": false,
-      "path": "tasks/v2_mini_tool_sim_026"
-    },
-    {
-      "task_id": "v2_mini_tool_sim_027",
-      "title": "Mini tool sim 027",
-      "category": "mini_repo_tool_sim",
-      "difficulty": "easy",
-      "split": "train",
-      "quick": false,
-      "path": "tasks/v2_mini_tool_sim_027"
-    },
-    {
-      "task_id": "v2_mini_tool_sim_028",
-      "title": "Mini tool sim 028",
-      "category": "mini_repo_tool_sim",
-      "difficulty": "medium",
-      "split": "train",
-      "quick": false,
-      "path": "tasks/v2_mini_tool_sim_028"
-    },
-    {
-      "task_id": "v2_mini_tool_sim_029",
-      "title": "Mini tool sim 029",
-      "category": "mini_repo_tool_sim",
-      "difficulty": "hard",
-      "split": "train",
-      "quick": false,
-      "path": "tasks/v2_mini_tool_sim_029"
-    },
-    {
-      "task_id": "v2_mini_tool_sim_030",
-      "title": "Mini tool sim 030",
-      "category": "mini_repo_tool_sim",
-      "difficulty": "medium",
-      "split": "train",
-      "quick": false,
-      "path": "tasks/v2_mini_tool_sim_030"
-    },
-    {
-      "task_id": "v2_mini_tool_sim_031",
-      "title": "Mini tool sim 031",
-      "category": "mini_repo_tool_sim",
-      "difficulty": "medium",
-      "split": "train",
-      "quick": false,
-      "path": "tasks/v2_mini_tool_sim_031"
-    },
-    {
-      "task_id": "v2_mini_tool_sim_032",
-      "title": "Mini tool sim 032",
-      "category": "mini_repo_tool_sim",
-      "difficulty": "medium",
-      "split": "dev",
-      "quick": false,
-      "path": "tasks/v2_mini_tool_sim_032"
-    },
-    {
-      "task_id": "v2_mini_tool_sim_033",
-      "title": "Mini tool sim 033",
-      "category": "mini_repo_tool_sim",
-      "difficulty": "medium",
-      "split": "train",
-      "quick": false,
-      "path": "tasks/v2_mini_tool_sim_033"
-    },
-    {
-      "task_id": "v2_mini_tool_sim_034",
-      "title": "Mini tool sim 034",
-      "category": "mini_repo_tool_sim",
-      "difficulty": "hard",
-      "split": "train",
-      "quick": false,
-      "path": "tasks/v2_mini_tool_sim_034"
-    },
-    {
-      "task_id": "v2_mini_tool_sim_035",
-      "title": "Mini tool sim 035",
-      "category": "mini_repo_tool_sim",
-      "difficulty": "medium",
-      "split": "train",
-      "quick": false,
-      "path": "tasks/v2_mini_tool_sim_035"
-    },
-    {
-      "task_id": "v2_mini_tool_sim_036",
-      "title": "Mini tool sim 036",
-      "category": "mini_repo_tool_sim",
-      "difficulty": "hard",
-      "split": "test",
-      "quick": false,
-      "path": "tasks/v2_mini_tool_sim_036"
-    },
-    {
-      "task_id": "v2_mini_tool_sim_037",
-      "title": "Mini tool sim 037",
-      "category": "mini_repo_tool_sim",
-      "difficulty": "easy",
-      "split": "train",
-      "quick": false,
-      "path": "tasks/v2_mini_tool_sim_037"
-    },
-    {
-      "task_id": "v2_mini_tool_sim_038",
-      "title": "Mini tool sim 038",
-      "category": "mini_repo_tool_sim",
-      "difficulty": "easy",
-      "split": "dev",
-      "quick": false,
-      "path": "tasks/v2_mini_tool_sim_038"
-    },
-    {
-      "task_id": "v2_mini_tool_sim_039",
-      "title": "Mini tool sim 039",
-      "category": "mini_repo_tool_sim",
-      "difficulty": "medium",
-      "split": "train",
-      "quick": false,
-      "path": "tasks/v2_mini_tool_sim_039"
-    },
-    {
-      "task_id": "v2_mini_tool_sim_040",
-      "title": "Mini tool sim 040",
-      "category": "mini_repo_tool_sim",
-      "difficulty": "easy",
-      "split": "test",
-      "quick": false,
-      "path": "tasks/v2_mini_tool_sim_040"
-    },
-    {
-      "task_id": "v2_mini_tool_sim_041",
-      "title": "Mini tool sim 041",
-      "category": "mini_repo_tool_sim",
-      "difficulty": "easy",
-      "split": "train",
-      "quick": false,
-      "path": "tasks/v2_mini_tool_sim_041"
-    },
-    {
-      "task_id": "v2_mini_tool_sim_042",
-      "title": "Mini tool sim 042",
-      "category": "mini_repo_tool_sim",
-      "difficulty": "medium",
-      "split": "dev",
-      "quick": true,
-      "path": "tasks/v2_mini_tool_sim_042"
-    },
-    {
-      "task_id": "v2_mini_tool_sim_043",
-      "title": "Mini tool sim 043",
-      "category": "mini_repo_tool_sim",
-      "difficulty": "easy",
-      "split": "train",
-      "quick": false,
-      "path": "tasks/v2_mini_tool_sim_043"
-    },
-    {
-      "task_id": "v2_mini_tool_sim_044",
-      "title": "Mini tool sim 044",
-      "category": "mini_repo_tool_sim",
-      "difficulty": "hard",
-      "split": "dev",
-      "quick": true,
-      "path": "tasks/v2_mini_tool_sim_044"
-    },
-    {
-      "task_id": "v2_mini_tool_sim_045",
-      "title": "Mini tool sim 045",
-      "category": "mini_repo_tool_sim",
-      "difficulty": "easy",
-      "split": "train",
-      "quick": false,
-      "path": "tasks/v2_mini_tool_sim_045"
-    },
-    {
-      "task_id": "v2_mini_tool_sim_046",
-      "title": "Mini tool sim 046",
-      "category": "mini_repo_tool_sim",
-      "difficulty": "medium",
-      "split": "train",
-      "quick": false,
-      "path": "tasks/v2_mini_tool_sim_046"
-    },
-    {
-      "task_id": "v2_mini_tool_sim_047",
-      "title": "Mini tool sim 047",
-      "category": "mini_repo_tool_sim",
-      "difficulty": "easy",
-      "split": "train",
-      "quick": false,
-      "path": "tasks/v2_mini_tool_sim_047"
-    },
-    {
-      "task_id": "v2_mini_tool_sim_048",
-      "title": "Mini tool sim 048",
-      "category": "mini_repo_tool_sim",
-      "difficulty": "hard",
-      "split": "train",
-      "quick": false,
-      "path": "tasks/v2_mini_tool_sim_048"
-    },
-    {
-      "task_id": "v2_mini_tool_sim_049",
-      "title": "Mini tool sim 049",
-      "category": "mini_repo_tool_sim",
-      "difficulty": "easy",
-      "split": "test",
-      "quick": false,
-      "path": "tasks/v2_mini_tool_sim_049"
     }
   ]
 }

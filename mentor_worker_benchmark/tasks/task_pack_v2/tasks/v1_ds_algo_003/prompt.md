@@ -1,17 +1,25 @@
-# Task: Rank Products (easy)
+# Task: Rank Products (medium)
 
 Fix `rank_products(records, k)` in `src/solution.py`.
 
 `records` is a list of `(name, score_delta)` pairs.
 
 Requirements:
-- Aggregate score deltas per product name.
+- Aggregate score deltas by product name.
 - Drop products with total score `<= 0`.
 - Sort by total descending, then by product name ascending.
 - Return only product names.
 - Return at most `k` entries.
 - If `k <= 0`, return `[]`.
 
+## Quality Gate Expectations
+Implement all behavior required by tests, including edge-case handling and deterministic output.
+
 ## Input/Output Examples
-- `rank_products([("a", 2), ("b", 1), ("a", -1)], 2) == ["a", "b"]`
-- `rank_products([("x", 1), ("y", 1)], 1) == ["x"]`
+- Example 1 input/output contract: `assert rank_products(records, 3) == ['bravo', 'yankee', 'foxtrot']`
+- Example 2 input/output contract: `assert rank_products(records, 2) == ['golf', 'nebula']`
+
+## Required Edge Cases
+- Handle empty datasets and non-positive limits.
+- Keep tie-breaking deterministic.
+- Reject invalid inputs where required by the tests.

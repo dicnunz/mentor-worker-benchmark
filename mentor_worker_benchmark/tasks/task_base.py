@@ -10,6 +10,7 @@ class TaskDefinition:
     title: str
     category: str
     path: Path
+    family_id: str | None = None
     split: str = "train"
     difficulty: str = "medium"
     pack_name: str = "legacy_codegen_py"

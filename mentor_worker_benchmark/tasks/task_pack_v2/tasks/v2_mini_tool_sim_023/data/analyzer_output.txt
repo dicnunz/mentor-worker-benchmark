@@ -1,1 +1,0 @@
-RULE:unused_import|SEVERITY:warn|FILE:onyx.py|LINE:33\nRULE:unsafe_eval|SEVERITY:error|FILE:willow.py|LINE:43\nRULE:line_too_long|SEVERITY:info|FILE:onyx.py|LINE:53\nRULE:unused_import|SEVERITY:warn|FILE:willow.py|LINE:63\n
