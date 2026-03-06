@@ -21,6 +21,10 @@ SANITY_SUITES = {"dev10", "quick"}
 TIMEOUT_TOKEN_RE = re.compile(r"(timed out|\btimeout\b)", re.IGNORECASE)
 
 
+def _current_generated_at() -> str:
+    return datetime.now(UTC).replace(microsecond=0).isoformat()
+
+
 def _safe_float(value: Any) -> float:
     if isinstance(value, (int, float)):
         return float(value)
@@ -1498,7 +1502,7 @@ def main() -> None:
         out = normalized_dir / f"{entry['submission_id']}.json"
         out.write_text(json.dumps(entry, indent=2), encoding="utf-8")
 
-    generated_at = max((str(row.get("generated_at", "")) for row in valid_entries), default="n/a")
+    generated_at = _current_generated_at()
     headline_official_runs = _headline_official_runs(valid_entries)
     official_sanity_runs = _sanity_official_runs(valid_entries)
     summary = {

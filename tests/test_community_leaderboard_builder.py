@@ -4,6 +4,7 @@ import importlib.util
 import json
 import re
 import subprocess
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
@@ -300,3 +301,17 @@ def test_rendered_index_contains_tabs_single_table_headers_and_embedded_summary_
     ]
     assert "sig-marker" in rendered
     assert "95% CI" in rendered
+
+
+def test_current_generated_at_uses_build_time(monkeypatch: Any) -> None:
+    builder = _load_builder_module()
+
+    class _FakeDatetime:
+        @staticmethod
+        def now(tz: Any) -> datetime:
+            assert tz is UTC
+            return datetime(2026, 3, 6, 21, 30, 45, 123456, tzinfo=UTC)
+
+    monkeypatch.setattr(builder, "datetime", _FakeDatetime)
+
+    assert builder._current_generated_at() == "2026-03-06T21:30:45+00:00"
