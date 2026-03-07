@@ -100,6 +100,40 @@ def test_guard_aborts_when_no_tests_execute(monkeypatch, tmp_path: Path) -> None
         raise AssertionError("Expected run_benchmark to abort when tests_executed == 0")
 
 
+def test_run_sanity_check_counts_zero_tests_as_broken_harness(monkeypatch, tmp_path: Path) -> None:
+    task = _write_minimal_task(tmp_path)
+    monkeypatch.setattr(runner_module, "resolve_tasks", lambda **_: _selection_for_task(task))
+    monkeypatch.setattr(
+        runner_module,
+        "run_pytest",
+        lambda _workdir, **_kwargs: HarnessTestRunResult(
+            exit_code=1,
+            passed=False,
+            output="/usr/bin/python: No module named pytest",
+            duration_seconds=0.01,
+            tests_executed=0,
+            tests_passed=0,
+            tests_failed=0,
+            timed_out=False,
+        ),
+    )
+
+    summary = runner_module.run_sanity_check(
+        task_pack="task_pack_v2",
+        task_pack_path=None,
+        suite="quick",
+        task_selector=None,
+        seed=1337,
+    )
+
+    assert summary["task_count"] == 1
+    assert summary["expected_failures"] == 0
+    assert summary["unexpected_passes"] == 0
+    assert summary["broken_tasks"] == 1
+    assert summary["runs"][0]["status"] == "broken_harness"
+    assert summary["runs"][0]["tests_executed"] == 0
+
+
 def test_quick_run_simulation_records_integrity_and_audit_passes(monkeypatch, tmp_path: Path, capsys) -> None:
     task = _write_minimal_task(tmp_path)
     monkeypatch.setattr(runner_module, "resolve_tasks", lambda **_: _selection_for_task(task))

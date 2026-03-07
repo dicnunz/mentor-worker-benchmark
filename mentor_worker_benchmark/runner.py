@@ -1727,7 +1727,10 @@ def run_sanity_check(
                 timeout_seconds=8,
             )
             status = "expected_failure"
-            if test_result.exit_code == 0:
+            if int(test_result.tests_executed) <= 0:
+                status = "broken_harness"
+                broken_tasks += 1
+            elif test_result.exit_code == 0:
                 status = "unexpected_pass"
                 unexpected_passes += 1
             elif test_result.exit_code == 1:
@@ -1744,6 +1747,7 @@ def run_sanity_check(
                     "evaluation_seed": evaluation_seed,
                     "status": status,
                     "exit_code": test_result.exit_code,
+                    "tests_executed": int(test_result.tests_executed),
                     "duration_seconds": round(test_result.duration_seconds, 4),
                 }
             )

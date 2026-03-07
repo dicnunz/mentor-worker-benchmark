@@ -607,11 +607,13 @@ def _run_mutation_counterexample(
         "starter_test_passed": None,
         "starter_test_exit_code": None,
         "starter_test_timed_out": None,
+        "starter_tests_executed": None,
         "mutation_status": "skipped",
         "mutation_skip_reason": None,
         "mutation_test_passed": None,
         "mutation_test_exit_code": None,
         "mutation_test_timed_out": None,
+        "mutation_tests_executed": None,
         "mutation_target": None,
     }
 
@@ -623,6 +625,10 @@ def _run_mutation_counterexample(
         mutation_report["starter_test_passed"] = bool(starter_run.passed)
         mutation_report["starter_test_exit_code"] = int(starter_run.exit_code)
         mutation_report["starter_test_timed_out"] = bool(starter_run.timed_out)
+        mutation_report["starter_tests_executed"] = int(starter_run.tests_executed)
+        if int(starter_run.tests_executed) <= 0:
+            mutation_report["mutation_skip_reason"] = "starter_no_tests_executed"
+            return mutation_report
 
         src_modules = _source_modules(workdir)
         if not source_module:
@@ -650,6 +656,10 @@ def _run_mutation_counterexample(
         mutation_report["mutation_test_passed"] = bool(mutated_run.passed)
         mutation_report["mutation_test_exit_code"] = int(mutated_run.exit_code)
         mutation_report["mutation_test_timed_out"] = bool(mutated_run.timed_out)
+        mutation_report["mutation_tests_executed"] = int(mutated_run.tests_executed)
+        if int(mutated_run.tests_executed) <= 0:
+            mutation_report["mutation_skip_reason"] = "mutation_no_tests_executed"
+            return mutation_report
         mutation_report["mutation_status"] = "not_caught" if mutated_run.passed else "caught"
         return mutation_report
 
@@ -778,9 +788,11 @@ def build_task_strength_report(
             "starter_test_passed": None,
             "starter_test_exit_code": None,
             "starter_test_timed_out": None,
+            "starter_tests_executed": None,
             "mutation_test_passed": None,
             "mutation_test_exit_code": None,
             "mutation_test_timed_out": None,
+            "mutation_tests_executed": None,
         }
 
         if task_id in evaluated_mutation_tasks and task_dir.exists():

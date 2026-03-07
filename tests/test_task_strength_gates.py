@@ -4,6 +4,7 @@ from pathlib import Path
 from typing import Any
 
 import mentor_worker_benchmark.tasks.task_pack_validation as validation
+from mentor_worker_benchmark.tasks.task_codegen_py.harness import TestRunResult as HarnessTestRunResult
 
 
 def _write_synthetic_task(root: Path, *, weak_tests: bool) -> dict[str, Any]:
@@ -117,3 +118,55 @@ def test_validate_task_pack_payload_strict_flags_not_caught_mutation(
     strict_eval = report["strength_gates"]["strict_evaluation"]
     assert strict_eval["would_fail"] is True
     assert strict_eval["mutation_not_caught_non_allowlisted_ids"] == ["tiny_task"]
+
+
+def test_validate_task_pack_payload_strict_flags_zero_tests_executed(
+    tmp_path: Path,
+    monkeypatch: Any,
+) -> None:
+    payload = _write_synthetic_task(tmp_path, weak_tests=False)
+    schema = {"type": "object"}
+    monkeypatch.setitem(
+        validation.PACK_EXPECTATIONS,
+        "synthetic_pack",
+        {
+            "total": 1,
+            "splits": {"train": 1, "dev": 0, "test": 0},
+            "quick": 0,
+            "difficulty": {"easy": 1, "medium": 0, "hard": 0},
+            "strength_policy": {
+                "min_strength_score": 0,
+                "max_low_strength_fraction": 1.0,
+                "max_mutation_skip_fraction": 0.0,
+                "require_mutation_caught": True,
+            },
+        },
+    )
+
+    def _fake_run_pytest(*_args: Any, **_kwargs: Any) -> HarnessTestRunResult:
+        return HarnessTestRunResult(
+            exit_code=1,
+            passed=False,
+            output="/usr/bin/python: No module named pytest",
+            duration_seconds=0.01,
+            tests_executed=0,
+            tests_passed=0,
+            tests_failed=0,
+            timed_out=False,
+        )
+
+    monkeypatch.setattr(validation, "run_pytest", _fake_run_pytest)
+
+    ok, errors, report = validation.validate_task_pack_payload(
+        root=tmp_path,
+        payload=payload,
+        schema=schema,
+        strict=True,
+        return_report=True,
+        mutation_sample_limit=1,
+    )
+    assert not ok
+    assert any("Strength gate failure" in item for item in errors)
+    strict_eval = report["strength_gates"]["strict_evaluation"]
+    assert strict_eval["would_fail"] is True
+    assert strict_eval["mutation_skipped_non_allowlisted_ids"] == ["tiny_task"]
