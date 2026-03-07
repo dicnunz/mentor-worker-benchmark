@@ -1,0 +1,79 @@
+{
+  "submission_id": "official_dev10_signal_qwen25coder7b_gemma29b_2026-03-06",
+  "submission_file": "official_dev10_signal_qwen25coder7b_gemma29b_2026-03-06.zip",
+  "submission_path": "submissions/archive/task_pack_v2_2.0.0/official_dev10_signal_qwen25coder7b_gemma29b_2026-03-06.zip",
+  "official_submission": true,
+  "submission_label": "official",
+  "official_role": "sanity",
+  "task_pack": "task_pack_v2",
+  "task_pack_version": "2.1.0",
+  "suite": "dev10",
+  "generated_at": "2026-03-07T15:57:07.385374+00:00",
+  "manifest_created_at": "2026-03-07T16:22:52.562699+00:00",
+  "verified_at": "2026-03-07T16:22:52.562699+00:00",
+  "git_commit_hash": "9321a0092e2a5ee575cba2105e57632964e7dd10",
+  "cli_command": "/Users/nicdunz/mentor-worker-benchmark/.venv/bin/python -m mentor_worker_benchmark run --task-pack task_pack_v2 --suite dev10 --seed 1337 --repro --max-turns 3 --model-timeout 180 --test-timeout 8 --model-retries 1 --model-retry-backoff 1.0 --worker-num-predict 512 --mentor-num-predict 256 --run-modes worker_only,mentor_worker --worker-model qwen2.5-coder:7b --mentor-model gemma2:9b --results-path results/community_dev10_signal_qwen25coder7b_gemma29b_2026-03-06.json",
+  "models": [
+    "gemma2:9b",
+    "qwen2.5-coder:7b"
+  ],
+  "worker_models": [
+    "qwen2.5-coder:7b"
+  ],
+  "run_modes": [
+    "worker_only",
+    "mentor_worker"
+  ],
+  "protocol_version": "v0.3.0",
+  "seeds_count": 1,
+  "protocol_seeds": [
+    1337
+  ],
+  "time_total_s": 1766.3844,
+  "total_runs": 20,
+  "total_passes": 4,
+  "passes_by_mode": {
+    "worker_only": 2,
+    "mentor_worker": 2
+  },
+  "benchmark_wall_time_seconds": 1766.3844,
+  "violation_count": 0,
+  "model_call_errors_by_mode": {},
+  "model_call_timeouts_by_mode": {},
+  "total_model_call_errors": 0,
+  "total_model_call_timeouts": 0,
+  "metrics_source": {
+    "total_runs": "summary",
+    "passes_by_mode": "summary",
+    "total_passes": "summary",
+    "model_call_errors_by_mode": "summary",
+    "model_call_timeouts_by_mode": "summary",
+    "total_model_call_errors": "summary",
+    "total_model_call_timeouts": "summary"
+  },
+  "benchmark_version": "1.0.0",
+  "baseline_mean": 0.2,
+  "baseline_ci_low": 0.0,
+  "baseline_ci_high": 0.5,
+  "mentored_mean": 0.2,
+  "mentored_ci_low": 0.0,
+  "mentored_ci_high": 0.5,
+  "lift_mean": 0.0,
+  "lift_ci_low": 0.0,
+  "lift_ci_high": 0.0,
+  "lift_significant": false,
+  "lift_p_value_gt_zero": 1.0,
+  "best_worker": {
+    "worker_model": "qwen2.5-coder:7b",
+    "baseline_pass_rate": 0.2,
+    "mentored_pass_rate": 0.2,
+    "control_pass_rate": 0.0,
+    "lift": 0.0
+  },
+  "best_mentor": {
+    "mentor_model": "gemma2:9b",
+    "avg_lift_across_workers": 0.0,
+    "overall_mentored_pass_rate": 0.2,
+    "mentor_violation_rate": 0.0
+  }
+}

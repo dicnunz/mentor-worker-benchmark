@@ -7,6 +7,7 @@
 
 Core docs:
 - [Live Leaderboard](https://dicnunz.github.io/mentor-worker-benchmark/)
+- [Post-Ready Snapshot](docs/post_ready_summary.md)
 - [Methodology](docs/METHODOLOGY.md)
 - [Reproducibility](docs/reproducibility.md)
 - [Submit Results](docs/SUBMIT_RESULTS.md)
@@ -291,19 +292,10 @@ make setup
 make quick
 ```
 
-## Example Leaderboard Snippet
+## Current Snapshot
 
-```md
-## Best Mentors
-| Mentor | Avg Lift | Mentored Pass Rate | Violation Rate |
-| --- | --- | --- | --- |
-| phi3:mini | 0.00% | 0.00% | 0.00% |
-
-## Best Workers
-| Worker | Baseline | Mentored | Control | Lift |
-| --- | --- | --- | --- | --- |
-| phi3:mini | 0.00% | 0.00% | 0.00% | 0.00% |
-```
+Use `docs/post_ready_summary.md` for a compact, shareable summary generated from `leaderboard/summary.json`.
+Use the live leaderboard or `docs/leaderboard.md` for the full verified submission table.
 
 Generated files:
 - `results/results.json`
