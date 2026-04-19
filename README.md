@@ -10,12 +10,32 @@ Core docs:
 - [Post-Ready Snapshot](docs/post_ready_summary.md)
 - [Methodology](docs/METHODOLOGY.md)
 - [Reproducibility](docs/reproducibility.md)
+- [Benchmark Claim Policy](docs/benchmark_policy.md)
 - [Submit Results](docs/SUBMIT_RESULTS.md)
 - [Pack Data Cards](docs/PACKS.md)
+- [task_pack_v2 Provenance](mentor_worker_benchmark/tasks/task_pack_v2/PROVENANCE.md)
 
 - Inference is local via [Ollama](https://ollama.com/) (no paid APIs required).
 - Scoring is objective: generated patches are applied, then `pytest` decides pass/fail.
 - Outputs are reproducible artifacts (`results.json`, markdown leaderboard, optional static docs page).
+
+## Fastest Credible First Run
+
+If you want the shortest path from clone to a verified artifact:
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -e .
+pip install -r requirements.lock
+python -m mentor_worker_benchmark setup
+./scripts/run_local_verification.sh
+```
+
+That path gives you:
+- a backend preflight record
+- a resumable benchmark artifact plus checkpoint log under `results/`
+- a verified `community (not official)` submission zip under `submissions/`
 
 ## Motivation
 
@@ -137,6 +157,18 @@ Default local verification profile:
 - `mentor=phi3:mini`
 - `run-modes=worker_only,mentor_worker`
 - backend preflight required before the run starts
+
+What the script leaves behind:
+- preflight JSON for backend stability
+- results JSON with pass/fail outcomes, compute budget, environment, and failure accounting
+- checkpoint JSONL for resumable reruns of the same config
+- run log plus a verified community submission zip
+
+How to read the core numbers:
+- `Baseline`: worker-only pass rate
+- `Mentored`: same worker with mentor guidance
+- `Lift`: `Mentored - Baseline`
+- `Model Errors` and `Timeouts`: backend failures that should be interpreted alongside pass rate
 
 Manual equivalent:
 

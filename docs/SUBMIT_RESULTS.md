@@ -2,7 +2,7 @@
 
 This project accepts reproducible result bundles so runs can be compared on a shared leaderboard.
 
-## 1. Run an official suite
+## 1. Choose the right run type
 
 From repo root:
 
@@ -11,8 +11,9 @@ From repo root:
 ```
 
 Use that first for local release-health verification on this machine.
+It is not an official suite. It exports a verified `community (not official)` bundle under `submissions/` and is the sanctioned first check before heavier publication runs.
 
-For publication/leaderboard artifacts:
+For official/public leaderboard artifacts, use:
 
 ```bash
 ./scripts/run_official_quick.sh
@@ -23,6 +24,8 @@ or:
 ```bash
 ./scripts/run_official_dev.sh
 ```
+
+Use `TASK_SUITE=dev50 ./scripts/run_official_dev_v1.sh` if you want explicit headline-suite control (`dev`, `dev50`, or `test`).
 
 Both scripts:
 - run the benchmark with standardized config (`task_pack_v2`, fixed suite/profile script defaults),

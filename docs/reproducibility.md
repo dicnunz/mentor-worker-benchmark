@@ -12,6 +12,14 @@ Operational policy for this machine:
 - Audited source corpus: `652` generated tasks.
 - The provenance `--fail-on-overlap` check fails on active exact-family leakage, not on softer near-similarity clusters.
 
+## Choose The Right Path
+
+Use:
+- `./scripts/run_local_verification.sh` for the fastest trustworthy local gate and a verified community bundle
+- `./scripts/run_official_quick.sh` for an official sanity artifact
+- `./scripts/run_official_dev.sh` or `TASK_SUITE=dev50 ./scripts/run_official_dev_v1.sh` for headline multi-seed official baselines
+- `./scripts/reproduce_leaderboard.sh` to rebuild the tracked public artifact set end to end
+
 ## Local Operational Verification
 
 Recommended first step on this machine:
@@ -36,6 +44,13 @@ This path performs, in order:
 5. bundle verification
 
 It is intended for local release-health verification only, not for headline publication.
+
+Artifacts emitted by the script:
+- preflight JSON
+- results JSON
+- checkpoint JSONL
+- run log
+- verified community submission zip
 
 ### Resume semantics
 
@@ -197,7 +212,8 @@ Default headline seeds are:
 
 ## Deterministic Leaderboard/Docs Regeneration
 
-Regenerate from tracked submission bundles under `submissions/` (recursive; includes `submissions/archive/...`; ignores `submissions/local_*` and `submissions/tmp_*`):
+Run the strict leaderboard build twice: the first pass regenerates artifacts, the second proves there is no drift when the tracked archive is unchanged.
+The scan is recursive under `submissions/`, including `submissions/archive/...`, and ignores local scratch names such as `submissions/local_*` and `submissions/tmp_*`.
 
 ```bash
 "$PYTHON_BIN" scripts/build_community_leaderboard.py --strict
