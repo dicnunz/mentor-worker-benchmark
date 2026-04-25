@@ -3,6 +3,8 @@
 [![CI](https://github.com/dicnunz/mentor-worker-benchmark/actions/workflows/ci.yml/badge.svg)](https://github.com/dicnunz/mentor-worker-benchmark/actions/workflows/ci.yml)
 [![GitHub Pages](https://img.shields.io/website?down_color=lightgrey&down_message=down&label=pages&up_color=brightgreen&up_message=live&url=https%3A%2F%2Fdicnunz.github.io%2Fmentor-worker-benchmark%2F)](https://dicnunz.github.io/mentor-worker-benchmark/)
 
+![Mentor worker benchmark visual](docs/assets/generated/mentor-worker-hero.png)
+
 `mentor-worker-benchmark` is a fully local benchmark for measuring whether a **mentor LLM** improves a **worker LLM** on deterministic, objectively scored coding tasks.
 
 Core docs:
