@@ -301,6 +301,10 @@ def test_rendered_index_contains_tabs_single_table_headers_and_embedded_summary_
     ]
     assert "sig-marker" in rendered
     assert "95% CI" in rendered
+    assert "Optional $5 support receipt" in rendered
+    assert "https://nicdunz.gumroad.com/l/smrimu" in rendered
+    assert "optional support" in rendered
+    assert "does not unlock or gate any results" in rendered
 
 
 def test_current_generated_at_uses_build_time(monkeypatch: Any) -> None:
