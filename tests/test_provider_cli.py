@@ -80,6 +80,10 @@ def test_cmd_support_prints_receipt_link(capsys: Any) -> None:
     output = capsys.readouterr().out
     assert "Support mentor-worker-benchmark" in output
     assert "https://nicdunz.gumroad.com/l/smrimu" in output
+    assert "https://nicdunz.gumroad.com/l/agent-workflow-mini-audit" in output
+    assert "https://nicdunz.gumroad.com/l/agent-workflow-audit" in output
+    assert "No secrets" in output
+    assert "call required" in output
 
 
 def test_cmd_run_supports_provider_overrides_and_single_model_flags(

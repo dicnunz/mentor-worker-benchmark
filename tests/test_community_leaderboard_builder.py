@@ -303,8 +303,13 @@ def test_rendered_index_contains_tabs_single_table_headers_and_embedded_summary_
     assert "95% CI" in rendered
     assert "Optional $5 support receipt" in rendered
     assert "https://nicdunz.gumroad.com/l/smrimu" in rendered
-    assert "optional support" in rendered
-    assert "does not unlock or gate any results" in rendered
+    assert "Mini audit $149" in rendered
+    assert "https://nicdunz.gumroad.com/l/agent-workflow-mini-audit" in rendered
+    assert "Workflow audit $750" in rendered
+    assert "https://nicdunz.gumroad.com/l/agent-workflow-audit" in rendered
+    assert "Written audits" in rendered
+    assert "no secrets" in rendered
+    assert "gated result access" in rendered
 
 
 def test_current_generated_at_uses_build_time(monkeypatch: Any) -> None:

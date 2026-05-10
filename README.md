@@ -19,6 +19,13 @@ Core docs:
 
 If this benchmark saves you local eval time, the smallest support path is the $5 Codex run receipt: <https://nicdunz.gumroad.com/l/smrimu>.
 
+For a written no-call audit of a local mentor/worker eval workflow, use the paid setup audit path:
+
+- Mini audit: <https://nicdunz.gumroad.com/l/agent-workflow-mini-audit>
+- Full workflow audit: <https://nicdunz.gumroad.com/l/agent-workflow-audit>
+
+Redacted configs, result summaries, and public repo links only. Do not paste API keys, provider credentials, private transcripts, auth files, or personal data. No call required.
+
 - Inference is local via [Ollama](https://ollama.com/) (no paid APIs required).
 - Scoring is objective: generated patches are applied, then `pytest` decides pass/fail.
 - Outputs are reproducible artifacts (`results.json`, markdown leaderboard, optional static docs page).

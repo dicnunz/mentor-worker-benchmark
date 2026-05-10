@@ -19,6 +19,8 @@ dependencies = [
 Homepage = "https://github.com/dicnunz/mentor-worker-benchmark"
 Repository = "https://github.com/dicnunz/mentor-worker-benchmark"
 Funding = "https://nicdunz.gumroad.com/l/smrimu"
+"Mini Audit" = "https://nicdunz.gumroad.com/l/agent-workflow-mini-audit"
+"Workflow Audit" = "https://nicdunz.gumroad.com/l/agent-workflow-audit"
 
 [project.scripts]
 mentor-worker-benchmark = "mentor_worker_benchmark.cli:main"

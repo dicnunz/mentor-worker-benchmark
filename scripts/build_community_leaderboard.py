@@ -21,6 +21,8 @@ SANITY_SUITES = {"dev10", "quick"}
 TIMEOUT_TOKEN_RE = re.compile(r"(timed out|\btimeout\b)", re.IGNORECASE)
 SUPPORT_RECEIPT_URL = "https://nicdunz.gumroad.com/l/smrimu"
 SUPPORT_RECEIPT_LINK_TEXT = "Optional $5 support receipt"
+MINI_AUDIT_URL = "https://nicdunz.gumroad.com/l/agent-workflow-mini-audit"
+WORKFLOW_AUDIT_URL = "https://nicdunz.gumroad.com/l/agent-workflow-audit"
 
 
 def _current_generated_at() -> str:
@@ -1002,7 +1004,7 @@ def _render_index_html(summary: dict[str, Any], output_path: Path) -> None:
       <p><strong>Baseline</strong> and <strong>Mentored</strong> are means across replicates with task-family bootstrap confidence intervals.</p>
       <p><strong>Lift</strong> is mentored minus baseline, with a paired task-family bootstrap CI and a <code>sig</code> marker when CI excludes 0.</p>
       <p><strong>Errors</strong> and <strong>Timeouts</strong> count model-call failures; sanity runs focus on harness health and are not headline performance claims.</p>
-      <p class="support">Using the benchmark or leaderboard? <a href="{SUPPORT_RECEIPT_URL}">{SUPPORT_RECEIPT_LINK_TEXT}</a>. It is optional support and does not unlock or gate any results.</p>
+      <p class="support">Using the benchmark or leaderboard? <a href="{SUPPORT_RECEIPT_URL}">{SUPPORT_RECEIPT_LINK_TEXT}</a>, <a href="{MINI_AUDIT_URL}">Mini audit $149</a>, or <a href="{WORKFLOW_AUDIT_URL}">Workflow audit $750</a>. Written audits are for redacted mentor/worker eval workflows only; no secrets, private transcripts, credentials, call, or gated result access.</p>
       <p class="subtle">Hover glossary chips for plain-English definitions.</p>
       <div class="glossary">
         <span class="term" tabindex="0" data-tip="Mean worker-only pass rate across replicates with 95% CI.">Baseline</span>
