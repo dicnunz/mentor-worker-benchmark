@@ -15,6 +15,11 @@ dependencies = [
   "pytest>=8.0.0",
 ]
 
+[project.urls]
+Homepage = "https://github.com/dicnunz/mentor-worker-benchmark"
+Repository = "https://github.com/dicnunz/mentor-worker-benchmark"
+Funding = "https://nicdunz.gumroad.com/l/smrimu"
+
 [project.scripts]
 mentor-worker-benchmark = "mentor_worker_benchmark.cli:main"
 
