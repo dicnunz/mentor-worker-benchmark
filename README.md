@@ -17,6 +17,8 @@ Core docs:
 - [Pack Data Cards](docs/PACKS.md)
 - [task_pack_v2 Provenance](mentor_worker_benchmark/tasks/task_pack_v2/PROVENANCE.md)
 
+If this benchmark saves you local eval time, the smallest support path is the $5 Codex run receipt: <https://nicdunz.gumroad.com/l/smrimu>.
+
 - Inference is local via [Ollama](https://ollama.com/) (no paid APIs required).
 - Scoring is objective: generated patches are applied, then `pytest` decides pass/fail.
 - Outputs are reproducible artifacts (`results.json`, markdown leaderboard, optional static docs page).
