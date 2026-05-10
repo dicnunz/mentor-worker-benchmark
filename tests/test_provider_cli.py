@@ -72,6 +72,16 @@ def test_build_client_openai_requires_no_network(monkeypatch: pytest.MonkeyPatch
     assert getattr(client, "provider_name") == "openai"
 
 
+def test_cmd_support_prints_receipt_link(capsys: Any) -> None:
+    parser = cli_module.build_parser()
+    args = parser.parse_args(["support"])
+
+    assert args.func(args) == 0
+    output = capsys.readouterr().out
+    assert "Support mentor-worker-benchmark" in output
+    assert "https://nicdunz.gumroad.com/l/smrimu" in output
+
+
 def test_cmd_run_supports_provider_overrides_and_single_model_flags(
     monkeypatch: pytest.MonkeyPatch,
     tmp_path: Path,

@@ -45,6 +45,7 @@ from mentor_worker_benchmark.tasks.task_pack_v2.provenance import (
 
 _SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
 _GIT_HASH_RE = re.compile(r"^[0-9a-f]{7,40}$")
+SUPPORT_RECEIPT_URL = "https://nicdunz.gumroad.com/l/smrimu"
 
 
 def _parse_models(raw: str) -> list[str]:
@@ -1204,6 +1205,14 @@ def cmd_provenance(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_support(args: argparse.Namespace) -> int:
+    del args
+    print("Support mentor-worker-benchmark:")
+    print(f"- Optional $5 Codex run receipt: {SUPPORT_RECEIPT_URL}")
+    print("- Use it if this benchmark saved eval setup time or helped compare agent runs.")
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="mentor-worker-benchmark",
@@ -1215,6 +1224,9 @@ def build_parser() -> argparse.ArgumentParser:
     setup.add_argument("--models", default="default", help="Comma-separated model list or `default`.")
     setup.add_argument("--skip-pull", action="store_true", help="Skip `ollama pull` checks.")
     setup.set_defaults(func=cmd_setup)
+
+    support = subparsers.add_parser("support", help="Show the optional support receipt link.")
+    support.set_defaults(func=cmd_support)
 
     preflight = subparsers.add_parser(
         "preflight",
