@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "mentor-worker-benchmark"
-version = "1.2.2"
+version = "1.2.3"
 description = "Local benchmark for mentor/worker LLM collaboration with objective coding tasks"
 readme = "README.md"
 requires-python = ">=3.11"
@@ -19,6 +19,7 @@ dependencies = [
 Homepage = "https://github.com/dicnunz/mentor-worker-benchmark"
 Repository = "https://github.com/dicnunz/mentor-worker-benchmark"
 Funding = "https://nicdunz.gumroad.com/l/smrimu"
+"Agent Browser Operator OS" = "https://nicdunz.gumroad.com/l/agent-browser-operator-os"
 "Mini Audit" = "https://nicdunz.gumroad.com/l/agent-workflow-mini-audit"
 "Workflow Audit" = "https://nicdunz.gumroad.com/l/agent-workflow-audit"
 

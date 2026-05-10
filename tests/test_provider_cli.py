@@ -80,9 +80,11 @@ def test_cmd_support_prints_receipt_link(capsys: Any) -> None:
     output = capsys.readouterr().out
     assert "Support mentor-worker-benchmark" in output
     assert "https://nicdunz.gumroad.com/l/smrimu" in output
+    assert "https://nicdunz.gumroad.com/l/agent-browser-operator-os" in output
     assert "https://nicdunz.gumroad.com/l/agent-workflow-mini-audit" in output
     assert "https://nicdunz.gumroad.com/l/agent-workflow-audit" in output
     assert "No secrets" in output
+    assert "no Chrome plugin repair" in output
     assert "call required" in output
 
 

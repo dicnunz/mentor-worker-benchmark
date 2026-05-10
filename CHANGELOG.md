@@ -5,6 +5,12 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.3] - 2026-05-10
+
+### Added
+- Added Agent Browser Operator OS as a self-serve support route in README, CLI support output, package project URLs, GitHub funding metadata, and generated leaderboard docs.
+- Added tests covering the browser operator route in CLI and leaderboard support surfaces.
+
 ## [1.0.0] - 2026-03-03
 
 ### Added

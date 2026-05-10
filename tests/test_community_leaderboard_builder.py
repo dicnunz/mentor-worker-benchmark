@@ -303,12 +303,15 @@ def test_rendered_index_contains_tabs_single_table_headers_and_embedded_summary_
     assert "95% CI" in rendered
     assert "Optional $5 support receipt" in rendered
     assert "https://nicdunz.gumroad.com/l/smrimu" in rendered
+    assert "Browser Operator OS $39" in rendered
+    assert "https://nicdunz.gumroad.com/l/agent-browser-operator-os" in rendered
     assert "Mini audit $149" in rendered
     assert "https://nicdunz.gumroad.com/l/agent-workflow-mini-audit" in rendered
     assert "Workflow audit $750" in rendered
     assert "https://nicdunz.gumroad.com/l/agent-workflow-audit" in rendered
     assert "Written audits" in rendered
     assert "no secrets" in rendered
+    assert "no Chrome plugin repair" in rendered
     assert "gated result access" in rendered
 
 

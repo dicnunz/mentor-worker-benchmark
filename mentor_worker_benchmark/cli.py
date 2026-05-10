@@ -46,6 +46,7 @@ from mentor_worker_benchmark.tasks.task_pack_v2.provenance import (
 _SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
 _GIT_HASH_RE = re.compile(r"^[0-9a-f]{7,40}$")
 SUPPORT_RECEIPT_URL = "https://nicdunz.gumroad.com/l/smrimu"
+BROWSER_OPERATOR_OS_URL = "https://nicdunz.gumroad.com/l/agent-browser-operator-os"
 MINI_AUDIT_URL = "https://nicdunz.gumroad.com/l/agent-workflow-mini-audit"
 WORKFLOW_AUDIT_URL = "https://nicdunz.gumroad.com/l/agent-workflow-audit"
 
@@ -1211,9 +1212,21 @@ def cmd_support(args: argparse.Namespace) -> int:
     del args
     print("Support mentor-worker-benchmark:")
     print(f"- Optional $5 Codex run receipt: {SUPPORT_RECEIPT_URL}")
+    print(
+        "- Agent Browser Operator OS for self-serve eval approvals, proof, "
+        f"and handoffs: {BROWSER_OPERATOR_OS_URL}"
+    )
     print(f"- Mini audit for a redacted mentor/worker eval workflow: {MINI_AUDIT_URL}")
     print(f"- Full workflow audit for a redacted eval pipeline: {WORKFLOW_AUDIT_URL}")
-    print("- Redacted configs/results and public repo links only. No secrets, private transcripts, credentials, or call required.")
+    print(
+        "- Redacted configs/results and public repo links only. No secrets, "
+        "private transcripts, credentials, or call required."
+    )
+    print(
+        "- Browser operator kit is self-serve material only: no Chrome plugin repair, "
+        "guaranteed automation, account access, custom setup, calls, or posting "
+        "without human approval."
+    )
     print("- Use it if this benchmark saved eval setup time or helped compare agent runs.")
     return 0
 
